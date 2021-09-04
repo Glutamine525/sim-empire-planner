@@ -57,7 +57,10 @@
     "react-app-polyfill": "^2.0.0",
     "react-dev-utils": "^11.0.3",
     "react-dom": "^17.0.2",
+    "react-redux": "^7.2.4",
     "react-refresh": "^0.8.3",
+    "react-router-dom": "^5.3.0",
+    "redux": "^4.1.1",
     "resolve": "1.18.1",
     "resolve-url-loader": "^3.1.2",
     "sass-loader": "^10.0.5",
@@ -74,9 +77,9 @@
     "workbox-webpack-plugin": "5.1.4"
   },
   "scripts": {
-    "start": "node scripts/start.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js"
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test"
   },
   "eslintConfig": {
     "extends": [
@@ -150,5 +153,13 @@
     "presets": [
       "react-app"
     ]
+  },
+  "devDependencies": {
+    "@types/react-router-dom": "^5.1.8",
+    "babel-plugin-import": "^1.13.3",
+    "customize-cra": "^1.0.0",
+    "less": "^3.13.1",
+    "less-loader": "^5.0.0",
+    "react-app-rewired": "^2.1.8"
   }
 }

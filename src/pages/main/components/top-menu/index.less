@@ -1,0 +1,88 @@
+@import '../../../../var.css';
+
+.wrapper {
+  position: fixed;
+  padding: 0.4rem;
+  width: calc(100% - 0.8rem);
+}
+
+.container {
+  width: 100%;
+  height: 4.2rem;
+  box-sizing: border-box;
+  border: 0.1rem solid var(--border-darker);
+  border-radius: 2rem;
+  padding: 0 2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+
+  transition: border-color 0.3s ease-in-out;
+
+  div,
+  span,
+  strong {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+}
+
+.controller {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+
+  > * {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.operation {
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.counter {
+  font-size: 1.2rem;
+  & > :last-child {
+    font-size: 1.4rem;
+  }
+
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  line-height: 1.6rem;
+
+  strong + span {
+    margin-left: 0.4rem;
+  }
+}
+
+.helper {
+  color: #0fbcf9;
+  border: 0.2rem #0fbcf9 solid;
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  text-align: center;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.version {
+  font-size: 1.2rem;
+  line-height: 1.6rem;
+  text-align: right;
+}

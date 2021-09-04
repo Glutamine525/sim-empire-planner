@@ -1,13 +1,50 @@
-body {
+@font-face {
+  font-family: 'DFPKingGothicGB-Regular';
+  src: url('./fonts/HuaKangJinGangHei-Regular-2.ttf');
+}
+
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  padding: 0;
+}
+
+html {
+  font-size: 10px;
+}
+
+body {
+  font-size: 1.4rem;
+  line-height: 2rem;
+  font-family: 'PingFang SC', 'DFPKingGothicGB-Regular', 'Microsoft Yahei',
+    monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  user-select: none;
+}
+
+body,
+#root {
+  width: 100vw;
+  height: 100vh;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
+}
+
+img {
+  display: block;
+}
+
+@media screen and (min-width: 320px) {
+  html {
+    font-size: 10px;
+  }
+}
+
+@media screen and (min-width: 2000px) {
+  html {
+    font-size: 12px;
+  }
 }
