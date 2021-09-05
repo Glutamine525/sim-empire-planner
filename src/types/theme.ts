@@ -1,6 +1,6 @@
 export type ThemeType = 'Light' | 'Dark';
 
-export const LightColor = {
+export const LightColor: { [key: string]: string } = {
   '--text-primary': '#303133',
   '--text-regular': '#606266',
   '--text-secondary': '#909399',
@@ -13,7 +13,7 @@ export const LightColor = {
   '--background-lighter': '#f5f5f5',
 };
 
-export const DarkColor = {
+export const DarkColor: { [key: string]: string } = {
   '--text-primary': '#f8f8ff',
   '--text-regular': '#c0c0c0',
   '--text-secondary': '#a9a9a9',

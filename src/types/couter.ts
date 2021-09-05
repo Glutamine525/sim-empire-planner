@@ -1,4 +1,4 @@
-export interface Counter {
+export interface CounterType {
   OridinaryHouse: number;
   HighEndHouse: number;
   Barn: number;

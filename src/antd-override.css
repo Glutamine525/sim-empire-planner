@@ -1,0 +1,25 @@
+.light .ant-dropdown-menu {
+  box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%),
+    0 9px 28px 8px rgb(0 0 0 / 5%);
+}
+
+.dark .ant-dropdown-menu {
+  box-shadow: 0 3px 6px -4px rgb(255 255 255 / 12%),
+    0 6px 16px 0 rgb(255 255 255 / 8%), 0 9px 28px 8px rgb(255 255 255 / 5%);
+}
+
+.ant-dropdown-menu,
+.ant-dropdown-menu-item {
+  font-size: 1.4rem;
+  color: var(--text-regular);
+  background: var(--background-lighter);
+}
+
+.ant-dropdown-menu-item:hover {
+  background: var(--background-darker);
+}
+
+.ant-dropdown-arrow {
+  border-color: var(--background-lighter) transparent transparent
+    var(--background-lighter) !important;
+}

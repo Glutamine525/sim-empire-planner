@@ -1,17 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
 import App from './App';
 import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import reducers from './reducers';
+import { ConfigProvider } from 'antd';
+import './var.css';
+import 'antd/dist/antd.variable.min.css';
+import './antd-override.css';
+import './index.css';
 
 let store = createStore(reducers);
+
+export { store };
 
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <App />
+      <ConfigProvider>
+        <App />
+      </ConfigProvider>
     </Provider>
   </React.StrictMode>,
   document.getElementById('root')

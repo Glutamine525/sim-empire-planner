@@ -1,9 +1,7 @@
-@import '../../../../var.css';
-
 .wrapper {
   position: fixed;
   padding: 0.4rem;
-  width: calc(100% - 0.8rem);
+  width: 100%;
 }
 
 .container {
@@ -12,7 +10,7 @@
   box-sizing: border-box;
   border: 0.1rem solid var(--border-darker);
   border-radius: 2rem;
-  padding: 0 2rem;
+  padding: 0 2rem 0 1rem;
 
   display: flex;
   align-items: center;
@@ -42,6 +40,21 @@
   > * {
     display: flex;
     align-items: center;
+  }
+
+  .map-type-label {
+    font-weight: bold;
+    width: 2.4rem;
+    text-align: center;
+    color: var(--ant-primary-color);
+    cursor: pointer;
+  }
+
+  .civil-label {
+    font-weight: bold;
+    margin: 0 0.4rem;
+    color: var(--ant-primary-color);
+    cursor: pointer;
   }
 }
 
@@ -73,8 +86,8 @@
   color: #0fbcf9;
   border: 0.2rem #0fbcf9 solid;
   border-radius: 50%;
-  width: 2rem;
-  height: 2rem;
+  width: 2.4rem;
+  height: 2.4rem;
   text-align: center;
   font-size: 1.8rem;
   font-weight: bold;

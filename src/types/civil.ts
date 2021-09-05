@@ -1,4 +1,18 @@
-export type CivilType = 'China' | 'Persian' | 'Egypt' | 'Greece' | 'Aztec';
+export type CivilType =
+  | 'China'
+  | 'Persian'
+  | 'Egypt'
+  | 'Greece'
+  | 'Aztec'
+  | 'Custom';
+
+export const CivilArray: CivilType[] = [
+  'China',
+  'Persian',
+  'Egypt',
+  'Greece',
+  'Aztec',
+];
 
 export const CivilNameMap: { [key: string]: string } = {
   China: '中国',
