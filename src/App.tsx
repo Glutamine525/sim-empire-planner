@@ -6,7 +6,7 @@ import Setting from '@/pages/setting';
 import TopMenuContainer from '@/components/top-menu';
 import { connect } from 'react-redux';
 import { store } from '.';
-import { InitState } from './types/state';
+import { InitTopMenuState } from './types/state';
 import { ActionType } from './types/action';
 
 interface AppProps {
@@ -22,15 +22,15 @@ const App: FC<AppProps> = (props: AppProps) => {
     ).matches;
     if (isDarkMode) {
       store.dispatch({
-        ...InitState,
+        ...InitTopMenuState,
         type: ActionType.ChangeTheme,
-        theme: 'Dark',
+        theme: ThemeType.Dark,
       });
     }
   }, []);
 
   useEffect(() => {
-    if (Theme === 'Light') {
+    if (Theme === ThemeType.Light) {
       // ConfigProvider.config({
       //   theme: {
       //     primaryColor: '#25b864',

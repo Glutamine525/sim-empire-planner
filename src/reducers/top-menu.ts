@@ -2,6 +2,7 @@ import { ActionType } from '@/types/action';
 import { CivilType } from '@/types/civil';
 import { CounterType } from '@/types/couter';
 import { OperationType } from '@/types/operation';
+import { InitTopMenuState } from '@/types/state';
 import { ThemeType } from '@/types/theme';
 
 interface TopMenuAction {
@@ -17,28 +18,7 @@ interface TopMenuAction {
   counter?: CounterType;
 }
 
-const TopMenu = (
-  state = {
-    isHamActive: false,
-    mapType: 5,
-    civil: 'China',
-    isNoWood: false,
-    theme: 'Light',
-    showMiniMap: true,
-    isMapRotated: false,
-    operation: 'Empty',
-    counter: {
-      OridinaryHouse: 0,
-      HighEndHouse: 0,
-      Barn: 0,
-      Warehouse: 0,
-      Agriculture: 0,
-      Industry: 0,
-      General: 0,
-    },
-  },
-  action: TopMenuAction
-) => {
+const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
   switch (action.type) {
     case ActionType.ClickHamButton:
       return { ...state, isHamActive: action.isHamActive };

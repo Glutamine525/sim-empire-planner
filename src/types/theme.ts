@@ -1,4 +1,7 @@
-export type ThemeType = 'Light' | 'Dark';
+export enum ThemeType {
+  Light = 'Light',
+  Dark = 'Dark',
+}
 
 export const LightColor: { [key: string]: string } = {
   '--text-primary': '#303133',
@@ -24,4 +27,9 @@ export const DarkColor: { [key: string]: string } = {
   '--background-darker': '#161823',
   '--background-base': '#292d3e',
   '--background-lighter': '#353b48',
+};
+
+export const ThemeColor: { [key in ThemeType]: any } = {
+  Light: LightColor,
+  Dark: DarkColor,
 };

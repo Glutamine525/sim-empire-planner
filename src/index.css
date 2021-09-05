@@ -29,6 +29,7 @@ body,
 #root {
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
 code {
@@ -55,4 +56,14 @@ strong {
   html {
     font-size: 12px;
   }
+}
+
+.ps__rail-x,
+.ps__rail-y {
+  z-index: 100;
+}
+
+.ps__thumb-x,
+.ps__thumb-y {
+  cursor: pointer;
 }

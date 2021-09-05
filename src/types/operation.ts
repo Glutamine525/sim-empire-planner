@@ -1,5 +1,3 @@
-export type OperationType = 'Empty';
-
-export const OperationNameMap = {
-  Empty: '无',
-};
+export enum OperationType {
+  Empty = '无',
+}

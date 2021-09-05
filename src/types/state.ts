@@ -2,15 +2,15 @@ import { CivilType } from './civil';
 import { OperationType } from './operation';
 import { ThemeType } from './theme';
 
-export const InitState = {
+export const InitTopMenuState = {
   isHamActive: false,
   mapType: 5,
-  civil: 'China' as CivilType,
+  civil: CivilType.China,
   isNoWood: false,
-  theme: 'Light' as ThemeType,
+  theme: ThemeType.Light,
   showMiniMap: true,
   isMapRotated: false,
-  operation: 'Empty' as OperationType,
+  operation: OperationType.Empty,
   counter: {
     OridinaryHouse: 0,
     HighEndHouse: 0,

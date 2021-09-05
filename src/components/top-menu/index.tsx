@@ -1,8 +1,8 @@
 import Switcher from '@/components/switcher';
 import React, { FC } from 'react';
 import { Link } from 'react-router-dom';
-import { CivilArray, CivilNameMap, CivilType } from '@/types/civil';
-import { OperationNameMap, OperationType } from '@/types/operation';
+import { CivilArray, CivilType } from '@/types/civil';
+import { OperationType } from '@/types/operation';
 import { CounterType } from '@/types/couter';
 import styles from './index.less';
 import { connect } from 'react-redux';
@@ -87,7 +87,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
       }}
     >
       {CivilArray.map(v => {
-        return <Menu.Item key={v}>{CivilNameMap[v]}</Menu.Item>;
+        return <Menu.Item key={v}>{v}</Menu.Item>;
       })}
     </Menu>
   );
@@ -101,7 +101,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   };
 
   const onClickTheme = () => {
-    OnChangeTheme(Theme === 'Dark' ? 'Light' : 'Dark');
+    OnChangeTheme(Theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
   };
 
   const onClickMiniMap = () => {
@@ -131,7 +131,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <span>文明：</span>
             <Dropdown overlay={civilDropdown} placement="bottomCenter" arrow>
               <span className={`ant-dropdown-link ${styles['civil-label']}`}>
-                {CivilNameMap[Civil]}
+                {Civil}
               </span>
             </Dropdown>
           </div>
@@ -149,7 +149,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <Switcher
               id="theme"
               type="daynight"
-              value={Theme === 'Light'}
+              value={Theme === ThemeType.Light}
               onClick={onClickTheme}
             />
           </div>
@@ -174,7 +174,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         </div>
         <div className={styles.operation}>
           <span>当前操作</span>
-          <strong>{OperationNameMap[Operation]}</strong>
+          <strong>{Operation}</strong>
         </div>
         <div className={styles.counter}>
           <div>
