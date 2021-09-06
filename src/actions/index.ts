@@ -1,4 +1,5 @@
 import { ActionType } from '@/types/action';
+import { Building } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import { CounterType } from '@/types/couter';
 import { OperationType } from '@/types/operation';
@@ -53,10 +54,16 @@ export const rotateMap = (isMapRotated: boolean) => {
   };
 };
 
-export const changeOperation = (operation: OperationType) => {
+export const changeOperation = (
+  operation: OperationType,
+  operationSub: string,
+  buildingConfig: Building
+) => {
   return {
     type: ActionType.ChangeOperation,
     operation,
+    operationSub,
+    buildingConfig,
   };
 };
 

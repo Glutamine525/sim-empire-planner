@@ -25,3 +25,5 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
+
+// setInterval(() => console.log(store.getState()), 1000);

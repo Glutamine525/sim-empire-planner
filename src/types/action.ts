@@ -1,4 +1,5 @@
 export enum ActionType {
+  Empty,
   ClickHamButton,
   ChangeMapType,
   ChangeCivil,

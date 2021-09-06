@@ -6,8 +6,8 @@ import Setting from '@/pages/setting';
 import TopMenuContainer from '@/components/top-menu';
 import { connect } from 'react-redux';
 import { store } from '.';
-import { InitTopMenuState } from './types/state';
-import { ActionType } from './types/action';
+import { InitLeftMenuState, InitTopMenuState } from '@/types/state';
+import { ActionType } from '@/types/action';
 
 interface AppProps {
   Theme: ThemeType;
@@ -23,6 +23,7 @@ const App: FC<AppProps> = (props: AppProps) => {
     if (isDarkMode) {
       store.dispatch({
         ...InitTopMenuState,
+        ...InitLeftMenuState,
         type: ActionType.ChangeTheme,
         theme: ThemeType.Dark,
       });

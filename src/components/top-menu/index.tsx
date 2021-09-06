@@ -28,6 +28,7 @@ interface TopMenuProps {
   ShowMiniMap: boolean;
   IsMapRotated: boolean;
   Operation: OperationType;
+  OperationSub: string;
   Counter: CounterType;
   OnClickHamButton: any;
   OnChangeMapType: any;
@@ -48,6 +49,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
     ShowMiniMap,
     IsMapRotated,
     Operation,
+    OperationSub,
     Counter,
     OnClickHamButton,
     OnChangeMapType,
@@ -174,7 +176,9 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         </div>
         <div className={styles.operation}>
           <span>当前操作</span>
-          <strong>{Operation}</strong>
+          <strong>{`${Operation}${
+            OperationSub ? ' ' + OperationSub : ''
+          }`}</strong>
         </div>
         <div className={styles.counter}>
           <div>
@@ -244,7 +248,8 @@ const mapStateToProps = (state: any) => {
     Theme: state.TopMenu.theme,
     ShowMiniMap: state.TopMenu.showMiniMap,
     IsMapRotated: state.TopMenu.isMapRotated,
-    Operation: state.TopMenu.operation,
+    Operation: state.LeftMenu.operation,
+    OperationSub: state.LeftMenu.operationSub,
     Counter: state.TopMenu.counter,
   };
 };

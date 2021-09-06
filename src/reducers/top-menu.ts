@@ -1,22 +1,5 @@
 import { ActionType } from '@/types/action';
-import { CivilType } from '@/types/civil';
-import { CounterType } from '@/types/couter';
-import { OperationType } from '@/types/operation';
-import { InitTopMenuState } from '@/types/state';
-import { ThemeType } from '@/types/theme';
-
-interface TopMenuAction {
-  type: ActionType;
-  isHamActive?: boolean;
-  mapType?: number;
-  civil?: CivilType;
-  isNoWood?: boolean;
-  theme?: ThemeType;
-  showMiniMap?: boolean;
-  isMapRotated?: boolean;
-  operation?: OperationType;
-  counter?: CounterType;
-}
+import { InitTopMenuState, TopMenuAction } from '@/types/state';
 
 const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
   switch (action.type) {
@@ -34,8 +17,6 @@ const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
       return { ...state, showMiniMap: action.showMiniMap };
     case ActionType.RotateMap:
       return { ...state, isMapRotated: action.isMapRotated };
-    case ActionType.ChangeOperation:
-      return { ...state, operation: action.operation };
     case ActionType.ChangeCounter:
       return { ...state, counter: action.counter };
     default:
