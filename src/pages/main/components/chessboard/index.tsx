@@ -1,14 +1,33 @@
 import PerfectScrollbar from 'perfect-scrollbar';
 import { ThemeColor, ThemeType } from '@/types/theme';
 import { getBuildingKey, isInRange } from '@/utils/chessboard';
-import { getFontSize, LENGTH } from '@/utils/config';
-import React, { MouseEventHandler, useEffect, useRef, useState } from 'react';
+import { LENGTH } from '@/utils/config';
+import React, {
+  MouseEventHandler,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { connect } from 'react-redux';
 import styles from './index.less';
-import { getScreenSize } from '@/utils/screen';
+import {
+  getScreenSize,
+  changeFontSize,
+  getFontSize,
+  DEFAULT_SIZE,
+  getCoord,
+} from '@/utils/browser';
 import { OperationType } from '@/types/operation';
-import { Building, CivilBuilding } from '@/types/building';
+import {
+  BorderStyleType,
+  Building,
+  CatalogType,
+  CivilBuilding,
+  MarkerColor,
+} from '@/types/building';
 import { CivilType } from '@/types/civil';
+import { getBuildingImage, getMarkerImage } from '@/utils/screenshot';
 
 interface ChessboardProps {
   Civil: CivilType;
@@ -22,30 +41,110 @@ const initDragConfig = {
   initY: -1,
 };
 
+const initMoveConfig = {
+  line: -1,
+  column: -1,
+  offsetLine: -1,
+  offsetColumn: -1,
+};
+
+const testBuildingConfig = {
+  Line: 0,
+  Column: 0,
+  Name: '道路',
+  Text: '路',
+  Range: 0,
+  Marker: 0,
+  Catalog: CatalogType.Road,
+  IsFixed: false,
+  IsBarrier: false,
+  IsRoad: true,
+  IsProtection: false,
+  IsWonder: false,
+  IsDecoration: false,
+  IsGeneral: false,
+  // css
+  Width: 1,
+  Height: 1,
+  Color: 'black',
+  FontSize: 1.4,
+  Background: '#fdfebd',
+  BorderColor: 'var(--border-base)',
+  BorderWidth: 0.1,
+  BorderTStyle: BorderStyleType.Solid,
+  BorderRStyle: BorderStyleType.Solid,
+  BorderBStyle: BorderStyleType.Solid,
+  BorderLStyle: BorderStyleType.Solid,
+};
+
 const Chessboard = (props: ChessboardProps) => {
   const { Civil, Theme, Operation, BuildingConfig } = props;
 
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
-  const [buildings, setBuildings] = useState([] as Building[]);
+  const [moveConfig, setMoveConfig] = useState({ ...initMoveConfig });
+  const [buildingMarker, setBuildingMarker] = useState(0);
 
   const wrapperOuterRef = useRef(null);
   const wrapperIuterRef = useRef(null);
-  const canvasRef = useRef(null);
+  const cellCanvasRef = useRef(null);
+  const buildingCanvasRef = useRef(null);
+  const markerCanvasRef = useRef(null);
+
+  const protectionNum = useMemo<number>(
+    () => CivilBuilding[Civil]['防'].length,
+    [Civil]
+  );
+  const buildingBuffer = useMemo(
+    () => getBuildingImage(BuildingConfig),
+    [BuildingConfig]
+  );
+  const markerBuffer = useMemo(() => {
+    return {
+      [MarkerColor.Normal]: Array.from(Array(20), (_, k) => k).map(v =>
+        getMarkerImage(v, MarkerColor.Normal)
+      ),
+      [MarkerColor.Safe]: [0, 1, 2, 3, 4, 5].map(v =>
+        getMarkerImage(v, MarkerColor.Safe)
+      ),
+      [MarkerColor.Danger]: [0, 1, 2, 3, 4, 5].map(v =>
+        getMarkerImage(v, MarkerColor.Danger)
+      ),
+    };
+  }, []);
 
   useEffect(() => {
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
       wheelSpeed: 1,
     });
+    const updateScroll = () => scroll.update();
+    updateScroll();
     const [W, H] = getWrapperSize();
     const [w, h] = getScreenSize();
     setScrollTop((H - h) / 2);
     setScrollLeft((W - w) / 2);
-    window.addEventListener('resize', () => scroll.update());
+    window.addEventListener('resize', updateScroll);
+
+    // (async () => {
+    //   const buildingImg = await getBuildingImage(testBuildingConfig);
+    //   const markerImg = await getMarkerImage(100, MarkerColor.Danger);
+    //   let count = 0;
+    //   console.time('[TEST] Painting Building');
+    //   for (let i = 1; i <= LENGTH; i++) {
+    //     for (let j = 1; j <= LENGTH; j++) {
+    //       if (isInRange(i, j)) {
+    //         testPlaceBuilding(buildingImg, markerImg, i, j);
+    //         count++;
+    //       }
+    //     }
+    //   }
+    //   console.timeEnd('[TEST] Painting Building');
+    // })();
   }, []);
 
   useEffect(() => {
-    const canvas: any = canvasRef.current;
+    console.time('Painting Cell');
+    const canvas: any = cellCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     // Boundary
@@ -58,66 +157,115 @@ const Chessboard = (props: ChessboardProps) => {
     ctx.closePath();
     ctx.fill();
     // Cell
-    ctx.lineWidth = 1;
     ctx.strokeStyle = ThemeColor[Theme]['--border-lighter'];
     ctx.fillStyle = ThemeColor[Theme]['--background-lighter'];
-    const offset = 0.5;
-    for (let li = 1; li <= LENGTH; li++) {
-      for (let co = 1; co <= LENGTH; co++) {
+    ctx.lineWidth = 1;
+    let offset = 0.5;
+    for (let li = 1; li <= 116; li++) {
+      for (let co = 1; co <= 116; co++) {
         if (isInRange(li, co)) {
-          const x = co * 30 - 30 + offset;
-          const y = li * 30 - 30 + offset;
+          let x = co * 30 - 30 + offset;
+          let y = li * 30 - 30 + offset;
           ctx.strokeRect(x, y, 29, 29);
           ctx.fillRect(x + 0.5, y + 0.5, 28, 28);
         }
       }
     }
+    console.timeEnd('Painting Cell');
   }, [Theme]);
 
+  // useEffect(() => {
+  //   if (!Object.keys(BuildingConfig).length) return;
+  //   (async () => {
+  //     setBuildingImage(await getBuildingImage(BuildingConfig));
+  //   })();
+  // }, [BuildingConfig]);
+
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
-    if (Operation !== OperationType.Empty) return;
-    const { clientX, clientY } = event;
     setIsDragging(true);
-    setDragConfig({
-      initX: getScrollLeft() + clientX,
-      initY: getScrollTop() + clientY,
-    });
+    switch (Operation) {
+      case OperationType.Empty:
+        const { clientX, clientY } = event;
+        setDragConfig({
+          initX: getScrollLeft() + clientX,
+          initY: getScrollTop() + clientY,
+        });
+        break;
+      case OperationType.Placing:
+        const { line, offsetLine, column, offsetColumn } = moveConfig;
+        placeBuilding(line - offsetLine, column - offsetColumn);
+        break;
+      default:
+        break;
+    }
   };
 
   const onWrapperMouseMove: MouseEventHandler<HTMLDivElement> = event => {
-    if (!isDragging) return;
-    const { initX, initY } = dragConfig;
-    const { clientX, clientY } = event;
-    setScrollLeft(initX - clientX);
-    setScrollTop(initY - clientY);
+    const { pageX, pageY, clientX, clientY } = event;
+    const [offsetX, offsetY] = [
+      pageX + getScrollLeft() - 86,
+      pageY + getScrollTop() - 80,
+    ];
+    const { line, column } = getCoord(offsetX, offsetY);
+    switch (Operation) {
+      case OperationType.Empty:
+        if (!isDragging) return;
+        const { initX, initY } = dragConfig;
+        setScrollLeft(initX - clientX);
+        setScrollTop(initY - clientY);
+        break;
+      case OperationType.Placing:
+        const [offsetLine, offsetColumn] = [
+          Math.floor((BuildingConfig.Height - 1) / 2),
+          Math.floor((BuildingConfig.Width - 1) / 2),
+        ];
+        setMoveConfig({ line, offsetLine, column, offsetColumn });
+        if (!isDragging) return;
+        placeBuilding(line - offsetLine, column - offsetColumn);
+        break;
+      default:
+        break;
+    }
   };
 
   const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = event => {
     setIsDragging(false);
   };
 
-  const onBuildingContainerMouseDown: MouseEventHandler<HTMLDivElement> =
-    event => {
-      const {
-        nativeEvent: { offsetX, offsetY },
-      } = event;
-      const fontSize = getFontSize();
-      console.log({ fontSize, offsetX, offsetY });
+  const testPlaceBuilding = async (
+    building: HTMLImageElement,
+    marker: HTMLImageElement,
+    line: number,
+    column: number
+  ) => {
+    const canvas: any = buildingCanvasRef.current;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.drawImage(building, (column - 1) * 30 * 4, (line - 1) * 30 * 4);
+    ctx.drawImage(marker, (column - 1) * 30 * 4, (line - 1) * 30 * 4);
+  };
 
-      if (Operation === OperationType.Placing) {
-        setBuildings(buildings => {
-          return [
-            ...buildings,
-            {
-              ...BuildingConfig,
-              Line: 60,
-              Column: 60,
-            },
-          ];
-        });
-        return;
-      }
-    };
+  const placeBuilding = async (line: number, column: number) => {
+    if (Operation !== OperationType.Placing) return;
+    let canvas: any = buildingCanvasRef.current;
+    let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.drawImage(
+      await buildingBuffer,
+      (column - 1) * 30 * 4,
+      (line - 1) * 30 * 4
+    );
+    canvas = markerCanvasRef.current;
+    ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    let markerColor: MarkerColor =
+      buildingMarker >= protectionNum ? MarkerColor.Safe : MarkerColor.Danger;
+    markerColor = BuildingConfig.IsRoad ? MarkerColor.Normal : markerColor;
+    console.log(BuildingConfig, markerColor);
+
+    ctx.drawImage(
+      await markerBuffer[markerColor][buildingMarker],
+      (column - 1) * 30 * 4,
+      (line - 1) * 30 * 4
+    );
+  };
 
   const getScrollLeft = () => (wrapperOuterRef.current as any).scrollLeft;
 
@@ -143,57 +291,70 @@ const Chessboard = (props: ChessboardProps) => {
       <div
         ref={wrapperIuterRef}
         className={styles['wrapper-inner']}
-        onMouseDown={onWrapperMouseDown}
-        onMouseMove={onWrapperMouseMove}
-        onMouseUp={onWrapperMouseUp}
+        onMouseDownCapture={onWrapperMouseDown}
+        onMouseMoveCapture={onWrapperMouseMove}
+        onMouseUpCapture={onWrapperMouseUp}
       >
         <div className={styles.container}>
           <canvas
-            ref={canvasRef}
+            ref={cellCanvasRef}
             width={3480}
             height={3480}
             className={styles.canvas}
           ></canvas>
+          <canvas
+            ref={buildingCanvasRef}
+            width={13920}
+            height={13920}
+            className={`${styles.canvas} ${styles['canvas-building']}`}
+          ></canvas>
+          <canvas
+            ref={markerCanvasRef}
+            width={13920}
+            height={13920}
+            className={`${styles.canvas} ${styles['canvas-marker']}`}
+          ></canvas>
           <div
-            className={styles['building-container']}
-            onMouseDown={onBuildingContainerMouseDown}
+            id="building-preview"
+            className={styles['building-preview']}
+            style={{
+              display: Operation === OperationType.Placing ? 'flex' : 'none',
+              width: `${BuildingConfig.Width * 3}rem`,
+              height: `${BuildingConfig.Height * 3}rem`,
+              // top: `${(BuildingConfig.Line - 1) * 3}rem`,
+              // left: `${(BuildingConfig.Column - 1) * 3}rem`,
+              // top: `${58 * 3}rem`,
+              // left: `${58 * 3}rem`,
+              color: BuildingConfig.Color,
+              fontSize: `${BuildingConfig.FontSize}rem`,
+              background: BuildingConfig.Background,
+              borderWidth: `${BuildingConfig.BorderWidth}rem`,
+              borderColor: BuildingConfig.BorderColor,
+              borderTopStyle: BuildingConfig.BorderTStyle,
+              borderRightStyle: BuildingConfig.BorderRStyle,
+              borderBottomStyle: BuildingConfig.BorderBStyle,
+              borderLeftStyle: BuildingConfig.BorderLStyle,
+              transform: `translate(${
+                (moveConfig.column - moveConfig.offsetColumn - 1) * 3
+              }rem,${(moveConfig.line - moveConfig.offsetLine - 1) * 3}rem)`,
+              transition:
+                Operation === OperationType.Placing
+                  ? 'transform 30ms ease-in-out'
+                  : '',
+            }}
           >
-            {buildings.map(building => {
-              return (
-                <div
-                  key={getBuildingKey(building)}
-                  className={styles.building}
-                  style={{
-                    width: `${building.Width * 3}rem`,
-                    height: `${building.Height * 3}rem`,
-                    top: `${building.Line * 3}rem`,
-                    left: `${building.Column * 3}rem`,
-                    color: building.Color,
-                    fontSize: `${building.FontSize}rem`,
-                    background: building.Background,
-                    borderWidth: building.BorderWidth,
-                    borderColor: building.BorderColor,
-                    borderTopStyle: building.BorderTStyle,
-                    borderRightStyle: building.BorderRStyle,
-                    borderBottomStyle: building.BorderBStyle,
-                    borderLeftStyle: building.BorderLStyle,
-                  }}
-                >
-                  <div className={styles.text}>{building.Text}</div>
-                  <div
-                    className={styles.marker}
-                    style={{
-                      color:
-                        CivilBuilding[Civil]['防'].length <= building.Marker
-                          ? 'var(--ant-success-color)'
-                          : 'var(--ant-error-color)',
-                    }}
-                  >
-                    {building.Marker}
-                  </div>
-                </div>
-              );
-            })}
+            {BuildingConfig.Text}
+            <div
+              className={styles.marker}
+              style={{
+                color:
+                  protectionNum <= buildingMarker
+                    ? 'var(--ant-success-color)'
+                    : 'var(--ant-error-color)',
+              }}
+            >
+              {buildingMarker}
+            </div>
           </div>
         </div>
       </div>

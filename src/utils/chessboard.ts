@@ -10,7 +10,14 @@ export function isInRange(li: number, co: number) {
   return true;
 }
 
-export function getBuildingKey(building: Building) {
-  const { Line, Column, Width, Height } = building;
+export function getBuildingKey(
+  building: Building,
+  line?: number,
+  column?: number
+) {
+  const { Width, Height } = building;
+  let { Line, Column } = building;
+  Line = line ? line : Line;
+  Column = column ? column : Column;
   return `${Line}-${Column}-${Width}` + (Width === Height ? '' : `-${Height}`);
 }

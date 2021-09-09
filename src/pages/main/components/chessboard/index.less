@@ -9,6 +9,7 @@
   width: calc(348rem + 5.6rem + 3rem + 3rem);
   height: calc(348rem + 5rem + 3rem + 3rem);
   padding: 8rem 3rem 3rem 8.6rem;
+  will-change: transform;
 }
 
 .container {
@@ -22,6 +23,18 @@
   height: 100%;
 }
 
+.canvas-building {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.canvas-marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .building-container {
   position: absolute;
   top: 0;
@@ -30,21 +43,17 @@
   height: 348rem;
 }
 
-.building {
+.building-preview {
   position: absolute;
+  top: 0;
+  left: 0;
   box-sizing: border-box;
   display: flex;
   justify-content: center;
   align-items: center;
+  font-family: 'PingFang SC', 'Microsoft Yahei', monospace;
   font-weight: bold;
   text-shadow: white 0 0.1rem 1rem;
-  transition: border-color 0.3s ease-in-out, color 0.3s ease-in-out;
-
-  .text {
-    text-overflow: ellipsis;
-    overflow: hidden;
-    white-space: nowrap;
-  }
 
   .marker {
     position: absolute;

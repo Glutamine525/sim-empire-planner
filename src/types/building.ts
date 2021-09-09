@@ -3,12 +3,12 @@ import { BuildingPersian } from './building-persian';
 import { CivilType } from './civil';
 
 export const CivilBuilding: { [key in CivilType]: any } = {
-  中国: BuildingChina,
-  波斯: BuildingPersian,
-  埃及: undefined,
-  希腊: undefined,
-  阿兹特克: undefined,
-  自定义: undefined,
+  [CivilType.China]: BuildingChina,
+  [CivilType.Persian]: BuildingPersian,
+  [CivilType.Egypt]: undefined,
+  [CivilType.Greece]: undefined,
+  [CivilType.Aztec]: undefined,
+  [CivilType.Custom]: undefined,
 };
 
 export enum CatalogType {
@@ -64,4 +64,10 @@ export interface Building {
   BorderRStyle: BorderStyleType;
   BorderBStyle: BorderStyleType;
   BorderLStyle: BorderStyleType;
+}
+
+export enum MarkerColor {
+  Normal = 'black',
+  Danger = 'var(--ant-error-color)',
+  Safe = 'var(--ant-success-color)',
 }

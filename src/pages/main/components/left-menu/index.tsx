@@ -142,7 +142,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       Color: building.color,
       FontSize: 1.4,
       Background: building.background,
-      BorderColor: 'var(--border-base)',
+      BorderColor: 'black',
       BorderWidth: 0.1,
       BorderTStyle: BorderStyleType.Solid,
       BorderRStyle: BorderStyleType.Solid,
