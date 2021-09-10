@@ -73,3 +73,11 @@ export const changeCounter = (counter: CounterType) => {
     counter,
   };
 };
+
+export const placeOrDeleteBuilding = (building: Building, diff: number) => {
+  return {
+    type: ActionType.PlaceOrDeleteBuilding,
+    building,
+    diff,
+  };
+};

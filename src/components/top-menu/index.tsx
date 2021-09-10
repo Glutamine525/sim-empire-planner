@@ -219,9 +219,16 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             </div>
           </div>
           <div>
-            <span>通用：</span>
-            <strong>{Counter.General}</strong>
-            <span>个</span>
+            <div>
+              <span>通用：</span>
+              <strong>{Counter.General}</strong>
+              <span>个</span>
+            </div>
+            <div>
+              <span>总计：</span>
+              <strong>{Counter.Total}</strong>
+              <span>个</span>
+            </div>
           </div>
         </div>
         <div className={styles.helper}>?</div>
@@ -251,7 +258,7 @@ const mapStateToProps = (state: any) => {
     IsMapRotated: state.TopMenu.isMapRotated,
     Operation: state.LeftMenu.operation,
     OperationSub: state.LeftMenu.operationSub,
-    Counter: state.TopMenu.counter,
+    Counter: state.Chessboard.counter,
   };
 };
 

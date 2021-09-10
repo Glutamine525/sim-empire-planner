@@ -64,3 +64,13 @@ export function parseBuildingKey(key: string) {
   if (data.length === 3) data.push(data[2]);
   return data;
 }
+
+export function showMarker(building: Building) {
+  return !(
+    building.IsRoad ||
+    building.IsBarrier ||
+    building.IsProtection ||
+    building.IsWonder ||
+    building.IsDecoration
+  );
+}

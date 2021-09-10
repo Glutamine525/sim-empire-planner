@@ -16,6 +16,8 @@ interface RangeProps {
 export default function Range(props: RangeProps) {
   const { Size, Line, Column, Width, Height, Color, Operation } = props;
 
+  if (Size < 4) return null;
+
   return (
     <div
       className={styles.container}

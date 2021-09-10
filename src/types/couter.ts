@@ -6,4 +6,6 @@ export interface CounterType {
   Agriculture: number;
   Industry: number;
   General: number;
+  Total: number;
+  Road: number;
 }

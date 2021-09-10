@@ -17,8 +17,6 @@ const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
       return { ...state, showMiniMap: action.showMiniMap };
     case ActionType.RotateMap:
       return { ...state, isMapRotated: action.isMapRotated };
-    case ActionType.ChangeCounter:
-      return { ...state, counter: action.counter };
     default:
       return state;
   }

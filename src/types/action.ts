@@ -9,4 +9,5 @@ export enum ActionType {
   RotateMap,
   ChangeOperation,
   ChangeCounter,
+  PlaceOrDeleteBuilding,
 }

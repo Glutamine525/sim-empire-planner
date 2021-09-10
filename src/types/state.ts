@@ -14,7 +14,6 @@ export interface TopMenuAction {
   theme: ThemeType;
   showMiniMap: boolean;
   isMapRotated: boolean;
-  counter: CounterType;
 }
 
 export const InitTopMenuState: TopMenuAction = {
@@ -26,15 +25,6 @@ export const InitTopMenuState: TopMenuAction = {
   theme: ThemeType.Light,
   showMiniMap: true,
   isMapRotated: false,
-  counter: {
-    OridinaryHouse: 0,
-    HighEndHouse: 0,
-    Barn: 0,
-    Warehouse: 0,
-    Agriculture: 0,
-    Industry: 0,
-    General: 0,
-  },
 };
 
 export interface LeftMenuAction {
@@ -51,7 +41,32 @@ export const InitLeftMenuState: LeftMenuAction = {
   buildingConfig: {} as any,
 };
 
-export const InitState: TopMenuAction & LeftMenuAction = {
+export interface ChessboardAction {
+  type: ActionType;
+  building: Building;
+  diff: number;
+  counter: CounterType;
+}
+
+export const InitChessboardState: ChessboardAction = {
+  type: ActionType.Empty,
+  building: {} as any,
+  diff: 1,
+  counter: {
+    OridinaryHouse: 0,
+    HighEndHouse: 0,
+    Barn: 0,
+    Warehouse: 0,
+    Agriculture: 0,
+    Industry: 0,
+    General: 0,
+    Total: 0,
+    Road: 0,
+  },
+};
+
+export const InitState: TopMenuAction & LeftMenuAction & ChessboardAction = {
   ...InitTopMenuState,
   ...InitLeftMenuState,
+  ...InitChessboardState,
 };
