@@ -1,5 +1,5 @@
 import { Building, MarkerColor } from '@/types/building';
-import { $, DEFAULT_SIZE } from './browser';
+import { DEFAULT_SIZE } from './browser';
 
 export const RATIO = 4;
 
@@ -32,6 +32,10 @@ export async function getBuildingImage(building: Building) {
   div.style.textShadow = 'white 0 1px 10px';
   div.style.transform = `scale(${RATIO}00%)`;
   div.style.transformOrigin = 'top left';
+  if (building.IsRoad) {
+    div.style.backgroundImage =
+      'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAIAAAC0Ujn1AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAEXRFWHRTb2Z0d2FyZQBTbmlwYXN0ZV0Xzt0AAAE6SURBVEiJ7VVLEsIwCAWuUZe297+A9+g0LvUYLS4YkeHTVN24MJsyvPBCII/iPM8AME73tgxiwHNZzwcortulLQMiMrPFZF3biZnFjqgwVrEkH4136zzeKl51prwAQNd20k1ip3mJEe9kt3lqPXOc7sxsN2kFJXcX35ZBYm25LYrrdvEuxPN4i52Ruuv9XB1iVz21Pb/q20GUoFhV3xBxB7WGp9aT087A8y2lqHNSxKrOiEfQ+GZsrNjk0nSXcg9GUfdmYuxLjZYuzcXy6trX6qsgO51JeaGnVbJ5RdilnzorrZKembJr3yJ7V6uJGvV2rg77UzRqNVdj1bdv1Si1O6K3iFqtJmo8orcKtbFkZ7TO7q7eInuMJZ3ROn9la1dvDo2x/3+jp/7/G3/03/iWVint20G9RV4b+wB4s+9T4iL+igAAAABJRU5ErkJggg==)';
+  }
   document.documentElement.append(div);
   const html = `
     <svg width="${Width * size}" height="${Height * size}" xmlns="${SVG_XMLNS}">
@@ -87,11 +91,11 @@ export async function getMarkerImage(marker: number, color: MarkerColor) {
       </foreignObject>
     </svg>`;
 
-  const svg = new Blob([html], {
-    type: 'image/svg+xml;charset=utf-8',
-  });
-  const url = window.URL.createObjectURL(svg);
-  console.log(url);
+  // const svg = new Blob([html], {
+  //   type: 'image/svg+xml;charset=utf-8',
+  // });
+  // const url = window.URL.createObjectURL(svg);
+  // console.log(url);
 
   let img = new Image();
   img.src =

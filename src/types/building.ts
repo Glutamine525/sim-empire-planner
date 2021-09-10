@@ -38,8 +38,6 @@ export enum BorderStyleType {
 }
 
 export interface Building {
-  Line: number;
-  Column: number;
   Name: string;
   Text: string;
   Range: number;

@@ -50,3 +50,8 @@ export const InitLeftMenuState: LeftMenuAction = {
   operationSub: '',
   buildingConfig: {} as any,
 };
+
+export const InitState: TopMenuAction & LeftMenuAction = {
+  ...InitTopMenuState,
+  ...InitLeftMenuState,
+};

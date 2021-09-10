@@ -18,6 +18,7 @@ import {
 import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu } from 'antd';
 import HamButton from '@/components/ham-button';
+import { MINOR_PATCH, VERSION } from '@/utils/config';
 
 interface TopMenuProps {
   IsHamActive: boolean;
@@ -227,7 +228,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         <div className={styles.version}>
           <div>
             <span>模拟帝国地图编辑器 </span>
-            <strong>V2.6.0</strong>
+            <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
           </div>
           <div>
             <span>作者：</span>

@@ -63,6 +63,34 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
         ],
       },
     });
+
+    document.addEventListener('keydown', event => {
+      const { key, ctrlKey } = event;
+      let keyPath: string[];
+      let building: any;
+      switch (key) {
+        case ' ':
+          event.preventDefault();
+          OnChangeOperation(OperationType.Empty, '', {} as any);
+          return;
+        case 'a':
+          keyPath = ['道路'];
+          building = {
+            name: '道路',
+            text: '',
+            size: 1,
+            range: 0,
+            color: BuildingColor.Black,
+            background: '#fdfebd',
+            isRoad: true,
+          };
+          break;
+        default:
+          return;
+      }
+      building && dispatchBuilding(keyPath!, building);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -83,6 +111,39 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       ...newCatalog,
     }));
   }, [Civil]);
+
+  const dispatchBuilding = (keyPath: string[], building: any) => {
+    OnChangeOperation(OperationType.Placing, keyPath.join('-'), {
+      Name: building.name,
+      Text: building.text,
+      Range: building.range,
+      Marker: 0,
+      Catalog: keyPath[0] as CatalogType,
+      IsFixed: false,
+      IsBarrier: false,
+      IsRoad: building.isRoad,
+      IsProtection:
+        keyPath[0] === CatalogType.Municipal &&
+        CivilBuilding[Civil]['防护'].includes(building.name),
+      IsWonder:
+        keyPath[0] === CatalogType.Wonder ||
+        typeof building.isPalace !== 'undefined',
+      IsDecoration: keyPath[0] === CatalogType.Decoration,
+      IsGeneral: keyPath[0] === CatalogType.General,
+      // css
+      Width: building.size,
+      Height: building.size,
+      Color: building.color,
+      FontSize: 1.4,
+      Background: building.background,
+      BorderColor: 'black',
+      BorderWidth: 0.1,
+      BorderTStyle: BorderStyleType.Solid,
+      BorderRStyle: BorderStyleType.Solid,
+      BorderBStyle: BorderStyleType.Solid,
+      BorderLStyle: BorderStyleType.Solid,
+    });
+  };
 
   const onClick = (e: any) => {
     console.log('[on click left menu]', e);
@@ -119,36 +180,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       );
       building = { ...building, isRoad: false };
     }
-    OnChangeOperation(OperationType.Placing, e.keyPath.join('-'), {
-      Line: 0,
-      Column: 0,
-      Name: building.name,
-      Text: building.text,
-      Range: building.range,
-      Marker: 0,
-      Catalog: e.keyPath[0] as CatalogType,
-      IsFixed: false,
-      IsBarrier: false,
-      IsRoad: building.isRoad,
-      IsProtection:
-        e.keyPath[0] === CatalogType.Municipal &&
-        CivilBuilding[Civil]['防护'].includes(building.name),
-      IsWonder: e.keyPath[0] === CatalogType.Wonder || building.isPalace,
-      IsDecoration: e.keyPath[0] === CatalogType.Decoration,
-      IsGeneral: e.keyPath[0] === CatalogType.General,
-      // css
-      Width: building.size,
-      Height: building.size,
-      Color: building.color,
-      FontSize: 1.4,
-      Background: building.background,
-      BorderColor: 'black',
-      BorderWidth: 0.1,
-      BorderTStyle: BorderStyleType.Solid,
-      BorderRStyle: BorderStyleType.Solid,
-      BorderBStyle: BorderStyleType.Solid,
-      BorderLStyle: BorderStyleType.Solid,
-    });
+    dispatchBuilding(e.keyPath, building);
   };
 
   const onMouseEnter = () => {
