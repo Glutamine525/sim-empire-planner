@@ -8,6 +8,8 @@ export enum ActionType {
   ChangeMiniMap,
   RotateMap,
   ChangeOperation,
+  ResetCouter,
   ChangeCounter,
   PlaceOrDeleteBuilding,
+  SetCopiedBuilding,
 }

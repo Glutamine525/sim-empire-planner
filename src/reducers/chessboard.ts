@@ -4,6 +4,21 @@ import { InitChessboardState, ChessboardAction } from '@/types/state';
 
 const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
   switch (action.type) {
+    case ActionType.ResetCouter:
+      return {
+        ...state,
+        counter: {
+          OridinaryHouse: 0,
+          HighEndHouse: 0,
+          Barn: 0,
+          Warehouse: 0,
+          Agriculture: 0,
+          Industry: 0,
+          General: 0,
+          Total: 0,
+          Road: 0,
+        },
+      };
     case ActionType.PlaceOrDeleteBuilding:
       let { counter } = state;
       const { building, diff } = action;
@@ -21,6 +36,11 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
         counter.Agriculture += diff;
       if (building.Catalog === CatalogType.Industry) counter.Industry += diff;
       return { ...state, counter: { ...counter } };
+    case ActionType.SetCopiedBuilding:
+      return {
+        ...state,
+        copiedBuilding: action.copiedBuilding,
+      };
     default:
       return state;
   }

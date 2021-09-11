@@ -4,6 +4,7 @@ import React from 'react';
 import styles from './index.less';
 
 interface RangeProps {
+  Show: boolean;
   Size: number;
   Line: number;
   Column: number;
@@ -14,9 +15,9 @@ interface RangeProps {
 }
 
 export default function Range(props: RangeProps) {
-  const { Size, Line, Column, Width, Height, Color, Operation } = props;
+  const { Show, Size, Line, Column, Width, Height, Color, Operation } = props;
 
-  if (Size < 4) return null;
+  if (!Show) return null;
 
   return (
     <div

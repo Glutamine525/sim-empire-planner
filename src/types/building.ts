@@ -1,4 +1,5 @@
 import { BuildingChina } from './building-china';
+import { BuildingColor } from './building-color';
 import { BuildingPersian } from './building-persian';
 import { CivilType } from './civil';
 
@@ -37,6 +38,63 @@ export enum BorderStyleType {
   None = 'none',
 }
 
+export enum BarrierType {
+  Tree = 'tree',
+  Water = 'water',
+  Mountain = 'mountain',
+}
+
+export const BarrierColor = {
+  [BarrierType.Tree]: '#92d050',
+  [BarrierType.Water]: '#0070c0',
+  [BarrierType.Mountain]: '#808080',
+};
+
+export enum FixedBuildingType {
+  Road = 'road',
+  Stone = 'stone',
+  Copper = 'copper',
+  Wood = 'wood',
+  Clay = 'clay',
+  Wharf = 'wharf',
+}
+
+export const FixedBuildingColor = {
+  [FixedBuildingType.Road]: '',
+  [FixedBuildingType.Stone]: '#d9d9d9',
+  [FixedBuildingType.Copper]: '#ffd966',
+  [FixedBuildingType.Wood]: '#00b050',
+  [FixedBuildingType.Clay]: '#ed7d31',
+  [FixedBuildingType.Wharf]: '#00b0f0',
+};
+
+export const FixedBuildingText = {
+  [FixedBuildingType.Road]: '',
+  [FixedBuildingType.Stone]: '采石场',
+  [FixedBuildingType.Copper]: '铜矿场',
+  [FixedBuildingType.Wood]: '伐木场',
+  [FixedBuildingType.Clay]: '粘土矿',
+  [FixedBuildingType.Wharf]: '码头',
+};
+
+export const FixedBuildingSize = {
+  [FixedBuildingType.Road]: 1,
+  [FixedBuildingType.Stone]: 2,
+  [FixedBuildingType.Copper]: 2,
+  [FixedBuildingType.Wood]: 2,
+  [FixedBuildingType.Clay]: 2,
+  [FixedBuildingType.Wharf]: 3,
+};
+
+export const FixedBuildingCatalog = {
+  [FixedBuildingType.Road]: CatalogType.Road,
+  [FixedBuildingType.Stone]: CatalogType.Industry,
+  [FixedBuildingType.Copper]: CatalogType.Industry,
+  [FixedBuildingType.Wood]: CatalogType.Industry,
+  [FixedBuildingType.Clay]: CatalogType.Industry,
+  [FixedBuildingType.Wharf]: CatalogType.Agriculture,
+};
+
 export interface Building {
   Name: string;
   Text: string;
@@ -69,3 +127,38 @@ export enum MarkerColor {
   Danger = 'var(--ant-error-color)',
   Safe = 'var(--ant-success-color)',
 }
+
+export const GeneralBuilding = [
+  {
+    name: '2x2建筑',
+    text: '2x2',
+    size: 2,
+    range: 0,
+    color: BuildingColor.Black,
+    background: BuildingColor['通用'][0],
+  },
+  {
+    name: '3x3建筑',
+    text: '3x3',
+    size: 3,
+    range: 0,
+    color: BuildingColor.Black,
+    background: BuildingColor['通用'][1],
+  },
+  {
+    name: '4x4建筑',
+    text: '4x4',
+    size: 4,
+    range: 0,
+    color: BuildingColor.Black,
+    background: BuildingColor['通用'][2],
+  },
+  {
+    name: '5x5建筑',
+    text: '5x5',
+    size: 5,
+    range: 0,
+    color: BuildingColor.Black,
+    background: BuildingColor['通用'][3],
+  },
+];

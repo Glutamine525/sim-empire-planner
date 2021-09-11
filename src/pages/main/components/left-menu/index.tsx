@@ -5,29 +5,34 @@ import {
   Building,
   CatalogType,
   CivilBuilding,
+  GeneralBuilding,
 } from '@/types/building';
 import { BuildingColor } from '@/types/building-color';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { Menu } from 'antd';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
 import styles from './index.less';
 
 const { SubMenu } = Menu;
 
 interface LeftMenuProps {
+  MapType: number;
   Civil: CivilType;
+  CopiedBuilding: Building;
   OnChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
 }
 
 const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
-  const { Civil, OnChangeOperation } = props;
+  const { MapType, Civil, CopiedBuilding, OnChangeOperation } = props;
 
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
     {} as { [key in CatalogType]: { sub: any[] } }
   );
+
+  const protection = useMemo(() => CivilBuilding[Civil]['防护'], [Civil]);
 
   useEffect(() => {
     setCatalog({
@@ -43,12 +48,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       美化: { sub: [] },
       奇迹: { sub: [] },
       通用: {
-        sub: [
-          { name: '2x2建筑' },
-          { name: '3x3建筑' },
-          { name: '4x4建筑' },
-          { name: '5x5建筑' },
-        ],
+        sub: GeneralBuilding,
       },
       特殊建筑: { sub: [] },
       取消操作: { sub: [] },
@@ -63,35 +63,18 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
         ],
       },
     });
-
     document.addEventListener('keydown', event => {
-      const { key, ctrlKey } = event;
-      let keyPath: string[];
-      let building: any;
-      switch (key) {
-        case ' ':
-          event.preventDefault();
-          OnChangeOperation(OperationType.Empty, '', {} as any);
-          return;
-        case 'a':
-          keyPath = ['道路'];
-          building = {
-            name: '道路',
-            text: '',
-            size: 1,
-            range: 0,
-            color: BuildingColor.Black,
-            background: '#fdfebd',
-            isRoad: true,
-          };
-          break;
-        default:
-          return;
-      }
-      building && dispatchBuilding(keyPath!, building);
+      const { key } = event;
+      if (key !== ' ') return;
+      event.preventDefault();
+      OnChangeOperation(OperationType.Empty, '', {} as any);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    document.addEventListener('keyup', event => {
+      const { key, ctrlKey } = event;
+      if (key !== 'c' || !ctrlKey) return;
+      OnChangeOperation(OperationType.Copying, '', {} as any);
+    });
+  }, []); // eslint-disable-line
 
   useEffect(() => {
     const newCatalog = {
@@ -112,6 +95,116 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     }));
   }, [Civil]);
 
+  useEffect(() => {
+    OnChangeOperation(OperationType.Empty, '', {} as any);
+  }, [MapType, Civil]); // eslint-disable-line
+
+  useEffect(() => {
+    if (!Object.keys(CopiedBuilding).length) {
+      OnChangeOperation(OperationType.Empty, '', {} as any);
+      return;
+    }
+    const {
+      Catalog,
+      Name,
+      Text,
+      Width,
+      Height,
+      Range,
+      Color,
+      Background,
+      IsRoad,
+    } = CopiedBuilding;
+    let keyPath = IsRoad ? [Catalog] : [Catalog, Name];
+    dispatchBuilding(keyPath, {
+      name: Name,
+      text: Text,
+      width: Width,
+      height: Height,
+      range: Range,
+      color: Color,
+      background: Background,
+      isRoad: IsRoad,
+    });
+  }, [CopiedBuilding]); // eslint-disable-line
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const { key, ctrlKey } = event;
+      const digits = Array.from(Array(10), (_, i) => i.toString());
+      if (ctrlKey) return;
+      let keyPath: string[];
+      let building: any;
+      let parent: CatalogType = CatalogType.Road;
+      let name: string = '';
+      switch (key) {
+        case 'a':
+          keyPath = [CatalogType.Road];
+          building = {
+            name: '道路',
+            text: '',
+            size: 1,
+            range: 0,
+            color: BuildingColor.Black,
+            background: '#fdfebd',
+            isRoad: true,
+          };
+          dispatchBuilding(keyPath, building);
+          return;
+        case 'z':
+          if (protection.length < 1) return;
+          parent = CatalogType.Municipal;
+          name = protection[0];
+          break;
+        case 'x':
+          if (protection.length < 2) return;
+          parent = CatalogType.Municipal;
+          name = protection[1];
+          break;
+        case 'c':
+          if (protection.length < 3) return;
+          parent = CatalogType.Municipal;
+          name = protection[2];
+          break;
+        case 'v':
+          if (protection.length < 4) return;
+          parent = CatalogType.Municipal;
+          name = protection[3];
+          break;
+        case 'q':
+          parent = CatalogType.General;
+          name = '2x2建筑';
+          break;
+        case 'w':
+          parent = CatalogType.General;
+          name = '3x3建筑';
+          break;
+        case 'e':
+          parent = CatalogType.General;
+          name = '4x4建筑';
+          break;
+        case 'r':
+          parent = CatalogType.General;
+          name = '5x5建筑';
+          break;
+        default:
+          break;
+      }
+      if (digits.includes(key)) {
+        parent = CatalogType.Commerce;
+        const index = +key - 1 >= 0 ? +key - 1 : 9;
+        if (catalog[parent].sub.length <= index) return;
+        name = catalog[parent].sub[index].name;
+      }
+      if (parent === CatalogType.Road) return;
+      keyPath = [parent, name];
+      building = catalog[parent].sub.find(v => v.name === name);
+      building && dispatchBuilding(keyPath, building);
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [catalog]); // eslint-disable-line
+
   const dispatchBuilding = (keyPath: string[], building: any) => {
     OnChangeOperation(OperationType.Placing, keyPath.join('-'), {
       Name: building.name,
@@ -124,15 +217,15 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       IsRoad: building.isRoad,
       IsProtection:
         keyPath[0] === CatalogType.Municipal &&
-        CivilBuilding[Civil]['防护'].includes(building.name),
+        protection.includes(building.name),
       IsWonder:
         keyPath[0] === CatalogType.Wonder ||
         typeof building.isPalace !== 'undefined',
       IsDecoration: keyPath[0] === CatalogType.Decoration,
       IsGeneral: keyPath[0] === CatalogType.General,
       // css
-      Width: building.size,
-      Height: building.size,
+      Width: building.size || building.width,
+      Height: building.size || building.height,
       Color: building.color,
       FontSize: 1.4,
       Background: building.background,
@@ -238,7 +331,9 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
+    MapType: state.TopMenu.mapType,
     Civil: state.TopMenu.civil,
+    CopiedBuilding: state.Chessboard.copiedBuilding,
   };
 };
 

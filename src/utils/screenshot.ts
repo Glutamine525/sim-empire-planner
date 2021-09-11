@@ -1,7 +1,9 @@
 import { Building, MarkerColor } from '@/types/building';
 import { DEFAULT_SIZE } from './browser';
+import { parseBuildingKey } from './chessboard';
+import { LENGTH } from './config';
 
-export const RATIO = 4;
+export const RATIO = 2;
 
 const SVG_XMLNS = 'http://www.w3.org/2000/svg';
 const DIV_XMLNS = 'http://www.w3.org/1999/xhtml';
@@ -66,7 +68,8 @@ export async function getBuildingImage(building: Building) {
 }
 
 export async function getMarkerImage(marker: number, color: MarkerColor) {
-  const size = 30 * RATIO;
+  const { cellSize } = DEFAULT_SIZE;
+  const size = cellSize * RATIO;
   let div = document.createElement('div');
   div.innerText = marker.toString();
   div.style.width = '30px';
@@ -76,12 +79,71 @@ export async function getMarkerImage(marker: number, color: MarkerColor) {
   div.style.fontSize = '10px';
   div.style.position = 'relative';
   div.style.top = '0px';
-  div.style.left = '12px';
+  div.style.left = '6px';
   div.style.fontWeight = 'bold';
   div.style.textShadow = 'white 0px 1px 10px';
   div.style.transform = `scale(${0.8 * RATIO})`;
   div.style.transformOrigin = 'top left';
   document.documentElement.append(div);
+  const html = `
+    <svg width="${size}" height="${size}" xmlns="${SVG_XMLNS}">
+      <foreignObject width="100%" height="100%">
+        <div xmlns="${DIV_XMLNS}">
+          ${htmlToText(div)}
+        </div>
+      </foreignObject>
+    </svg>`;
+
+  // const svg = new Blob([html], {
+  //   type: 'image/svg+xml;charset=utf-8',
+  // });
+  // const url = window.URL.createObjectURL(svg);
+  // console.log(url);
+
+  let img = new Image();
+  img.src =
+    'data:image/svg+xml;base64,' +
+    window.btoa(unescape(encodeURIComponent(html)));
+  await new Promise<void>(resolve => {
+    img.onload = () => {
+      document.documentElement.removeChild(div);
+      resolve();
+    };
+  });
+  return img;
+}
+
+export async function getBarrierImage(barriers: any) {
+  const { cellSize } = DEFAULT_SIZE;
+  const size = LENGTH * cellSize * RATIO;
+  let div = document.createElement('div');
+  div.style.position = 'absolute';
+  div.style.top = '0';
+  div.style.left = '0';
+  div.style.width = '3480px';
+  div.style.height = '3480px';
+  div.style.transform = `scale(${RATIO}00%)`;
+  div.style.transformOrigin = 'top left';
+  Object.keys(barriers).map(key => {
+    const [line, column] = parseBuildingKey(key);
+    let cell = document.createElement('div');
+    cell.style.position = 'absolute';
+    cell.style.boxSizing = 'border-box';
+    cell.style.width = '3rem';
+    cell.style.height = '3rem';
+    cell.style.border = '1px #000000';
+    cell.style.background = barriers[key].background;
+    cell.style.top = `${(line - 1) * 3}rem`;
+    cell.style.left = `${(column - 1) * 3}rem`;
+    cell.style.borderTopStyle = barriers[key].T ? 'solid' : 'none';
+    cell.style.borderRightStyle = barriers[key].R ? 'solid' : 'none';
+    cell.style.borderBottomStyle = barriers[key].B ? 'solid' : 'none';
+    cell.style.borderLeftStyle = barriers[key].L ? 'solid' : 'none';
+    div.append(cell);
+    return null;
+  });
+  document.documentElement.append(div);
+
   const html = `
     <svg width="${size}" height="${size}" xmlns="${SVG_XMLNS}">
       <foreignObject width="100%" height="100%">
@@ -161,12 +223,8 @@ function styleToString(node: Element, styleNames: string[]) {
   for (const name of styleNames) {
     const fName = separatorToCamelNaming(name);
     let value = css[fName as any];
-    // if (['top', 'left'].includes(fName) && node.className !== 'marker')
-    //   continue;
-    if (fName === 'fontFamily') {
+    if (['fontFamily', 'backgroundImage'].includes(fName)) {
       value = value.replace(/"/g, '');
-    } else if (fName === 'backgroundImage') {
-      value = value.replace(/"/g, "'");
     }
     style.push(`${name}: ${value};`);
   }

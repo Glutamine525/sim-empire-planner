@@ -1,7 +1,6 @@
 import { ActionType } from '@/types/action';
 import { Building } from '@/types/building';
 import { CivilType } from '@/types/civil';
-import { CounterType } from '@/types/couter';
 import { OperationType } from '@/types/operation';
 import { ThemeType } from '@/types/theme';
 
@@ -67,11 +66,8 @@ export const changeOperation = (
   };
 };
 
-export const changeCounter = (counter: CounterType) => {
-  return {
-    type: ActionType.ChangeCounter,
-    counter,
-  };
+export const resetCounter = () => {
+  return { type: ActionType.ResetCouter };
 };
 
 export const placeOrDeleteBuilding = (building: Building, diff: number) => {
@@ -79,5 +75,12 @@ export const placeOrDeleteBuilding = (building: Building, diff: number) => {
     type: ActionType.PlaceOrDeleteBuilding,
     building,
     diff,
+  };
+};
+
+export const setCopiedBuilding = (building: Building) => {
+  return {
+    type: ActionType.SetCopiedBuilding,
+    copiedBuilding: building,
   };
 };

@@ -45,13 +45,15 @@ export interface ChessboardAction {
   type: ActionType;
   building: Building;
   diff: number;
+  copiedBuilding: Building;
   counter: CounterType;
 }
 
 export const InitChessboardState: ChessboardAction = {
   type: ActionType.Empty,
-  building: {} as any,
+  building: {} as Building,
   diff: 1,
+  copiedBuilding: {} as Building,
   counter: {
     OridinaryHouse: 0,
     HighEndHouse: 0,

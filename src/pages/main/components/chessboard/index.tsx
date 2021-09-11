@@ -20,18 +20,43 @@ import { connect } from 'react-redux';
 import styles from './index.less';
 import { getScreenSize, getCoord } from '@/utils/browser';
 import { OperationType } from '@/types/operation';
-import { Building, CivilBuilding, MarkerColor } from '@/types/building';
+import {
+  BarrierColor,
+  BarrierType,
+  BorderStyleType,
+  Building,
+  CivilBuilding,
+  FixedBuildingCatalog,
+  FixedBuildingColor,
+  FixedBuildingSize,
+  FixedBuildingText,
+  FixedBuildingType,
+  MarkerColor,
+} from '@/types/building';
 import { CivilType } from '@/types/civil';
-import { getBuildingImage, getMarkerImage, RATIO } from '@/utils/screenshot';
+import {
+  getBarrierImage,
+  getBuildingImage,
+  getMarkerImage,
+  RATIO,
+} from '@/utils/screenshot';
 import Range from '../range';
-import { placeOrDeleteBuilding } from '@/actions';
+import {
+  placeOrDeleteBuilding,
+  resetCounter,
+  setCopiedBuilding,
+} from '@/actions';
+import { BuildingFixed } from '@/types/building-fixed';
 
 interface ChessboardProps {
+  MapType: number;
   Civil: CivilType;
   Theme: ThemeType;
   Operation: OperationType;
   BuildingConfig: Building;
+  OnResetCounter: any;
   OnPlaceOrDeleteBuilding: any;
+  SetCopiedBuilding: any;
 }
 
 const initDragConfig = {
@@ -58,9 +83,35 @@ let cells = Array.from(Array(LENGTH + 1), (_, i) =>
   })
 );
 
+let barriers = {} as {
+  [key: string]: {
+    background: string;
+    T: boolean;
+    B: boolean;
+    L: boolean;
+    R: boolean;
+  };
+};
+
+const usePrevState = (value: any) => {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+};
+
 const Chessboard = (props: ChessboardProps) => {
-  const { Civil, Theme, Operation, BuildingConfig, OnPlaceOrDeleteBuilding } =
-    props;
+  const {
+    MapType,
+    Civil,
+    Theme,
+    Operation,
+    BuildingConfig,
+    OnResetCounter,
+    OnPlaceOrDeleteBuilding,
+    SetCopiedBuilding,
+  } = props;
 
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
@@ -69,6 +120,8 @@ const Chessboard = (props: ChessboardProps) => {
   const [cellOccupied, setCellOccupied] = useState(false);
   const [buildingMarker, setBuildingMarker] = useState(0);
   const [hoveredBuilding, setHoveredBuilding] = useState({} as Building);
+
+  const prevBuildingConfig = usePrevState(BuildingConfig);
 
   const wrapperOuterRef = useRef(null);
   const wrapperIuterRef = useRef(null);
@@ -125,6 +178,30 @@ const Chessboard = (props: ChessboardProps) => {
   }, []);
 
   useEffect(() => {
+    setBuildingMarker(0);
+    OnResetCounter();
+    let canvas: any = buildingCanvasRef.current;
+    let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas = markerCanvasRef.current;
+    ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    cells = Array.from(Array(LENGTH + 1), (_, i) =>
+      Array.from(Array(LENGTH + 1), (_, j) => {
+        return {
+          inRange: isInRange(i + 1, j + 1),
+          occupied: '',
+          protection: {} as any,
+          building: {} as Building,
+          marker: 0,
+        };
+      })
+    );
+    placeBarrier();
+    placeFixed();
+  }, [MapType, Civil]); // eslint-disable-line
+
+  useEffect(() => {
     console.time('Painting Cell');
     const canvas: any = cellCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -157,8 +234,30 @@ const Chessboard = (props: ChessboardProps) => {
   }, [Theme]);
 
   useEffect(() => {
-    if (Operation !== OperationType.Placing) setShowBuilding(false);
-  }, [Operation]);
+    switch (Operation) {
+      case OperationType.Empty:
+        SetCopiedBuilding({});
+        setHoveredBuilding({} as Building);
+        setShowBuilding(false);
+        break;
+      case OperationType.Placing:
+        setShowBuilding(true);
+        break;
+      case OperationType.Copying:
+        const { line, column } = moveConfig;
+        const { occupied } = cells[line][column];
+        if (!occupied) {
+          SetCopiedBuilding(prevBuildingConfig);
+        } else {
+          const [li, co] = parseBuildingKey(occupied);
+          const { building } = cells[li][co];
+          SetCopiedBuilding(building);
+        }
+        break;
+      default:
+        break;
+    }
+  }, [Operation]); // eslint-disable-line
 
   // useEffect(() => {
   //   if (!Object.keys(BuildingConfig).length) return;
@@ -192,7 +291,7 @@ const Chessboard = (props: ChessboardProps) => {
             }
           }
         }
-        placeBuilding(line + offsetLine, column + offsetColumn);
+        placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
         break;
       default:
         break;
@@ -206,12 +305,18 @@ const Chessboard = (props: ChessboardProps) => {
       pageY + getScrollTop() - 80,
     ];
     const { line, column } = getCoord(offsetX, offsetY);
+    setMoveConfig({
+      line,
+      offsetLine: 0,
+      column,
+      offsetColumn: 0,
+    });
     switch (Operation) {
       case OperationType.Empty:
         const { occupied } = cells[line][column];
         if (occupied) {
           const [li, co] = parseBuildingKey(occupied);
-          const { building: target, protection: p, marker } = cells[li][co];
+          const { building: target, marker } = cells[li][co];
           if (!target.IsBarrier && !target.IsRoad) {
             setMoveConfig({
               line: li,
@@ -281,7 +386,7 @@ const Chessboard = (props: ChessboardProps) => {
         setCellOccupied(isOccupied);
         setMoveConfig({ line, offsetLine, column, offsetColumn });
         if (!isDragging || isOccupied) return;
-        placeBuilding(line + offsetLine, column + offsetColumn);
+        placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
         break;
       default:
         break;
@@ -322,21 +427,25 @@ const Chessboard = (props: ChessboardProps) => {
     );
   };
 
-  const placeBuilding = async (line: number, column: number) => {
-    const key = getBuildingKey(BuildingConfig, line, column);
-    const { Width, Height } = BuildingConfig;
+  const placeBuilding = async (
+    building: Building,
+    line: number,
+    column: number
+  ) => {
+    const key = getBuildingKey(building, line, column);
+    const { Width, Height } = building;
     for (let i = line; i < line + Height; i++) {
       for (let j = column; j < column + Width; j++) {
         cells[i][j].occupied = key;
       }
     }
 
-    cells[line][column].building = BuildingConfig;
+    cells[line][column].building = building;
     cells[line][column].marker = buildingMarker;
 
-    if (BuildingConfig.IsProtection) {
+    if (building.IsProtection) {
       let record: string[] = [];
-      const { Range, Name } = BuildingConfig;
+      const { Range, Name } = building;
       for (let i = line - Range; i < line + Height + Range; i++) {
         for (let j = column - Range; j < column + Width + Range; j++) {
           if (!isInBuildingRange(i, j, line, column, Width, Height, Range))
@@ -357,19 +466,26 @@ const Chessboard = (props: ChessboardProps) => {
           if (!record.includes(occupied)) record.push(occupied);
         }
       }
-
       updateRecordMarker(record);
     }
 
-    OnPlaceOrDeleteBuilding(BuildingConfig, 1);
-    let canvas: any = buildingCanvasRef.current;
-    let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    ctx.drawImage(
-      await buildingBuffer,
-      (column - 1) * 30 * RATIO,
-      (line - 1) * 30 * RATIO
-    );
-    if (!hideMarker) {
+    OnPlaceOrDeleteBuilding(building, 1);
+    const canvas: any = buildingCanvasRef.current;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    if (building.IsFixed) {
+      ctx.drawImage(
+        await getBuildingImage(building),
+        (column - 1) * 30 * RATIO,
+        (line - 1) * 30 * RATIO
+      );
+    } else {
+      ctx.drawImage(
+        await buildingBuffer,
+        (column - 1) * 30 * RATIO,
+        (line - 1) * 30 * RATIO
+      );
+    }
+    if (showMarker(building)) {
       placeMarker(buildingMarker, line, column);
     }
   };
@@ -429,6 +545,81 @@ const Chessboard = (props: ChessboardProps) => {
       width * 30 * RATIO,
       height * 30 * RATIO
     );
+  };
+
+  const placeBarrier = async () => {
+    Object.keys(BarrierType)
+      .map(v => v.toLowerCase() as BarrierType)
+      .map((v: BarrierType) => {
+        const keys = BuildingFixed[v][MapType - 3];
+        const color = BarrierColor[v];
+        for (let key of keys) {
+          const [line, column] = parseBuildingKey(key);
+          const top = `${line - 1}-${column}`;
+          const bottom = `${line + 1}-${column}`;
+          const left = `${line}-${column - 1}`;
+          const right = `${line}-${column + 1}`;
+          barriers[key] = {
+            background: color,
+            T: !keys.includes(top),
+            B: !keys.includes(bottom),
+            L: !keys.includes(left),
+            R: !keys.includes(right),
+          };
+          cells[line][column].occupied = `${key}-1`;
+          cells[line][column].building = {
+            IsFixed: true,
+            IsBarrier: true,
+          } as Building;
+        }
+        return null;
+      });
+    const canvas: any = buildingCanvasRef.current;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+    barriers = {};
+  };
+
+  const placeFixed = async () => {
+    Object.keys(FixedBuildingType)
+      .map(v => v.toLowerCase() as FixedBuildingType)
+      .map((v: FixedBuildingType) => {
+        const keys = BuildingFixed[v][MapType - 3];
+        for (let key of keys) {
+          const [line, column] = parseBuildingKey(key);
+          placeBuilding(
+            {
+              Name:
+                v === FixedBuildingType.Road ? '道路' : FixedBuildingText[v],
+              Text: FixedBuildingText[v],
+              Range: 0,
+              Marker: 0,
+              Catalog: FixedBuildingCatalog[v],
+              IsFixed: true,
+              IsBarrier: false,
+              IsRoad: v === FixedBuildingType.Road,
+              IsProtection: false,
+              IsWonder: false,
+              IsDecoration: false,
+              IsGeneral: false,
+              Width: FixedBuildingSize[v],
+              Height: FixedBuildingSize[v],
+              Color: '#000000',
+              FontSize: 1.4,
+              Background: FixedBuildingColor[v],
+              BorderColor: '#000000',
+              BorderWidth: 0.1,
+              BorderTStyle: BorderStyleType.Solid,
+              BorderRStyle: BorderStyleType.Solid,
+              BorderBStyle: BorderStyleType.Solid,
+              BorderLStyle: BorderStyleType.Solid,
+            },
+            line,
+            column
+          );
+        }
+        return null;
+      });
   };
 
   const updateMarker = (value: number, line: number, column: number) => {
@@ -494,20 +685,20 @@ const Chessboard = (props: ChessboardProps) => {
           ></canvas>
           <canvas
             ref={buildingCanvasRef}
-            width={13920}
-            height={13920}
+            width={LENGTH * 30 * RATIO}
+            height={LENGTH * 30 * RATIO}
             className={`${styles.canvas} ${styles['canvas-building']}`}
           ></canvas>
           <canvas
             ref={markerCanvasRef}
-            width={13920}
-            height={13920}
+            width={LENGTH * 30 * RATIO}
+            height={LENGTH * 30 * RATIO}
             className={`${styles.canvas} ${styles['canvas-marker']}`}
           ></canvas>
           <div
-            className={`${styles['building-preview']} ${
-              building.IsRoad && styles.road
-            } ${cellOccupied && styles.occupied}`}
+            className={`${styles.building} ${
+              building.IsRoad ? styles.road : ''
+            } ${cellOccupied ? styles.occupied : ''}`}
             style={{
               display: showBuilding ? 'flex' : 'none',
               width: `${building.Width * 3}rem`,
@@ -549,6 +740,7 @@ const Chessboard = (props: ChessboardProps) => {
             </div>
           </div>
           <Range
+            Show={showBuilding}
             Size={building.Range || 0}
             Line={moveConfig.line + moveConfig.offsetLine}
             Column={moveConfig.column + moveConfig.offsetColumn}
@@ -565,6 +757,7 @@ const Chessboard = (props: ChessboardProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
+    MapType: state.TopMenu.mapType,
     Civil: state.TopMenu.civil,
     Theme: state.TopMenu.theme,
     Operation: state.LeftMenu.operation,
@@ -574,8 +767,14 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    OnResetCounter: () => {
+      dispatch(resetCounter());
+    },
     OnPlaceOrDeleteBuilding: (building: Building, diff: number) => {
       dispatch(placeOrDeleteBuilding(building, diff));
+    },
+    SetCopiedBuilding: (building: Building) => {
+      dispatch(setCopiedBuilding(building));
     },
   };
 };
