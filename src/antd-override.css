@@ -22,28 +22,28 @@
 }
 
 .ant-dropdown-arrow {
-  border-color: var(--background-lighter) transparent transparent
+  border-color:
+    var(--background-lighter) transparent transparent
     var(--background-lighter) !important;
 }
 
 .left-menu .ant-menu {
-  width: 4.8rem;
   margin: 0.4rem 0.1rem 1rem 0.4rem;
-  border-radius: 2.3rem;
+  width: 4.8rem;
   border: 0.1rem solid var(--border-darker);
+  border-radius: 2.3rem;
   background-color: transparent;
-
   transition: border-color 0.3s ease-in-out;
 }
 
 .left-menu .ant-menu-submenu-title,
 .left-menu .ant-menu-item {
-  padding: 0 calc(50% - 1.6rem) !important;
-  height: 4.6rem !important;
-  margin: 0 !important;
-  border-radius: 2.3rem;
   display: flex;
   align-items: center;
+  margin: 0 !important;
+  padding: 0 calc(50% - 1.6rem) !important;
+  height: 4.6rem !important;
+  border-radius: 2.3rem;
 }
 
 img + .ant-menu-title-content {
@@ -60,8 +60,8 @@ img + .ant-menu-title-content {
 }
 
 .ant-menu-title-content {
-  font-weight: bold;
   font-size: 1.4rem;
+  font-weight: bold;
   color: var(--text-primary);
 }
 

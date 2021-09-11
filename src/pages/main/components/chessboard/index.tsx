@@ -40,7 +40,7 @@ import {
   getMarkerImage,
   RATIO,
 } from '@/utils/screenshot';
-import Range from '../range';
+import Range from './components/range';
 import {
   placeOrDeleteBuilding,
   resetCounter,
@@ -259,13 +259,6 @@ const Chessboard = (props: ChessboardProps) => {
     }
   }, [Operation]); // eslint-disable-line
 
-  // useEffect(() => {
-  //   if (!Object.keys(BuildingConfig).length) return;
-  //   (async () => {
-  //     setBuildingImage(await getBuildingImage(BuildingConfig));
-  //   })();
-  // }, [BuildingConfig]);
-
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
     setIsDragging(true);
     switch (Operation) {
@@ -441,7 +434,9 @@ const Chessboard = (props: ChessboardProps) => {
     }
 
     cells[line][column].building = building;
-    cells[line][column].marker = buildingMarker;
+    cells[line][column].marker = Object.keys(
+      cells[line][column].protection
+    ).length;
 
     if (building.IsProtection) {
       let record: string[] = [];
@@ -486,7 +481,7 @@ const Chessboard = (props: ChessboardProps) => {
       );
     }
     if (showMarker(building)) {
-      placeMarker(buildingMarker, line, column);
+      placeMarker(cells[line][column].marker, line, column);
     }
   };
 
@@ -519,6 +514,7 @@ const Chessboard = (props: ChessboardProps) => {
           if (i > LENGTH || j > LENGTH) continue;
           const { protection: p } = cells[i][j];
           p[Name].splice(p[Name].indexOf(occupied), 1);
+          if (!p[Name].length) delete p[Name];
           const { occupied: o } = cells[i][j];
           if (!o) continue;
           const [li, co] = parseBuildingKey(o);

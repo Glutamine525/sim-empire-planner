@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'DFPKingGothicGB-Regular';
-  src: url('./fonts/HuaKangJinGangHei-Regular-2.ttf');
+  src: url(./fonts/HuaKangJinGangHei-Regular-2.ttf);
 }
 
 * {
@@ -11,7 +11,10 @@
 body {
   font-size: 1.4rem;
   line-height: 2rem;
-  font-family: 'PingFang SC', 'DFPKingGothicGB-Regular', 'Microsoft Yahei',
+  font-family:
+    'PingFang SC',
+    'DFPKingGothicGB-Regular',
+    'Microsoft Yahei',
     monospace;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -23,13 +26,18 @@ body {
 
 body,
 #root {
+  overflow: hidden;
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family:
+    source-code-pro,
+    Menlo,
+    Monaco,
+    Consolas,
+    'Courier New',
     monospace;
 }
 
@@ -45,18 +53,6 @@ strong {
 html {
   font-size: 10px;
 }
-
-/* @media screen and (min-width: 320px) {
-  html {
-    font-size: 10px;
-  }
-}
-
-@media screen and (min-width: 2000px) {
-  html {
-    font-size: 12px;
-  }
-} */
 
 .ps__rail-x,
 .ps__rail-y {

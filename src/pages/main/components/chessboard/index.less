@@ -6,9 +6,9 @@
 
 .wrapper-inner {
   position: relative;
+  padding: 8rem 3rem 3rem 8.6rem;
   width: calc(348rem + 5.6rem + 3rem + 3rem);
   height: calc(348rem + 5rem + 3rem + 3rem);
-  padding: 8rem 3rem 3rem 8.6rem;
   will-change: transform;
 }
 
@@ -55,7 +55,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  font-family: 'PingFang SC', 'Microsoft Yahei', monospace;
+  font-family: PingFang SC, Microsoft Yahei, monospace;
   font-weight: bold;
   text-shadow: white 0 0.1rem 1rem;
 
@@ -70,14 +70,15 @@
     left: 0;
     width: 100%;
     height: 100%;
+    background:
+      linear-gradient(
+        45deg,
+        transparent 48%,
+        var(--ant-error-color-active) 48%,
+        var(--ant-error-color-active) 52%,
+        transparent 52%
+      );
     box-shadow: inset 0 0 1rem 0.5rem var(--ant-error-color-hover);
-    background: linear-gradient(
-      45deg,
-      transparent 48%,
-      var(--ant-error-color-active) 48%,
-      var(--ant-error-color-active) 52%,
-      transparent 52%
-    );
   }
 
   &.occupied::after {
@@ -87,26 +88,27 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-      135deg,
-      transparent 48%,
-      var(--ant-error-color) 48%,
-      var(--ant-error-color) 52%,
-      transparent 52%
-    );
+    background:
+      linear-gradient(
+        135deg,
+        transparent 48%,
+        var(--ant-error-color) 48%,
+        var(--ant-error-color) 52%,
+        transparent 52%
+      );
   }
 
   .marker {
     position: absolute;
     top: 0.1rem;
     left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     width: 1.25rem;
     height: 1.25rem;
     font-size: 1rem;
     transform: scale(0.8);
     transform-origin: top left;
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 }

@@ -81,7 +81,8 @@
   "scripts": {
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
-    "test": "react-app-rewired test"
+    "test": "react-app-rewired test",
+    "style": "stylelint 'src/**/*.(vue|css|less)' --fix"
   },
   "eslintConfig": {
     "extends": [
@@ -162,6 +163,9 @@
     "customize-cra": "^1.0.0",
     "less": "^3.13.1",
     "less-loader": "^5.0.0",
-    "react-app-rewired": "^2.1.8"
+    "react-app-rewired": "^2.1.8",
+    "stylelint": "^13.13.1",
+    "stylelint-config-standard": "^22.0.0",
+    "stylelint-order": "^4.1.0"
   }
 }
