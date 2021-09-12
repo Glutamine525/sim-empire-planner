@@ -77,7 +77,7 @@ let cells = Array.from(Array(LENGTH + 1), (_, i) =>
       inRange: isInRange(i + 1, j + 1),
       occupied: '',
       protection: {} as any,
-      building: {} as Building,
+      building: {} as any,
       marker: 0,
     };
   })
@@ -137,18 +137,20 @@ const Chessboard = (props: ChessboardProps) => {
   );
   const markerBuffer = useMemo(() => {
     return {
-      [MarkerColor.Normal]: Array.from(Array(20), (_, k) => k).map(v =>
+      [MarkerColor.Normal]: Array.from(Array(100), (_, i) => i).map(v =>
         getMarkerImage(v, MarkerColor.Normal)
       ),
-      [MarkerColor.Safe]: [0, 1, 2, 3, 4, 5].map(v =>
-        getMarkerImage(v, MarkerColor.Safe)
+      [MarkerColor.Safe]: Array.from(Array(protectionNum + 1), (_, i) => i).map(
+        v => getMarkerImage(v, MarkerColor.Safe)
       ),
-      [MarkerColor.Danger]: [0, 1, 2, 3, 4, 5].map(v =>
-        getMarkerImage(v, MarkerColor.Danger)
-      ),
+      [MarkerColor.Danger]: Array.from(
+        Array(protectionNum + 1),
+        (_, i) => i
+      ).map(v => getMarkerImage(v, MarkerColor.Danger)),
     };
-  }, []);
+  }, [protectionNum]);
   const building = useMemo(() => {
+    setShowBuilding(false);
     if (Operation === OperationType.Empty) return hoveredBuilding;
     else if (Operation === OperationType.Placing) return BuildingConfig;
     return {} as Building;
@@ -192,7 +194,7 @@ const Chessboard = (props: ChessboardProps) => {
           inRange: isInRange(i + 1, j + 1),
           occupied: '',
           protection: {} as any,
-          building: {} as Building,
+          building: {} as any,
           marker: 0,
         };
       })
@@ -241,7 +243,7 @@ const Chessboard = (props: ChessboardProps) => {
         setShowBuilding(false);
         break;
       case OperationType.Placing:
-        setShowBuilding(true);
+        setShowBuilding(false);
         break;
       case OperationType.Copying:
         const { line, column } = moveConfig;
@@ -251,6 +253,10 @@ const Chessboard = (props: ChessboardProps) => {
         } else {
           const [li, co] = parseBuildingKey(occupied);
           const { building } = cells[li][co];
+          if (building.IsFixed) {
+            SetCopiedBuilding(prevBuildingConfig);
+            return;
+          }
           SetCopiedBuilding(building);
         }
         break;
@@ -284,6 +290,7 @@ const Chessboard = (props: ChessboardProps) => {
             }
           }
         }
+        setCellOccupied(true);
         placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
         break;
       default:
@@ -309,7 +316,7 @@ const Chessboard = (props: ChessboardProps) => {
         const { occupied } = cells[line][column];
         if (occupied) {
           const [li, co] = parseBuildingKey(occupied);
-          const { building: target, marker } = cells[li][co];
+          const { building: target } = cells[li][co];
           if (!target.IsBarrier && !target.IsRoad) {
             setMoveConfig({
               line: li,
@@ -320,7 +327,7 @@ const Chessboard = (props: ChessboardProps) => {
             setShowBuilding(true);
             setCellOccupied(false);
             setHoveredBuilding(target);
-            setBuildingMarker(marker);
+            setBuildingMarker(building.Marker);
           } else {
             setShowBuilding(false);
             setHoveredBuilding({} as Building);
@@ -407,12 +414,17 @@ const Chessboard = (props: ChessboardProps) => {
     setHoveredBuilding({} as Building);
   };
 
-  const placeMarker = async (value: number, line: number, column: number) => {
+  const placeMarker = async (
+    value: number,
+    line: number,
+    column: number,
+    isRoad?: boolean
+  ) => {
     const canvas: any = markerCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     let markerColor: MarkerColor =
       value >= protectionNum ? MarkerColor.Safe : MarkerColor.Danger;
-    markerColor = BuildingConfig.IsRoad ? MarkerColor.Normal : markerColor;
+    markerColor = isRoad ? MarkerColor.Normal : markerColor;
     ctx.drawImage(
       await markerBuffer[markerColor][value],
       (column - 1) * 30 * RATIO,
@@ -427,16 +439,15 @@ const Chessboard = (props: ChessboardProps) => {
   ) => {
     const key = getBuildingKey(building, line, column);
     const { Width, Height } = building;
+    let marker = 0;
     for (let i = line; i < line + Height; i++) {
       for (let j = column; j < column + Width; j++) {
         cells[i][j].occupied = key;
+        marker = cells[i][j].marker > marker ? cells[i][j].marker : marker;
       }
     }
-
-    cells[line][column].building = building;
-    cells[line][column].marker = Object.keys(
-      cells[line][column].protection
-    ).length;
+    cells[line][column].building = { ...building };
+    cells[line][column].building.Marker = marker;
 
     if (building.IsProtection) {
       let record: string[] = [];
@@ -451,6 +462,7 @@ const Chessboard = (props: ChessboardProps) => {
             cells[i][j].protection[Name].push(key);
           } else {
             cells[i][j].protection[Name] = [key];
+            cells[i][j].marker += 1;
           }
 
           const { occupied } = cells[i][j];
@@ -462,6 +474,11 @@ const Chessboard = (props: ChessboardProps) => {
         }
       }
       updateRecordMarker(record);
+    }
+
+    if (building.IsRoad) {
+      cells[line][column].building.Marker = 1;
+      updateRoadMarker(line, column);
     }
 
     OnPlaceOrDeleteBuilding(building, 1);
@@ -481,7 +498,7 @@ const Chessboard = (props: ChessboardProps) => {
       );
     }
     if (showMarker(building)) {
-      placeMarker(cells[line][column].marker, line, column);
+      placeMarker(marker, line, column);
     }
   };
 
@@ -504,6 +521,7 @@ const Chessboard = (props: ChessboardProps) => {
     const { building: target } = cells[originLine][originColumn];
     const { Range, Name } = target;
     if (target.IsFixed || target.IsBarrier) return;
+
     if (target.IsProtection) {
       let record: string[] = [];
       for (let i = line - Range; i < line + height + Range; i++) {
@@ -514,7 +532,10 @@ const Chessboard = (props: ChessboardProps) => {
           if (i > LENGTH || j > LENGTH) continue;
           const { protection: p } = cells[i][j];
           p[Name].splice(p[Name].indexOf(occupied), 1);
-          if (!p[Name].length) delete p[Name];
+          if (!p[Name].length) {
+            delete p[Name];
+            cells[i][j].marker -= 1;
+          }
           const { occupied: o } = cells[i][j];
           if (!o) continue;
           const [li, co] = parseBuildingKey(o);
@@ -525,12 +546,18 @@ const Chessboard = (props: ChessboardProps) => {
       }
       updateRecordMarker(record);
     }
+
     for (let i = originLine; i < originLine + height; i++) {
       for (let j = originColumn; j < originColumn + width; j++) {
         cells[i][j].occupied = '';
         cells[i][j].building = {} as any;
       }
     }
+
+    if (target.IsRoad) {
+      updateRoadMarker(line, column);
+    }
+
     OnPlaceOrDeleteBuilding(target, -1);
     deleteMarker(originLine, originColumn);
     const canvas: any = buildingCanvasRef.current;
@@ -618,9 +645,14 @@ const Chessboard = (props: ChessboardProps) => {
       });
   };
 
-  const updateMarker = (value: number, line: number, column: number) => {
+  const updateMarker = (
+    value: number,
+    line: number,
+    column: number,
+    isRoad?: boolean
+  ) => {
     deleteMarker(line, column);
-    placeMarker(value, line, column);
+    placeMarker(value, line, column, isRoad);
   };
 
   const updateRecordMarker = (record: string[]) => {
@@ -637,8 +669,205 @@ const Chessboard = (props: ChessboardProps) => {
           }
         }
       }
-      cells[li][co].marker = flag.length;
+      cells[li][co].building.Marker = flag.length;
       updateMarker(flag.length, li, co);
+    }
+  };
+
+  const isRoad = (li: number, co: number) => !!cells[li][co].building.IsRoad;
+
+  const getRoad = (li: number, co: number) => cells[li][co].building;
+
+  const getRoadDir = (li: number, co: number) => {
+    if (isRoad(li, co - 1)) return 'h';
+    if (isRoad(li, co + 1)) return 'h';
+    if (
+      isRoad(li - 1, co) &&
+      !isRoad(li - 1, co - 1) &&
+      !isRoad(li - 1, co + 1)
+    )
+      return 'v';
+    if (
+      isRoad(li + 1, co) &&
+      !isRoad(li + 1, co - 1) &&
+      !isRoad(li + 1, co + 1)
+    )
+      return 'v';
+    return 'n';
+  };
+
+  const isDirRoad = (li: number, co: number, dir: string) => {
+    if (isRoad(li, co) && getRoadDir(li, co) === dir) return true;
+    return false;
+  };
+
+  const updateRoadDisplay = async (li: number, co: number) => {
+    const canvas: any = buildingCanvasRef.current;
+    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    let self = getRoad(li, co);
+    const selfDir = getRoadDir(li, co);
+    if (selfDir === 'h') {
+      for (let i = -1; i < 2; i += 2) {
+        if (isRoad(li + i, co)) {
+          let adj = getRoad(li + i, co);
+          if (i === -1) {
+            adj.BorderBStyle = BorderStyleType.Dashed;
+            self.BorderTStyle = BorderStyleType.Dashed;
+          } else {
+            self.BorderBStyle = BorderStyleType.Dashed;
+            adj.BorderTStyle = BorderStyleType.Dashed;
+          }
+          if (isDirRoad(li + i, co, 'v') || isDirRoad(li + i, co, 'n')) {
+            self.isRoadVertex = true;
+          }
+          if (adj.isRoadVertex) updateMarker(adj.Marker, li + i, co, true);
+          else deleteMarker(li + i, co);
+          ctx.drawImage(
+            await getBuildingImage(adj),
+            (co - 1) * 30 * RATIO,
+            (li + i - 1) * 30 * RATIO
+          );
+        }
+      }
+    } else if (selfDir === 'v') {
+      if (isDirRoad(li - 1, co, 'v')) self.BorderTStyle = BorderStyleType.None;
+      else if (isDirRoad(li - 1, co, 'h'))
+        self.BorderTStyle = BorderStyleType.Dashed;
+      else self.BorderTStyle = BorderStyleType.Solid;
+      if (isDirRoad(li + 1, co, 'v')) self.BorderBStyle = BorderStyleType.None;
+      else if (isDirRoad(li + 1, co, 'h'))
+        self.BorderBStyle = BorderStyleType.Dashed;
+      else self.BorderBStyle = BorderStyleType.Solid;
+    }
+
+    if (isRoad(li, co - 1)) self.BorderLStyle = BorderStyleType.None;
+    else self.BorderLStyle = BorderStyleType.Solid;
+    if (isRoad(li, co + 1)) self.BorderRStyle = BorderStyleType.None;
+    else self.BorderRStyle = BorderStyleType.Solid;
+    if (!isRoad(li - 1, co)) self.BorderTStyle = BorderStyleType.Solid;
+    if (!isRoad(li + 1, co)) self.BorderBStyle = BorderStyleType.Solid;
+    if (self.isRoadVertex) updateMarker(self.Marker, li, co, true);
+    else deleteMarker(li, co);
+    ctx.drawImage(
+      await getBuildingImage(self),
+      (co - 1) * 30 * RATIO,
+      (li - 1) * 30 * RATIO
+    );
+  };
+
+  const updateRoadMarker = async (li: number, co: number) => {
+    let neighbors = [];
+    for (let i = -1; i <= 1; i++) {
+      for (let j = -1; j <= 1; j++) {
+        if (isRoad(li + i, co + j)) neighbors.push({ li: li + i, co: co + j });
+      }
+    }
+    let queue = [];
+    for (let v of neighbors) {
+      let self = getRoad(v.li, v.co);
+      if (getRoadDir(v.li, v.co) === 'h') {
+        let hasLeft = false;
+        if (isRoad(v.li, v.co - 1)) {
+          let left = getRoad(v.li, v.co - 1);
+          let { Marker } = left;
+          if (Marker === 1) {
+            left.Marker = 1;
+            self.Marker = 2;
+            left.isRoadVertex = true;
+          } else {
+            self.Marker = Marker + 1;
+            if (Marker > 1) left.isRoadVertex = false;
+          }
+          self.isRoadVertex = true;
+          queue.push(JSON.stringify({ li: v.li, co: v.co - 1 }));
+          queue.push(JSON.stringify({ li: v.li, co: v.co }));
+          hasLeft = true;
+        }
+        if (isRoad(v.li, v.co + 1)) {
+          let right = getRoad(v.li, v.co + 1);
+          let { Marker } = self;
+          if (Marker === 1 || !hasLeft) {
+            self.Marker = 1;
+            right.Marker = 2;
+            self.isRoadVertex = true;
+          } else {
+            right.Marker = Marker + 1;
+            if (Marker > 1) self.isRoadVertex = false;
+          }
+          right.isRoadVertex = true;
+          queue.push(JSON.stringify({ li: v.li, co: v.co }));
+          queue.push(JSON.stringify({ li: v.li, co: v.co + 1 }));
+          Marker += 2;
+          let idx = v.co + 2;
+          while (isRoad(v.li, idx)) {
+            getRoad(v.li, idx).isRoadVertex = true;
+            getRoad(v.li, idx).Marker = Marker;
+            getRoad(v.li, idx - 1).isRoadVertex = false;
+            queue.push(JSON.stringify({ li: v.li, co: idx - 1 }));
+            queue.push(JSON.stringify({ li: v.li, co: idx }));
+            Marker++;
+            idx++;
+          }
+        }
+      }
+    }
+    for (let v of neighbors) {
+      let self = getRoad(v.li, v.co);
+      if (getRoadDir(v.li, v.co) === 'v') {
+        let hasTop = false;
+        if (isDirRoad(v.li - 1, v.co, 'v')) {
+          let top = getRoad(v.li - 1, v.co);
+          let { Marker } = top;
+          if (Marker === 1) {
+            top.Marker = 1;
+            self.Marker = 2;
+            top.isRoadVertex = true;
+          } else {
+            self.Marker = Marker + 1;
+            if (Marker > 1) top.isRoadVertex = false;
+          }
+          self.isRoadVertex = true;
+          queue.push(JSON.stringify({ li: v.li - 1, co: v.co }));
+          queue.push(JSON.stringify({ li: v.li, co: v.co }));
+          hasTop = true;
+        }
+        if (isDirRoad(v.li + 1, v.co, 'v')) {
+          let bottom = getRoad(v.li + 1, v.co);
+          let { Marker } = self;
+          if (Marker === 1 || !hasTop) {
+            self.Marker = 1;
+            bottom.Marker = 2;
+            self.isRoadVertex = true;
+          } else {
+            bottom.Marker = Marker + 1;
+            if (Marker > 1) self.isRoadVertex = false;
+          }
+          bottom.isRoadVertex = true;
+          queue.push(JSON.stringify({ li: v.li, co: v.co }));
+          queue.push(JSON.stringify({ li: v.li + 1, co: v.co }));
+          Marker += 2;
+          let idx = v.li + 2;
+          while (isDirRoad(idx, v.co, 'v')) {
+            getRoad(idx, v.co).Marker = Marker;
+            getRoad(idx - 1, v.co).isRoadVertex = false;
+            getRoad(idx, v.co).isRoadVertex = true;
+            queue.push(JSON.stringify({ li: idx - 1, co: v.co }));
+            queue.push(JSON.stringify({ li: idx, co: v.co }));
+            Marker++;
+            idx++;
+          }
+        }
+      }
+      if (getRoadDir(v.li, v.co) === 'n') {
+        self.isRoadVertex = false;
+        self.Marker = 1;
+        updateRoadDisplay(v.li, v.co);
+      }
+    }
+    queue = Array.from(new Set(queue));
+    for (let v of queue) {
+      const { li, co } = JSON.parse(v);
+      await updateRoadDisplay(li, co);
     }
   };
 

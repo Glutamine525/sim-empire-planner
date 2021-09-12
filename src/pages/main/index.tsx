@@ -4,7 +4,7 @@ import LeftMenu from './components/left-menu';
 import styles from './index.less';
 
 const Main: FC = () => {
-  return (
+  return ( 
     <div className={styles.container}>
       <LeftMenu />
       <Chessboard />
