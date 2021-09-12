@@ -35,6 +35,7 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
       if (building.Catalog === CatalogType.Agriculture)
         counter.Agriculture += diff;
       if (building.Catalog === CatalogType.Industry) counter.Industry += diff;
+      if (building.Catalog === CatalogType.General) counter.General += diff;
       return { ...state, counter: { ...counter } };
     case ActionType.SetCopiedBuilding:
       return {

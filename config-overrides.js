@@ -6,6 +6,8 @@ const {
   fixBabelImports,
 } = require('customize-cra');
 
+const isDev = process.env.NODE_ENV === 'development';
+
 module.exports = override(
   addWebpackAlias({
     '@': path.resolve(__dirname, 'src'),
@@ -15,7 +17,11 @@ module.exports = override(
     noIeCompat: true,
     javascriptEnabled: true,
     cssLoaderOptions: {
-      modules: { localIdentName: '[path]_[local]_[hash:base64:5]' },
+      modules: {
+        localIdentName: isDev
+          ? '[path]_[local]_[hash:base64:5]'
+          : '[hash:base64]',
+      },
     },
   })
   // fixBabelImports("import", {

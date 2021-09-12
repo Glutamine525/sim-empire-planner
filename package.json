@@ -2,6 +2,7 @@
   "name": "sim-empire-planner",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@babel/core": "7.12.3",
     "@pmmmwh/react-refresh-webpack-plugin": "0.4.3",
@@ -62,6 +63,7 @@
     "react-redux": "^7.2.4",
     "react-refresh": "^0.8.3",
     "react-router-dom": "^5.3.0",
+    "react-scripts": "^4.0.3",
     "redux": "^4.1.1",
     "resolve": "1.18.1",
     "resolve-url-loader": "^3.1.2",
