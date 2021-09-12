@@ -787,6 +787,7 @@ const Chessboard = (props: ChessboardProps) => {
           let right = getRoad(v.li, v.co + 1);
           let { Marker } = self;
           if (Marker === 1 || !hasLeft) {
+            Marker = 1;
             self.Marker = 1;
             right.Marker = 2;
             self.isRoadVertex = true;
@@ -803,7 +804,7 @@ const Chessboard = (props: ChessboardProps) => {
             getRoad(v.li, idx).isRoadVertex = true;
             getRoad(v.li, idx).Marker = Marker;
             getRoad(v.li, idx - 1).isRoadVertex = false;
-            queue.push(JSON.stringify({ li: v.li, co: idx - 1 }));
+            queue.pop();
             queue.push(JSON.stringify({ li: v.li, co: idx }));
             Marker++;
             idx++;
@@ -835,6 +836,7 @@ const Chessboard = (props: ChessboardProps) => {
           let bottom = getRoad(v.li + 1, v.co);
           let { Marker } = self;
           if (Marker === 1 || !hasTop) {
+            Marker = 1;
             self.Marker = 1;
             bottom.Marker = 2;
             self.isRoadVertex = true;
@@ -849,9 +851,9 @@ const Chessboard = (props: ChessboardProps) => {
           let idx = v.li + 2;
           while (isDirRoad(idx, v.co, 'v')) {
             getRoad(idx, v.co).Marker = Marker;
-            getRoad(idx - 1, v.co).isRoadVertex = false;
             getRoad(idx, v.co).isRoadVertex = true;
-            queue.push(JSON.stringify({ li: idx - 1, co: v.co }));
+            getRoad(idx - 1, v.co).isRoadVertex = false;
+            queue.pop();
             queue.push(JSON.stringify({ li: idx, co: v.co }));
             Marker++;
             idx++;
