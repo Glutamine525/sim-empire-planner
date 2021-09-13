@@ -145,7 +145,7 @@ const Chessboard = (props: ChessboardProps) => {
       ).map(v => getMarkerImage(v, MarkerColor.Danger)),
     };
   }, [protectionNum]);
-  const roadImageBuffer = useMemo(() => getRoadImageBuffer(), []);
+  const roadImageBuffer = useMemo(() => getRoadImageBuffer(), []); // eslint-disable-line
   const building = useMemo(() => {
     setShowBuilding(false);
     if (Operation === OperationType.Empty) return hoveredBuilding;
