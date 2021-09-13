@@ -292,6 +292,7 @@ export class Cells {
   }
 
   getOccupied(line: number, column: number) {
+    if (!isInRange(line, column)) return false;
     return this.data[line][column].occupied;
   }
 

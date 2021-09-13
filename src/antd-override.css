@@ -75,3 +75,7 @@ img + .ant-menu-title-content {
 .ant-menu-item-group {
   background: var(--background-lighter);
 }
+
+.ant-tabs-nav-wrap {
+  left: 7rem;
+}

@@ -1,6 +1,5 @@
 import Switcher from '@/components/switcher';
 import React, { FC } from 'react';
-import { Link } from 'react-router-dom';
 import { CivilArray, CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { CounterType } from '@/types/couter';
@@ -12,16 +11,13 @@ import {
   changeMapType,
   changeMiniMap,
   changeNoWood,
-  clickHamButton,
   rotateMap,
 } from '@/actions';
 import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu } from 'antd';
-import HamButton from '@/components/ham-button';
 import { MINOR_PATCH, VERSION } from '@/utils/config';
 
 interface TopMenuProps {
-  IsHamActive: boolean;
   MapType: number;
   Civil: CivilType;
   IsNoWood: boolean;
@@ -31,7 +27,6 @@ interface TopMenuProps {
   Operation: OperationType;
   OperationSub: string;
   Counter: CounterType;
-  OnClickHamButton: any;
   OnChangeMapType: any;
   OnChangeCivil: any;
   OnChangeNoWood: any;
@@ -42,7 +37,6 @@ interface TopMenuProps {
 
 const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   const {
-    IsHamActive,
     MapType,
     Civil,
     IsNoWood,
@@ -52,7 +46,6 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
     Operation,
     OperationSub,
     Counter,
-    OnClickHamButton,
     OnChangeMapType,
     OnChangeCivil,
     OnChangeNoWood,
@@ -95,10 +88,6 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
     </Menu>
   );
 
-  const onClickHamButton = () => {
-    OnClickHamButton(!IsHamActive);
-  };
-
   const onClickNoWood = () => {
     OnChangeNoWood(!IsNoWood);
   };
@@ -116,12 +105,10 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   };
 
   return (
-    <div className={styles.wrapper}>
+    <nav className={styles.wrapper}>
       <div className={styles.container}>
         <div className={styles.controller}>
-          <Link to={IsHamActive ? '/' : '/setting'}>
-            <HamButton IsActive={IsHamActive} OnClick={onClickHamButton} />
-          </Link>
+          <div style={{ width: '4rem', height: '4rem' }}></div>
           <div>
             <span>地图类型：</span>
             <Dropdown overlay={mapTypeDropdown} placement="bottomCenter" arrow>
@@ -243,13 +230,12 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
           </div>
         </div>
       </div>
-    </div>
+    </nav>
   );
 };
 
 const mapStateToProps = (state: any) => {
   return {
-    IsHamActive: state.TopMenu.isHamActive,
     MapType: state.TopMenu.mapType,
     Civil: state.TopMenu.civil,
     IsNoWood: state.TopMenu.isNoWood,
@@ -264,9 +250,6 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    OnClickHamButton: (isHamActive: boolean) => {
-      dispatch(clickHamButton(isHamActive));
-    },
     OnChangeMapType: (mapType: number) => {
       dispatch(changeMapType(mapType));
     },

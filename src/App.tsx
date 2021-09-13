@@ -1,9 +1,7 @@
 import { DarkColor, LightColor, ThemeType } from '@/types/theme';
 import React, { FC, useEffect } from 'react';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Main from '@/pages/main';
-import Setting from '@/pages/setting';
-import TopMenuContainer from '@/components/top-menu';
+import Map from '@/pages/map';
 import { connect } from 'react-redux';
 import { store } from '.';
 import { InitState } from '@/types/state';
@@ -57,9 +55,7 @@ const App: FC<AppProps> = (props: AppProps) => {
 
   return (
     <Router>
-      <TopMenuContainer />
-      <Route exact path="/" component={Main} />
-      <Route exact path="/setting" component={Setting} />
+      <Route exact path="/" component={Map} />
     </Router>
   );
 };

@@ -144,8 +144,8 @@ const Chessboard = (props: ChessboardProps) => {
         (_, i) => i
       ).map(v => getMarkerImage(v, MarkerColor.Danger)),
     };
-  }, [protectionNum]);
-  const roadImageBuffer = useMemo(() => getRoadImageBuffer(), []); // eslint-disable-line
+  }, [roadMarkerBuffer, protectionNum]);
+  const roadImageBuffer = useMemo(() => getRoadImageBuffer(), []);
   const building = useMemo(() => {
     setShowBuilding(false);
     if (Operation === OperationType.Empty) return hoveredBuilding;
@@ -155,6 +155,7 @@ const Chessboard = (props: ChessboardProps) => {
   const hideMarker = useMemo(() => !showMarker(building), [building]);
 
   useEffect(() => {
+    console.time('useEffect []');
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
       wheelSpeed: 1,
     });
@@ -174,9 +175,11 @@ const Chessboard = (props: ChessboardProps) => {
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     window.addEventListener('resize', updateScroll);
+    console.timeEnd('useEffect []');
   }, []);
 
   useEffect(() => {
+    console.time('useEffect [MapType, Civil]');
     setBuildingMarker(0);
     OnResetCounter();
     let canvas: any = buildingCanvasRef.current;
@@ -188,10 +191,11 @@ const Chessboard = (props: ChessboardProps) => {
     cells.init(MapType, Civil);
     placeBarrier();
     placeFixed();
+    console.timeEnd('useEffect [MapType, Civil]');
   }, [MapType, Civil]); // eslint-disable-line
 
   useEffect(() => {
-    console.time('Painting Cell');
+    console.time('useEffect [Theme]');
     const canvas: any = cellCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -219,10 +223,11 @@ const Chessboard = (props: ChessboardProps) => {
         }
       }
     }
-    console.timeEnd('Painting Cell');
+    console.timeEnd('useEffect [Theme]');
   }, [Theme]);
 
   useEffect(() => {
+    console.time('useEffect [Operation]');
     switch (Operation) {
       case OperationType.Empty:
         SetCopiedBuilding({});
@@ -250,6 +255,7 @@ const Chessboard = (props: ChessboardProps) => {
       default:
         break;
     }
+    console.timeEnd('useEffect [Operation]');
   }, [Operation]); // eslint-disable-line
 
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
@@ -300,7 +306,7 @@ const Chessboard = (props: ChessboardProps) => {
     switch (Operation) {
       case OperationType.Empty:
         const occupied = cells.getOccupied(line, column);
-        if (isInRange(line, column) && occupied) {
+        if (occupied) {
           const [li, co] = parseBuildingKey(occupied);
           const target = cells.getBuilding(li, co);
           if (!target.IsBarrier && !target.IsRoad) {
