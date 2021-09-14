@@ -76,6 +76,27 @@ img + .ant-menu-title-content {
   background: var(--background-lighter);
 }
 
+.ant-tabs-nav {
+  position: fixed !important;
+  padding-top: 0.2rem;
+  width: 100%;
+  background: var(--background-lighter);
+}
+
 .ant-tabs-nav-wrap {
   left: 7rem;
+}
+
+.ant-tabs-top > .ant-tabs-nav::before {
+  border-color: var(--border-base);
+}
+
+.ant-tabs-tab {
+  color: var(--text-regular);
+}
+
+.ant-tabs-content-holder {
+  padding-top: 6.4rem;
+  box-sizing: border-box;
+  color: var(--text-regular);
 }
