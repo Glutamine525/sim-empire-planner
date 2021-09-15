@@ -228,14 +228,14 @@ export class Cells {
     return record;
   }
 
-  delete(line: number, column: number) {
+  delete(line: number, column: number, force?: boolean) {
     const { occupied } = this.data[line][column];
     if (!occupied) return [];
     const [oLi, oCo, width, height] = parseBuildingKey(occupied);
     const target = this.getBuilding(oLi, oCo);
     const { Range, Name } = target;
 
-    if (target.IsFixed || target.IsBarrier) return [];
+    if (target.IsFixed && !force) return [];
 
     let record: string[] = [];
     if (target.IsProtection) {

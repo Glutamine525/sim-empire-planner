@@ -52,6 +52,7 @@ import Coord from './components/coord';
 interface ChessboardProps {
   MapType: number;
   Civil: CivilType;
+  IsNoWood: boolean;
   Theme: ThemeType;
   Operation: OperationType;
   BuildingConfig: Building;
@@ -96,6 +97,7 @@ const Chessboard = (props: ChessboardProps) => {
   const {
     MapType,
     Civil,
+    IsNoWood,
     Theme,
     Operation,
     BuildingConfig,
@@ -193,6 +195,46 @@ const Chessboard = (props: ChessboardProps) => {
     placeFixed();
     console.timeEnd('useEffect [MapType, Civil]');
   }, [MapType, Civil]); // eslint-disable-line
+
+  useEffect(() => {
+    (async () => {
+      console.time('useEffect [IsNoWood]');
+      const keys = BuildingFixed[BarrierType.Tree][MapType - 3];
+      const color = BarrierColor[BarrierType.Tree];
+      if (IsNoWood) {
+        for (let key of keys) {
+          const [line, column] = parseBuildingKey(key);
+          deleteBuilding(line, column, true);
+        }
+      } else {
+        for (let key of keys) {
+          const [line, column] = parseBuildingKey(key);
+          const occupied = cells.getOccupied(line, column);
+          if (occupied) {
+            const [oLi, oCo] = parseBuildingKey(occupied);
+            deleteBuilding(oLi, oCo, true);
+          }
+          const top = `${line - 1}-${column}`;
+          const bottom = `${line + 1}-${column}`;
+          const left = `${line}-${column - 1}`;
+          const right = `${line}-${column + 1}`;
+          barriers[key] = {
+            background: color,
+            T: !keys.includes(top),
+            B: !keys.includes(bottom),
+            L: !keys.includes(left),
+            R: !keys.includes(right),
+          };
+          cells.placeBarrier(line, column);
+        }
+        const canvas: any = buildingCanvasRef.current;
+        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+        barriers = {};
+      }
+      console.timeEnd('useEffect [IsNoWood]');
+    })();
+  }, [IsNoWood]); // eslint-disable-line
 
   useEffect(() => {
     console.time('useEffect [Theme]');
@@ -449,14 +491,14 @@ const Chessboard = (props: ChessboardProps) => {
     );
   };
 
-  const deleteBuilding = (line: number, column: number) => {
+  const deleteBuilding = (line: number, column: number, force?: boolean) => {
     const occupied = cells.getOccupied(line, column);
     if (!occupied) return false;
     const [originLine, originColumn, width, height] =
       parseBuildingKey(occupied);
     const target = cells.getBuilding(originLine, originColumn);
-    if (target.IsFixed) return false;
-    const records = cells.delete(line, column);
+    if (target.IsFixed && !force) return false;
+    const records = cells.delete(line, column, force);
     if (target.IsProtection) updateRecordMarker(records);
     else if (target.IsRoad) updateRoadDisplay(records);
     OnPlaceOrDeleteBuilding(target, -1);
@@ -694,6 +736,7 @@ const mapStateToProps = (state: any) => {
   return {
     MapType: state.TopMenu.mapType,
     Civil: state.TopMenu.civil,
+    IsNoWood: state.TopMenu.isNoWood,
     Theme: state.TopMenu.theme,
     Operation: state.LeftMenu.operation,
     BuildingConfig: state.LeftMenu.buildingConfig,
