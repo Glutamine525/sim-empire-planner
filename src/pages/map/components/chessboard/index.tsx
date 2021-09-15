@@ -48,6 +48,7 @@ import {
 } from '@/actions';
 import { BuildingFixed } from '@/types/building-fixed';
 import Coord from './components/coord';
+import Box from './components/box';
 
 interface ChessboardProps {
   MapType: number;
@@ -64,6 +65,8 @@ interface ChessboardProps {
 const initDragConfig = {
   initX: -1,
   initY: -1,
+  curX: -1,
+  curY: -1,
 };
 
 const initMoveConfig = {
@@ -110,6 +113,7 @@ const Chessboard = (props: ChessboardProps) => {
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
   const [moveConfig, setMoveConfig] = useState({ ...initMoveConfig });
   const [showBuilding, setShowBuilding] = useState(false);
+  const [showBox, setShowBox] = useState(false);
   const [cellOccupied, setCellOccupied] = useState(false);
   const [buildingMarker, setBuildingMarker] = useState(0);
   const [hoveredBuilding, setHoveredBuilding] = useState({} as Building);
@@ -270,6 +274,7 @@ const Chessboard = (props: ChessboardProps) => {
 
   useEffect(() => {
     console.time('useEffect [Operation]');
+    setShowBox(false);
     switch (Operation) {
       case OperationType.Empty:
         SetCopiedBuilding({});
@@ -301,13 +306,15 @@ const Chessboard = (props: ChessboardProps) => {
   }, [Operation]); // eslint-disable-line
 
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
+    const { clientX, clientY } = event;
     setIsDragging(true);
     switch (Operation) {
       case OperationType.Empty:
-        const { clientX, clientY } = event;
         setDragConfig({
           initX: getScrollLeft() + clientX,
           initY: getScrollTop() + clientY,
+          curX: getScrollLeft() + clientX,
+          curY: getScrollTop() + clientY,
         });
         break;
       case OperationType.Placing:
@@ -326,6 +333,25 @@ const Chessboard = (props: ChessboardProps) => {
         }
         setCellOccupied(true);
         placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
+        if (BuildingConfig.IsRoad) {
+          setShowBox(true);
+          setDragConfig({
+            initX: getScrollLeft() + clientX - 86,
+            initY: getScrollTop() + clientY - 80,
+            curX: getScrollLeft() + clientX - 86,
+            curY: getScrollTop() + clientY - 80,
+          });
+        }
+        break;
+      case OperationType.Select: // eslint-disable-line
+      case OperationType.Delete:
+        setShowBox(true);
+        setDragConfig({
+          initX: getScrollLeft() + clientX - 86,
+          initY: getScrollTop() + clientY - 80,
+          curX: getScrollLeft() + clientX - 86,
+          curY: getScrollTop() + clientY - 80,
+        });
         break;
       default:
         break;
@@ -404,7 +430,23 @@ const Chessboard = (props: ChessboardProps) => {
         setCellOccupied(!canPlace);
         setMoveConfig({ line, offsetLine, column, offsetColumn });
         if (!isDragging || !canPlace) return;
+        if (BuildingConfig.IsRoad) {
+          setDragConfig(state => {
+            const curX = getScrollLeft() + clientX - 86;
+            const curY = getScrollTop() + clientY - 80;
+            return { ...state, curX, curY };
+          });
+        }
         placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
+        break;
+      case OperationType.Select: // eslint-disable-line
+      case OperationType.Delete:
+        if (!isDragging) return;
+        setDragConfig(state => ({
+          ...state,
+          curX: getScrollLeft() + clientX - 86,
+          curY: getScrollTop() + clientY - 80,
+        }));
         break;
       default:
         break;
@@ -413,6 +455,31 @@ const Chessboard = (props: ChessboardProps) => {
 
   const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = event => {
     setIsDragging(false);
+    switch (Operation) {
+      case OperationType.Placing:
+        setShowBox(false);
+        break;
+      case OperationType.Select: // eslint-disable-line
+      case OperationType.Delete:
+        setDragConfig(state => {
+          let { initX, initY, curX, curY } = state;
+          if (initX === curX || initY === curY) setShowBox(false);
+          [initX, curX] = initX < curX ? [initX, curX] : [curX, initX];
+          [initY, curY] = initY < curY ? [initY, curY] : [curY, initY];
+          const initLi = Math.floor(initX / 30);
+          const initCo = Math.floor(initY / 30);
+          const curLi = Math.ceil(curX / 30);
+          const curCo = Math.ceil(curY / 30);
+          initX = initLi * 30;
+          initY = initCo * 30;
+          curX = curLi * 30;
+          curY = curCo * 30;
+          return { initX, initY, curX, curY };
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   const onWrapperMouseLeave: MouseEventHandler<HTMLDivElement> = event => {
@@ -726,6 +793,7 @@ const Chessboard = (props: ChessboardProps) => {
             Color={building.Background}
             Operation={Operation}
           ></Range>
+          <Box Show={showBox} DragConfig={dragConfig} Operation={Operation} />
         </div>
       </div>
     </div>

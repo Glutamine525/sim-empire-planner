@@ -151,6 +151,12 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           };
           dispatchBuilding(keyPath, building);
           return;
+        case 's':
+          OnChangeOperation(OperationType.Select, '', {} as any);
+          break;
+        case 'd':
+          OnChangeOperation(OperationType.Delete, '', {} as any);
+          break;
         case 'z':
           if (protection.length < 1) return;
           parent = CatalogType.Municipal;
@@ -259,8 +265,10 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           OnChangeOperation(OperationType.Empty, '', {} as any);
           return;
         case '选中建筑':
+          OnChangeOperation(OperationType.Select, '', {} as any);
           return;
         case '删除建筑':
+          OnChangeOperation(OperationType.Delete, '', {} as any);
           return;
         case '导入导出':
           return;
