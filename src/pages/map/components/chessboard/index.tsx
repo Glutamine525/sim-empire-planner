@@ -86,6 +86,8 @@ let barriers = {} as {
   };
 };
 
+let roadBuffer: string[] = [];
+
 const usePrevState = (value: any) => {
   const ref = useRef();
   useEffect(() => {

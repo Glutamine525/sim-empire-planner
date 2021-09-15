@@ -15,13 +15,13 @@ export default function Box(props: BoxProps) {
     Operation,
   } = props;
 
+  const [showRoadHelper, setShowRoadHelper] = useState(false);
   const [config, setConfig] = useState({
     x: 0,
     y: 0,
     width: 0,
     height: 0,
   });
-
   const [style, setStyle] = useState({
     background: 'black',
     borderStyle: 'none',
@@ -33,10 +33,23 @@ export default function Box(props: BoxProps) {
     let y = initY < curY ? initY : curY;
     let width = Math.abs(initX - curX);
     let height = Math.abs(initY - curY);
-    if (Operation == OperationType.Placing) {
-      x = Math.floor(x / 30) * 30;
-      y = Math.floor(y / 30) * 30;
-      //TODO
+    if (Operation === OperationType.Placing) {
+      let [startX, endX] = initX < curX ? [initX, curX] : [curX, initX];
+      let [startY, endY] = initY < curY ? [initY, curY] : [curY, initY];
+      startX = Math.floor(startX / 30) * 30;
+      startY = Math.floor(startY / 30) * 30;
+      endX = Math.floor(endX / 30) * 30;
+      endY = Math.floor(endY / 30) * 30;
+      [x, y] = [startX, startY];
+      if (startX === endX) {
+        width = 30;
+        height = endY - startY + 30;
+        setShowRoadHelper(true);
+      } else if (startY === endY) {
+        height = 30;
+        width = endX - startX + 30;
+        setShowRoadHelper(true);
+      } else setShowRoadHelper(false);
     }
     setConfig({ x, y, width, height });
   }, [initX, initY, curX, curY]);
@@ -74,7 +87,11 @@ export default function Box(props: BoxProps) {
       className={styles.container}
       style={{
         ...style,
-        display: Show ? 'block' : 'none',
+        display:
+          (Show && Operation !== OperationType.Placing) ||
+          (Show && showRoadHelper && Operation === OperationType.Placing)
+            ? 'block'
+            : 'none',
         transform: `translate(${config.x}px, ${config.y}px)`,
         width: config.width,
         height: config.height,
