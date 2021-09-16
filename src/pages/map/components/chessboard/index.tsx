@@ -114,6 +114,7 @@ const Chessboard = (props: ChessboardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
   const [moveConfig, setMoveConfig] = useState({ ...initMoveConfig });
+  const [updateRoad, setUpdateRoad] = useState(false); // 当按下鼠标，格子被占据时，需要实时更新道路边框
   const [showBuilding, setShowBuilding] = useState(false);
   const [showBox, setShowBox] = useState(false);
   const [cellOccupied, setCellOccupied] = useState(false);
@@ -320,7 +321,10 @@ const Chessboard = (props: ChessboardProps) => {
         });
         break;
       case OperationType.Placing:
-        if (!showBuilding || cellOccupied) return;
+        if (!showBuilding || cellOccupied) {
+          setUpdateRoad(true);
+          return;
+        }
         const { line, offsetLine, column, offsetColumn } = moveConfig;
         const { Width, Height } = BuildingConfig;
         if (
@@ -334,7 +338,13 @@ const Chessboard = (props: ChessboardProps) => {
           return;
         }
         setCellOccupied(true);
-        placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
+        setUpdateRoad(false);
+        placeBuilding(
+          BuildingConfig,
+          line + offsetLine,
+          column + offsetColumn,
+          updateRoad
+        );
         if (BuildingConfig.IsRoad) {
           roadBuffer.add(`${line}-${column}`);
           setShowBox(true);
@@ -441,7 +451,12 @@ const Chessboard = (props: ChessboardProps) => {
         }
         if (!isDragging || !canPlace) return;
         if (BuildingConfig.IsRoad) roadBuffer.add(`${line}-${column}`);
-        placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
+        placeBuilding(
+          BuildingConfig,
+          line + offsetLine,
+          column + offsetColumn,
+          updateRoad
+        );
         break;
       case OperationType.Select: // eslint-disable-line
       case OperationType.Delete:
@@ -470,7 +485,7 @@ const Chessboard = (props: ChessboardProps) => {
           let initLi = Math.floor(startY / 30);
           let curCo = Math.floor(endX / 30);
           let curLi = Math.floor(endY / 30);
-          if (initLi === curLi) {
+          if (!updateRoad && initLi === curLi) {
             roadBuffer.forEach(key => {
               const [line, column] = parseBuildingKey(key);
               deleteBuilding(line, column, true);
@@ -480,7 +495,7 @@ const Chessboard = (props: ChessboardProps) => {
               if (occupied) continue;
               placeBuilding(BuildingConfig, initLi + 1, i + 1, true);
             }
-          } else if (initCo === curCo) {
+          } else if (!updateRoad && initCo === curCo) {
             roadBuffer.forEach(key => {
               const [line, column] = parseBuildingKey(key);
               deleteBuilding(line, column, true);
