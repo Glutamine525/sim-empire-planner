@@ -49,7 +49,12 @@ export default function Box(props: BoxProps) {
         height = 30;
         width = endX - startX + 30;
         setShowRoadHelper(true);
-      } else setShowRoadHelper(false);
+      } else {
+        x = Math.floor(initX / 30) * 30;
+        y = Math.floor(initY / 30) * 30;
+        [width, height] = [30, 30];
+        setShowRoadHelper(true);
+      }
     }
     setConfig({ x, y, width, height });
   }, [initX, initY, curX, curY]); // eslint-disable-line

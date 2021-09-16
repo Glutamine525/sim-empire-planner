@@ -477,7 +477,6 @@ const Chessboard = (props: ChessboardProps) => {
     switch (Operation) {
       case OperationType.Placing:
         if (BuildingConfig.IsRoad) {
-          console.log(roadBuffer);
           const { initX, initY, curX, curY } = dragConfig;
           let [startX, endX] = initX < curX ? [initX, curX] : [curX, initX];
           let [startY, endY] = initY < curY ? [initY, curY] : [curY, initY];
