@@ -102,11 +102,46 @@ export default function Box(props: BoxProps) {
         height: config.height,
       }}
     >
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
-      <div></div>
+      <div
+        className={`${styles['icon-button']} ${styles.delete}`}
+        style={{
+          display: Operation === OperationType.Delete ? 'block' : 'none',
+        }}
+      >
+        <span className={styles['icon-font']}>&#xe625;</span>
+      </div>
+      <div
+        className={`${styles['icon-button']} ${styles.select}`}
+        style={{
+          display: Operation === OperationType.Select ? 'block' : 'none',
+        }}
+      >
+        <span className={styles['icon-font']}>&#xe621;</span>
+      </div>
+      <div
+        className={`${styles['icon-button']} ${styles.select}`}
+        style={{
+          display: Operation === OperationType.Select ? 'block' : 'none',
+        }}
+      >
+        <span className={styles['icon-font']}>&#xe622;</span>
+      </div>
+      <div
+        className={`${styles['icon-button']} ${styles.select}`}
+        style={{
+          display: Operation === OperationType.Select ? 'block' : 'none',
+        }}
+      >
+        <span className={styles['icon-font']}>&#xe623;</span>
+      </div>
+      <div
+        className={`${styles['icon-button']} ${styles.select}`}
+        style={{
+          display: Operation === OperationType.Select ? 'block' : 'none',
+        }}
+      >
+        <span className={styles['icon-font']}>&#xe624;</span>
+      </div>
     </div>
   );
 }

@@ -537,6 +537,4 @@ export class Cells {
     else records.push(`${line + 1}-${column}`);
     return records;
   }
-
-  toggleNoWood(isNoWood: boolean) {}
 }

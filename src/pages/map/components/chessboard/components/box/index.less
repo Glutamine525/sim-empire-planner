@@ -3,3 +3,87 @@
   top: 0;
   border-width: 0.1rem,;
 }
+
+.icon-button {
+  position: relative;
+  width: 4rem;
+  height: 4rem;
+  font-size: 2.8rem;
+  border: none;
+  border-radius: 50%;
+  text-decoration: none;
+  cursor: pointer;
+  color: white;
+  transition: 0.4s color ease-in-out;
+}
+
+.icon-button::before {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 1;
+  transform: translate(-50%, -50%);
+}
+
+.icon-button::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  content: '';
+  box-sizing: border-box;
+  transition: 0.4s transform ease-in-out, 0.4s opacity ease-in-out;
+}
+
+.icon-button:hover {
+  text-shadow:
+    0 0 5px var(--border-lighter),
+    0 0 10px var(--border-lighter),
+    0 0 15px var(--border-lighter),
+    0 0 20px var(--border-lighter);
+}
+
+.icon-button:hover::after {
+  transform: scale(1.6);
+  opacity: 0;
+}
+
+.icon-button.select {
+  border: 4px solid var(--ant-primary-color);
+}
+
+.icon-button.select::after {
+  background: var(--ant-primary-color);
+}
+
+.icon-button.select:hover {
+  color: var(--ant-primary-color);
+}
+
+.icon-button.delete {
+  border: 4px solid var(--ant-error-color);
+}
+
+.icon-button.delete::after {
+  background: var(--ant-error-color);
+}
+
+.icon-button.delete:hover {
+  color: var(--ant-error-color);
+}
+
+.icon-font {
+  position: absolute;
+  top: 0.2rem;
+  left: 0.2rem;
+  z-index: 2;
+  font-size: 2.8rem;
+  font-family: 'icon-font' !important;
+  line-height: 2.8rem;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

@@ -3,6 +3,14 @@
   src: url(./fonts/HuaKangJinGangHei-Regular-2.ttf);
 }
 
+@font-face {
+  font-family: 'icon-font';
+  src:
+    url(./fonts/iconfont.woff2?t=1631815426289) format('woff2'),
+    url(./fonts/iconfont.woff?t=1631815426289) format('woff'),
+    url(./fonts/iconfont.ttf?t=1631815426289) format('truetype');
+}
+
 * {
   margin: 0;
   padding: 0;
