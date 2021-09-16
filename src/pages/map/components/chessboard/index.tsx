@@ -86,7 +86,7 @@ let barriers = {} as {
   };
 };
 
-let roadBuffer: string[] = [];
+let roadBuffer = new Set<string>();
 
 const usePrevState = (value: any) => {
   const ref = useRef();
@@ -336,6 +336,7 @@ const Chessboard = (props: ChessboardProps) => {
         setCellOccupied(true);
         placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
         if (BuildingConfig.IsRoad) {
+          roadBuffer.add(`${line}-${column}`);
           setShowBox(true);
           setDragConfig({
             initX: getScrollLeft() + clientX - 86,
@@ -431,7 +432,6 @@ const Chessboard = (props: ChessboardProps) => {
         setShowBuilding(true);
         setCellOccupied(!canPlace);
         setMoveConfig({ line, offsetLine, column, offsetColumn });
-        if (!isDragging || !canPlace) return;
         if (BuildingConfig.IsRoad) {
           setDragConfig(state => {
             const curX = getScrollLeft() + clientX - 86;
@@ -439,6 +439,8 @@ const Chessboard = (props: ChessboardProps) => {
             return { ...state, curX, curY };
           });
         }
+        if (!isDragging || !canPlace) return;
+        if (BuildingConfig.IsRoad) roadBuffer.add(`${line}-${column}`);
         placeBuilding(BuildingConfig, line + offsetLine, column + offsetColumn);
         break;
       case OperationType.Select: // eslint-disable-line
@@ -459,7 +461,41 @@ const Chessboard = (props: ChessboardProps) => {
     setIsDragging(false);
     switch (Operation) {
       case OperationType.Placing:
-        setShowBox(false);
+        if (BuildingConfig.IsRoad) {
+          console.log(roadBuffer);
+          const { initX, initY, curX, curY } = dragConfig;
+          let [startX, endX] = initX < curX ? [initX, curX] : [curX, initX];
+          let [startY, endY] = initY < curY ? [initY, curY] : [curY, initY];
+          let initCo = Math.floor(startX / 30);
+          let initLi = Math.floor(startY / 30);
+          let curCo = Math.floor(endX / 30);
+          let curLi = Math.floor(endY / 30);
+          if (initLi === curLi) {
+            roadBuffer.forEach(key => {
+              const [line, column] = parseBuildingKey(key);
+              deleteBuilding(line, column, true);
+            });
+            for (let i = initCo; i <= curCo; i++) {
+              const occupied = cells.getOccupied(initLi + 1, i + 1);
+              if (occupied) continue;
+              placeBuilding(BuildingConfig, initLi + 1, i + 1, true);
+            }
+          } else if (initCo === curCo) {
+            roadBuffer.forEach(key => {
+              const [line, column] = parseBuildingKey(key);
+              deleteBuilding(line, column, true);
+            });
+            for (let i = initLi; i <= curLi; i++) {
+              const occupied = cells.getOccupied(i + 1, initCo + 1);
+              if (occupied) continue;
+              placeBuilding(BuildingConfig, i + 1, initCo + 1, true);
+            }
+          } else {
+            updateRoadDisplay(Array.from(roadBuffer));
+          }
+          roadBuffer.clear();
+          setShowBox(false);
+        }
         break;
       case OperationType.Select: // eslint-disable-line
       case OperationType.Delete:
@@ -522,13 +558,14 @@ const Chessboard = (props: ChessboardProps) => {
   const placeBuilding = async (
     building: Building,
     line: number,
-    column: number
+    column: number,
+    updateRoad?: boolean
   ) => {
     const records = cells.place(building, line, column);
     if (building.IsProtection) updateRecordMarker(records);
-    else if (building.IsRoad) updateRoadDisplay(records);
+    else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
     OnPlaceOrDeleteBuilding(building, 1);
-    if (building.IsRoad) return; // 禁止道路图片重绘
+    if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
     const canvas: any = buildingCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     if (building.IsFixed) {
@@ -569,7 +606,7 @@ const Chessboard = (props: ChessboardProps) => {
     if (target.IsFixed && !force) return false;
     const records = cells.delete(line, column, force);
     if (target.IsProtection) updateRecordMarker(records);
-    else if (target.IsRoad) updateRoadDisplay(records);
+    else if (target.IsRoad && !force) updateRoadDisplay(records);
     OnPlaceOrDeleteBuilding(target, -1);
     deleteMarker(originLine, originColumn);
     const canvas: any = buildingCanvasRef.current;

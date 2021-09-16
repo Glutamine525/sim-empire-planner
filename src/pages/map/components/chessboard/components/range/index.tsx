@@ -17,12 +17,11 @@ interface RangeProps {
 export default function Range(props: RangeProps) {
   const { Show, Size, Line, Column, Width, Height, Color, Operation } = props;
 
-  if (!Show) return null;
-
   return (
     <div
       className={styles.container}
       style={{
+        display: Show && Size ? 'flex' : 'none',
         transform: `translate(${(Column - Size - 1) * 3}rem, ${
           (Line - Size - 1) * 3
         }rem)`,

@@ -52,7 +52,7 @@ export default function Box(props: BoxProps) {
       } else setShowRoadHelper(false);
     }
     setConfig({ x, y, width, height });
-  }, [initX, initY, curX, curY]);
+  }, [initX, initY, curX, curY]); // eslint-disable-line
 
   useEffect(() => {
     switch (Operation) {
