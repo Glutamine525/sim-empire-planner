@@ -3,16 +3,18 @@ import React, { useEffect, useState } from 'react';
 import styles from './index.less';
 
 interface BoxProps {
-  DragConfig: { initX: number; initY: number; curX: number; curY: number };
-  Show: boolean;
-  Operation: OperationType;
+  dragConfig: { initX: number; initY: number; curX: number; curY: number };
+  show: boolean;
+  operation: OperationType;
+  showButton: boolean;
 }
 
 export default function Box(props: BoxProps) {
   const {
-    DragConfig: { initX, initY, curX, curY },
-    Show,
-    Operation,
+    dragConfig: { initX, initY, curX, curY },
+    show,
+    operation,
+    showButton,
   } = props;
 
   const [showRoadHelper, setShowRoadHelper] = useState(false);
@@ -33,7 +35,7 @@ export default function Box(props: BoxProps) {
     let y = initY < curY ? initY : curY;
     let width = Math.abs(initX - curX);
     let height = Math.abs(initY - curY);
-    if (Operation === OperationType.Placing) {
+    if (operation === OperationType.Placing) {
       let [startX, endX] = initX < curX ? [initX, curX] : [curX, initX];
       let [startY, endY] = initY < curY ? [initY, curY] : [curY, initY];
       startX = Math.floor(startX / 30) * 30;
@@ -60,7 +62,7 @@ export default function Box(props: BoxProps) {
   }, [initX, initY, curX, curY]); // eslint-disable-line
 
   useEffect(() => {
-    switch (Operation) {
+    switch (operation) {
       case OperationType.Placing:
         setStyle({
           background: 'var(--ant-primary-color-outline)',
@@ -85,7 +87,7 @@ export default function Box(props: BoxProps) {
       default:
         break;
     }
-  }, [Operation]);
+  }, [operation]);
 
   return (
     <div
@@ -93,8 +95,8 @@ export default function Box(props: BoxProps) {
       style={{
         ...style,
         display:
-          (Show && Operation !== OperationType.Placing) ||
-          (Show && showRoadHelper && Operation === OperationType.Placing)
+          (show && operation !== OperationType.Placing) ||
+          (show && showRoadHelper && operation === OperationType.Placing)
             ? 'block'
             : 'none',
         transform: `translate(${config.x}px, ${config.y}px)`,
@@ -105,7 +107,8 @@ export default function Box(props: BoxProps) {
       <div
         className={`${styles['icon-button']} ${styles.delete}`}
         style={{
-          display: Operation === OperationType.Delete ? 'block' : 'none',
+          display:
+            showButton && operation === OperationType.Delete ? 'block' : 'none',
         }}
       >
         <span className={styles['icon-font']}>&#xe625;</span>
@@ -113,7 +116,8 @@ export default function Box(props: BoxProps) {
       <div
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
-          display: Operation === OperationType.Select ? 'block' : 'none',
+          display:
+            showButton && operation === OperationType.Select ? 'block' : 'none',
         }}
       >
         <span className={styles['icon-font']}>&#xe621;</span>
@@ -121,7 +125,8 @@ export default function Box(props: BoxProps) {
       <div
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
-          display: Operation === OperationType.Select ? 'block' : 'none',
+          display:
+            showButton && operation === OperationType.Select ? 'block' : 'none',
         }}
       >
         <span className={styles['icon-font']}>&#xe622;</span>
@@ -129,7 +134,8 @@ export default function Box(props: BoxProps) {
       <div
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
-          display: Operation === OperationType.Select ? 'block' : 'none',
+          display:
+            showButton && operation === OperationType.Select ? 'block' : 'none',
         }}
       >
         <span className={styles['icon-font']}>&#xe623;</span>
@@ -137,7 +143,8 @@ export default function Box(props: BoxProps) {
       <div
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
-          display: Operation === OperationType.Select ? 'block' : 'none',
+          display:
+            showButton && operation === OperationType.Select ? 'block' : 'none',
         }}
       >
         <span className={styles['icon-font']}>&#xe624;</span>

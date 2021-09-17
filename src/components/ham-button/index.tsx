@@ -2,20 +2,20 @@ import React from 'react';
 import styles from './index.less';
 
 interface HamButtonProps {
-  IsActive: boolean;
-  OnClick: any;
+  isActive: boolean;
+  onClick: any;
 }
 
 export default function HamButton(props: HamButtonProps) {
-  const { IsActive, OnClick } = props;
+  const { isActive, onClick } = props;
 
   return (
     <svg
       className={`${styles['ham-button']} ${styles['ham-button-rotate']} ${
-        IsActive ? styles.active : ''
+        isActive ? styles.active : ''
       }`}
       viewBox="0 0 100 100"
-      onClick={OnClick}
+      onClick={onClick}
     >
       <path
         className={`${styles['line']} ${styles['top']}`}

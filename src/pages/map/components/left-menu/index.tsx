@@ -18,21 +18,21 @@ import styles from './index.less';
 const { SubMenu } = Menu;
 
 interface LeftMenuProps {
-  MapType: number;
-  Civil: CivilType;
-  CopiedBuilding: Building;
-  OnChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
+  mapType: number;
+  civil: CivilType;
+  copiedBuilding: Building;
+  onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
 }
 
 const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
-  const { MapType, Civil, CopiedBuilding, OnChangeOperation } = props;
+  const { mapType, civil, copiedBuilding, onChangeOperation } = props;
 
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
     {} as { [key in CatalogType]: { sub: any[] } }
   );
 
-  const protection = useMemo(() => CivilBuilding[Civil]['防护'], [Civil]);
+  const protection = useMemo(() => CivilBuilding[civil]['防护'], [civil]);
 
   useEffect(() => {
     setCatalog({
@@ -67,41 +67,41 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       const { key } = event;
       if (key !== ' ') return;
       event.preventDefault();
-      OnChangeOperation(OperationType.Empty, '', {} as any);
+      onChangeOperation(OperationType.Empty, '', {} as any);
     });
     document.addEventListener('keyup', event => {
       const { key, ctrlKey } = event;
       if (key !== 'c' || !ctrlKey) return;
-      OnChangeOperation(OperationType.Copying, '', {} as any);
+      onChangeOperation(OperationType.Copying, '', {} as any);
     });
   }, []); // eslint-disable-line
 
   useEffect(() => {
     const newCatalog = {
-      住宅: { sub: CivilBuilding[Civil]['住宅'] },
-      农业: { sub: CivilBuilding[Civil]['农业'] },
-      工业: { sub: CivilBuilding[Civil]['工业'] },
-      商业: { sub: CivilBuilding[Civil]['商业'] },
-      市政: { sub: CivilBuilding[Civil]['市政'] },
-      文化: { sub: CivilBuilding[Civil]['文化'] },
-      宗教: { sub: CivilBuilding[Civil]['宗教'] },
-      军事: { sub: CivilBuilding[Civil]['军事'] },
-      美化: { sub: CivilBuilding[Civil]['美化'] },
-      奇迹: { sub: CivilBuilding[Civil]['奇迹'] },
+      住宅: { sub: CivilBuilding[civil]['住宅'] },
+      农业: { sub: CivilBuilding[civil]['农业'] },
+      工业: { sub: CivilBuilding[civil]['工业'] },
+      商业: { sub: CivilBuilding[civil]['商业'] },
+      市政: { sub: CivilBuilding[civil]['市政'] },
+      文化: { sub: CivilBuilding[civil]['文化'] },
+      宗教: { sub: CivilBuilding[civil]['宗教'] },
+      军事: { sub: CivilBuilding[civil]['军事'] },
+      美化: { sub: CivilBuilding[civil]['美化'] },
+      奇迹: { sub: CivilBuilding[civil]['奇迹'] },
     };
     setCatalog((catalog: any) => ({
       ...catalog,
       ...newCatalog,
     }));
-  }, [Civil]);
+  }, [civil]);
 
   useEffect(() => {
-    OnChangeOperation(OperationType.Empty, '', {} as any);
-  }, [MapType, Civil]); // eslint-disable-line
+    onChangeOperation(OperationType.Empty, '', {} as any);
+  }, [mapType, civil]); // eslint-disable-line
 
   useEffect(() => {
-    if (!Object.keys(CopiedBuilding).length) {
-      OnChangeOperation(OperationType.Empty, '', {} as any);
+    if (!Object.keys(copiedBuilding).length) {
+      onChangeOperation(OperationType.Empty, '', {} as any);
       return;
     }
     const {
@@ -114,7 +114,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       Color,
       Background,
       IsRoad,
-    } = CopiedBuilding;
+    } = copiedBuilding;
     let keyPath = IsRoad ? [Catalog] : [Catalog, Name];
     dispatchBuilding(keyPath, {
       name: Name,
@@ -126,7 +126,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       background: Background,
       isRoad: IsRoad,
     });
-  }, [CopiedBuilding]); // eslint-disable-line
+  }, [copiedBuilding]); // eslint-disable-line
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -152,10 +152,10 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           dispatchBuilding(keyPath, building);
           return;
         case 's':
-          OnChangeOperation(OperationType.Select, '', {} as any);
+          onChangeOperation(OperationType.Select, '', {} as any);
           break;
         case 'd':
-          OnChangeOperation(OperationType.Delete, '', {} as any);
+          onChangeOperation(OperationType.Delete, '', {} as any);
           break;
         case 'z':
           if (protection.length < 1) return;
@@ -212,7 +212,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [catalog]); // eslint-disable-line
 
   const dispatchBuilding = (keyPath: string[], building: any) => {
-    OnChangeOperation(OperationType.Placing, keyPath.join('-'), {
+    onChangeOperation(OperationType.Placing, keyPath.join('-'), {
       Name: building.name,
       Text: building.text,
       Range: building.range,
@@ -262,13 +262,13 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           };
           break;
         case '取消操作':
-          OnChangeOperation(OperationType.Empty, '', {} as any);
+          onChangeOperation(OperationType.Empty, '', {} as any);
           return;
         case '选中建筑':
-          OnChangeOperation(OperationType.Select, '', {} as any);
+          onChangeOperation(OperationType.Select, '', {} as any);
           return;
         case '删除建筑':
-          OnChangeOperation(OperationType.Delete, '', {} as any);
+          onChangeOperation(OperationType.Delete, '', {} as any);
           return;
         case '导入导出':
           return;
@@ -339,15 +339,15 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
-    MapType: state.TopMenu.mapType,
-    Civil: state.TopMenu.civil,
-    CopiedBuilding: state.Chessboard.copiedBuilding,
+    mapType: state.TopMenu.mapType,
+    civil: state.TopMenu.civil,
+    copiedBuilding: state.Chessboard.copiedBuilding,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    OnChangeOperation: (
+    onChangeOperation: (
       operation: OperationType,
       operationSub: string,
       buildingConfig: Building

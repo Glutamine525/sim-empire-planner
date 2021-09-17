@@ -1,14 +1,14 @@
 import React from 'react';
 import styles from './index.less';
 
-interface IProps {
+interface SwitcherProps {
   id: string;
   type: 'ordinary' | 'daynight';
   value: boolean;
   onClick: () => void;
 }
 
-export default function Switcher(props: IProps) {
+export default function Switcher(props: SwitcherProps) {
   const { id, type, value, onClick } = props;
 
   return (

@@ -4,7 +4,7 @@ import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { ThemeType } from '@/types/theme';
 
-export const clickHamButton = (isHamActive: boolean) => {
+export const changeHamButton = (isHamActive: boolean) => {
   return {
     type: ActionType.ClickHamButton,
     isHamActive,
@@ -46,7 +46,7 @@ export const changeMiniMap = (showMiniMap: boolean) => {
   };
 };
 
-export const rotateMap = (isMapRotated: boolean) => {
+export const changeRotateMap = (isMapRotated: boolean) => {
   return {
     type: ActionType.RotateMap,
     isMapRotated,

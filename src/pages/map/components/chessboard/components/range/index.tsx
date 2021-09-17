@@ -4,49 +4,49 @@ import React from 'react';
 import styles from './index.less';
 
 interface RangeProps {
-  Show: boolean;
-  Size: number;
-  Line: number;
-  Column: number;
-  Width: number;
-  Height: number;
-  Color: string;
-  Operation: OperationType;
+  show: boolean;
+  size: number;
+  line: number;
+  column: number;
+  width: number;
+  height: number;
+  color: string;
+  operation: OperationType;
 }
 
 export default function Range(props: RangeProps) {
-  const { Show, Size, Line, Column, Width, Height, Color, Operation } = props;
+  const { show, size, line, column, width, height, color, operation } = props;
 
   return (
     <div
       className={styles.container}
       style={{
-        display: Show && Size ? 'flex' : 'none',
-        transform: `translate(${(Column - Size - 1) * 3}rem, ${
-          (Line - Size - 1) * 3
+        display: show && size ? 'flex' : 'none',
+        transform: `translate(${(column - size - 1) * 3}rem, ${
+          (line - size - 1) * 3
         }rem)`,
         transition:
-          Operation === OperationType.Placing
+          operation === OperationType.Placing
             ? 'transform 30ms ease-in-out'
             : '',
       }}
     >
-      {Array(Size * 2 + Height)
+      {Array(size * 2 + height)
         .fill(0)
         .map((_, i) => {
           return (
             <div key={i} className={styles.row}>
-              {Array(Size * 2 + Width)
+              {Array(size * 2 + width)
                 .fill(0)
                 .map((_, j) => {
                   const borderStyle = isInBuildingRange(
-                    i - Size,
-                    j - Size,
+                    i - size,
+                    j - size,
                     0,
                     0,
-                    Width,
-                    Height,
-                    Size
+                    width,
+                    height,
+                    size
                   );
                   return (
                     <div
@@ -55,8 +55,8 @@ export default function Range(props: RangeProps) {
                         borderStyle && styles[borderStyle]
                       }`}
                       style={{
-                        background: borderStyle ? Color + '6f' : 'transparent',
-                        borderColor: Color,
+                        background: borderStyle ? color + '6f' : 'transparent',
+                        borderColor: color,
                       }}
                     ></div>
                   );

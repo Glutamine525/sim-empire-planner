@@ -7,13 +7,13 @@ import styles from './index.less';
 const { TabPane } = Tabs;
 
 interface PanelProps {
-  IsHamActive: boolean;
+  isHamActive: boolean;
 }
 
 let updateScroll: any;
 
 function Panel(props: PanelProps) {
-  const { IsHamActive } = props;
+  const { isHamActive } = props;
 
   const [activeKey, setActiveKey] = useState('1');
 
@@ -39,7 +39,7 @@ function Panel(props: PanelProps) {
       ref={panelRef}
       className={styles.wrapper}
       style={{
-        left: IsHamActive ? 0 : '-100%',
+        left: isHamActive ? 0 : '-100%',
       }}
     >
       <Tabs activeKey={activeKey} onTabClick={onTabClick}>
@@ -64,7 +64,7 @@ function Panel(props: PanelProps) {
 
 const mapStateToProps = (state: any) => {
   return {
-    IsHamActive: state.TopMenu.isHamActive,
+    isHamActive: state.TopMenu.isHamActive,
   };
 };
 

@@ -1,13 +1,15 @@
 import React, { FC } from 'react';
 import styles from './index.less';
 
-interface IProps {
+interface MenuIconProps {
   src: string;
   alt: string;
 }
 
-const MenuIcon: FC<IProps> = IProps => {
-  return <img className={styles.icon} src={IProps.src} alt={IProps.alt} />;
+const MenuIcon: FC<MenuIconProps> = props => {
+  const { src, alt } = props;
+
+  return <img className={styles.icon} src={src} alt={alt} />;
 };
 
 export default MenuIcon;

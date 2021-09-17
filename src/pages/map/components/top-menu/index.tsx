@@ -11,47 +11,47 @@ import {
   changeMapType,
   changeMiniMap,
   changeNoWood,
-  rotateMap,
+  changeRotateMap,
 } from '@/actions';
 import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu } from 'antd';
 import { MINOR_PATCH, VERSION } from '@/utils/config';
 
 interface TopMenuProps {
-  MapType: number;
-  Civil: CivilType;
-  IsNoWood: boolean;
-  Theme: ThemeType;
-  ShowMiniMap: boolean;
-  IsMapRotated: boolean;
-  Operation: OperationType;
-  OperationSub: string;
-  Counter: CounterType;
-  OnChangeMapType: any;
-  OnChangeCivil: any;
-  OnChangeNoWood: any;
-  OnChangeTheme: any;
-  OnChangeMiniMap: any;
-  OnRotateMap: any;
+  mapType: number;
+  civil: CivilType;
+  isNoWood: boolean;
+  theme: ThemeType;
+  showMiniMap: boolean;
+  isMapRotated: boolean;
+  operation: OperationType;
+  operationSub: string;
+  counter: CounterType;
+  onChangeMapType: any;
+  onChangeCivil: any;
+  onChangeNoWood: any;
+  onChangeTheme: any;
+  onChangeMiniMap: any;
+  onChangeRotateMap: any;
 }
 
 const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   const {
-    MapType,
-    Civil,
-    IsNoWood,
-    Theme,
-    ShowMiniMap,
-    IsMapRotated,
-    Operation,
-    OperationSub,
-    Counter,
-    OnChangeMapType,
-    OnChangeCivil,
-    OnChangeNoWood,
-    OnChangeTheme,
-    OnChangeMiniMap,
-    OnRotateMap,
+    mapType,
+    civil,
+    isNoWood,
+    theme,
+    showMiniMap,
+    isMapRotated,
+    operation,
+    operationSub,
+    counter,
+    onChangeMapType,
+    onChangeCivil,
+    onChangeNoWood,
+    onChangeTheme,
+    onChangeMiniMap,
+    onChangeRotateMap,
   } = props;
 
   const mapTypeDropdown = (
@@ -62,7 +62,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
       }}
       onClick={item => {
         const { key } = item;
-        OnChangeMapType(Number(key));
+        onChangeMapType(Number(key));
       }}
     >
       {[5, 4, 3].map(v => {
@@ -79,7 +79,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
       }}
       onClick={item => {
         const { key } = item;
-        OnChangeCivil(key);
+        onChangeCivil(key);
       }}
     >
       {CivilArray.map(v => {
@@ -89,19 +89,19 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   );
 
   const onClickNoWood = () => {
-    OnChangeNoWood(!IsNoWood);
+    onChangeNoWood(!isNoWood);
   };
 
   const onClickTheme = () => {
-    OnChangeTheme(Theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
+    onChangeTheme(theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
   };
 
   const onClickMiniMap = () => {
-    OnChangeMiniMap(!ShowMiniMap);
+    onChangeMiniMap(!showMiniMap);
   };
 
-  const onClickRotate = () => {
-    OnRotateMap(!IsMapRotated);
+  const onClickRotateMap = () => {
+    onChangeRotateMap(!isMapRotated);
   };
 
   return (
@@ -113,7 +113,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <span>地图类型：</span>
             <Dropdown overlay={mapTypeDropdown} placement="bottomCenter" arrow>
               <span className={`ant-dropdown-link ${styles['map-type-label']}`}>
-                {MapType}
+                {mapType}
               </span>
             </Dropdown>
           </div>
@@ -121,7 +121,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <span>文明：</span>
             <Dropdown overlay={civilDropdown} placement="bottomCenter" arrow>
               <span className={`ant-dropdown-link ${styles['civil-label']}`}>
-                {Civil}
+                {civil}
               </span>
             </Dropdown>
           </div>
@@ -130,7 +130,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <Switcher
               id="no-wood"
               type="ordinary"
-              value={IsNoWood}
+              value={isNoWood}
               onClick={onClickNoWood}
             />
           </div>
@@ -139,7 +139,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <Switcher
               id="theme"
               type="daynight"
-              value={Theme === ThemeType.Light}
+              value={theme === ThemeType.Light}
               onClick={onClickTheme}
             />
           </div>
@@ -148,7 +148,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <Switcher
               id="mini-map"
               type="ordinary"
-              value={ShowMiniMap}
+              value={showMiniMap}
               onClick={onClickMiniMap}
             />
           </div>
@@ -157,63 +157,63 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <Switcher
               id="rotate"
               type="ordinary"
-              value={IsMapRotated}
-              onClick={onClickRotate}
+              value={isMapRotated}
+              onClick={onClickRotateMap}
             />
           </div>
         </div>
         <div className={styles.operation}>
           <span>当前操作</span>
-          <strong>{`${Operation}${
-            OperationSub ? ' ' + OperationSub : ''
+          <strong>{`${operation}${
+            operationSub ? ' ' + operationSub : ''
           }`}</strong>
         </div>
         <div className={styles.counter}>
           <div>
             <div>
               <span>普通住宅：</span>
-              <strong>{Counter.OridinaryHouse}</strong>
+              <strong>{counter.OridinaryHouse}</strong>
               <span>个</span>
             </div>
             <div>
               <span>高级住宅：</span>
-              <strong>{Counter.HighEndHouse}</strong>
+              <strong>{counter.HighEndHouse}</strong>
               <span>个</span>
             </div>
           </div>
           <div>
             <div>
               <span>粮仓：</span>
-              <strong>{Counter.Barn}</strong>
+              <strong>{counter.Barn}</strong>
               <span>个</span>
             </div>
             <div>
               <span>货栈：</span>
-              <strong>{Counter.Warehouse}</strong>
+              <strong>{counter.Warehouse}</strong>
               <span>个</span>
             </div>
           </div>
           <div>
             <div>
               <span>农业：</span>
-              <strong>{Counter.Agriculture}</strong>
+              <strong>{counter.Agriculture}</strong>
               <span>/150个</span>
             </div>
             <div>
               <span>工业：</span>
-              <strong>{Counter.Industry}</strong>
+              <strong>{counter.Industry}</strong>
               <span>/100个</span>
             </div>
           </div>
           <div>
             <div>
               <span>通用：</span>
-              <strong>{Counter.General}</strong>
+              <strong>{counter.General}</strong>
               <span>个</span>
             </div>
             <div>
               <span>总计：</span>
-              <strong>{Counter.Total}</strong>
+              <strong>{counter.Total}</strong>
               <span>个</span>
             </div>
           </div>
@@ -236,37 +236,37 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
-    MapType: state.TopMenu.mapType,
-    Civil: state.TopMenu.civil,
-    IsNoWood: state.TopMenu.isNoWood,
-    Theme: state.TopMenu.theme,
-    ShowMiniMap: state.TopMenu.showMiniMap,
-    IsMapRotated: state.TopMenu.isMapRotated,
-    Operation: state.LeftMenu.operation,
-    OperationSub: state.LeftMenu.operationSub,
-    Counter: state.Chessboard.counter,
+    mapType: state.TopMenu.mapType,
+    civil: state.TopMenu.civil,
+    isNoWood: state.TopMenu.isNoWood,
+    theme: state.TopMenu.theme,
+    showMiniMap: state.TopMenu.showMiniMap,
+    isMapRotated: state.TopMenu.isMapRotated,
+    operation: state.LeftMenu.operation,
+    operationSub: state.LeftMenu.operationSub,
+    counter: state.Chessboard.counter,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    OnChangeMapType: (mapType: number) => {
+    onChangeMapType: (mapType: number) => {
       dispatch(changeMapType(mapType));
     },
-    OnChangeCivil: (civil: CivilType) => {
+    onChangeCivil: (civil: CivilType) => {
       dispatch(changeCivil(civil));
     },
-    OnChangeNoWood: (isNoWood: boolean) => {
+    onChangeNoWood: (isNoWood: boolean) => {
       dispatch(changeNoWood(isNoWood));
     },
-    OnChangeTheme: (theme: ThemeType) => {
+    onChangeTheme: (theme: ThemeType) => {
       dispatch(changeTheme(theme));
     },
-    OnChangeMiniMap: (showMiniMap: boolean) => {
+    onChangeMiniMap: (showMiniMap: boolean) => {
       dispatch(changeMiniMap(showMiniMap));
     },
-    OnRotateMap: (isMapRotated: boolean) => {
-      dispatch(rotateMap(isMapRotated));
+    onChangeRotateMap: (isMapRotated: boolean) => {
+      dispatch(changeRotateMap(isMapRotated));
     },
   };
 };

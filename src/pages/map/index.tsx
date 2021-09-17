@@ -1,4 +1,4 @@
-import { clickHamButton } from '@/actions';
+import { changeHamButton } from '@/actions';
 import HamButton from '@/components/ham-button';
 import React, { FC } from 'react';
 import { connect } from 'react-redux';
@@ -9,28 +9,28 @@ import TopMenuContainer from './components/top-menu';
 import styles from './index.less';
 
 interface MapProps {
-  IsHamActive: boolean;
-  OnClickHamButton: any;
+  isHamActive: boolean;
+  onChangeHamButton: any;
 }
 
 const Map: FC<MapProps> = (props: MapProps) => {
-  const { IsHamActive, OnClickHamButton } = props;
+  const { isHamActive, onChangeHamButton } = props;
 
   const onClickHamButton = () => {
     let chessboard = document.getElementById('chessboard-wrapper-outer');
-    if (IsHamActive) chessboard!.style.display = 'block';
+    if (isHamActive) chessboard!.style.display = 'block';
     else {
       setTimeout(() => {
         chessboard!.style.display = 'none';
       }, 300);
     }
-    OnClickHamButton(!IsHamActive);
+    onChangeHamButton(!isHamActive);
   };
 
   return (
     <main id="map" className={styles.container}>
       <div className={styles['ham-container']}>
-        <HamButton IsActive={IsHamActive} OnClick={onClickHamButton} />
+        <HamButton isActive={isHamActive} onClick={onClickHamButton} />
       </div>
       <TopMenuContainer />
       <LeftMenu />
@@ -42,14 +42,14 @@ const Map: FC<MapProps> = (props: MapProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
-    IsHamActive: state.TopMenu.isHamActive,
+    isHamActive: state.TopMenu.isHamActive,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    OnClickHamButton: (isHamActive: boolean) => {
-      dispatch(clickHamButton(isHamActive));
+    onChangeHamButton: (isHamActive: boolean) => {
+      dispatch(changeHamButton(isHamActive));
     },
   };
 };
