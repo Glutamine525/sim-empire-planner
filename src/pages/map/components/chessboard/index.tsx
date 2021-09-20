@@ -49,6 +49,7 @@ import {
 import { BuildingFixed } from '@/types/building-fixed';
 import Coord from './components/coord';
 import Box from './components/box';
+import Operation from 'antd/lib/transfer/operation';
 
 interface ChessboardProps {
   mapType: number;
@@ -121,6 +122,7 @@ const Chessboard = (props: ChessboardProps) => {
   const [cellOccupied, setCellOccupied] = useState(false);
   const [buildingMarker, setBuildingMarker] = useState(0);
   const [hoveredBuilding, setHoveredBuilding] = useState({} as Building);
+  const [boxBuffer, setBoxBuffer] = useState(new Set<string>());
 
   const prevBuildingConfig = usePrevState(buildingConfig);
 
@@ -279,6 +281,7 @@ const Chessboard = (props: ChessboardProps) => {
   useEffect(() => {
     console.time('useEffect [Operation]');
     setShowBox(false);
+    setBoxBuffer(new Set<string>());
     switch (operation) {
       case OperationType.Empty:
         setCopiedBuilding({});
@@ -359,9 +362,10 @@ const Chessboard = (props: ChessboardProps) => {
         break;
       case OperationType.Select:
       case OperationType.Delete:
-        if ((target as any).id) {
+        if ((target as any).id?.startsWith('box-')) {
           break;
         }
+        setBoxBuffer(new Set<string>());
         setShowBox(true);
         setShowBoxButton(false);
         setDragConfig({
@@ -463,7 +467,7 @@ const Chessboard = (props: ChessboardProps) => {
           updateRoad
         );
         break;
-      case OperationType.Select: // eslint-disable-line
+      case OperationType.Select:
       case OperationType.Delete:
         if (!isDragging) return;
         if ((target as any).id) {
@@ -518,24 +522,31 @@ const Chessboard = (props: ChessboardProps) => {
           setShowBox(false);
         }
         break;
-      case OperationType.Select: // eslint-disable-line
+      case OperationType.Select:
       case OperationType.Delete:
-        setDragConfig(state => {
-          let { initX, initY, curX, curY } = state;
-          if (initX === curX || initY === curY) setShowBox(false);
-          setShowBoxButton(true);
-          [initX, curX] = initX < curX ? [initX, curX] : [curX, initX];
-          [initY, curY] = initY < curY ? [initY, curY] : [curY, initY];
-          const initLi = Math.floor(initX / 30);
-          const initCo = Math.floor(initY / 30);
-          const curLi = Math.ceil(curX / 30);
-          const curCo = Math.ceil(curY / 30);
-          initX = initLi * 30;
-          initY = initCo * 30;
-          curX = curLi * 30;
-          curY = curCo * 30;
-          return { initX, initY, curX, curY };
-        });
+        let { initX, initY, curX, curY } = dragConfig;
+        // if (initX === curX || initY === curY) setShowBox(false);
+        setShowBoxButton(true);
+        [initX, curX] = initX < curX ? [initX, curX] : [curX, initX];
+        [initY, curY] = initY < curY ? [initY, curY] : [curY, initY];
+        const initCo = Math.floor(initX / 30);
+        const initLi = Math.floor(initY / 30);
+        const curCo = Math.ceil(curX / 30);
+        const curLi = Math.ceil(curY / 30);
+        initX = initCo * 30;
+        initY = initLi * 30;
+        curX = curCo * 30;
+        curY = curLi * 30;
+        for (let i = initLi + 1; i <= curLi; i++) {
+          for (let j = initCo + 1; j <= curCo; j++) {
+            const occupied = cells.getOccupied(i, j);
+            if (!occupied) continue;
+            const building = cells.getBuilding(occupied);
+            if (building.IsFixed) continue;
+            setBoxBuffer(state => state.add(occupied));
+          }
+        }
+        setDragConfig({ initX, initY, curX, curY });
         break;
       default:
         break;
@@ -750,6 +761,12 @@ const Chessboard = (props: ChessboardProps) => {
     }
   };
 
+  const onClickBoxDelete = () => {
+    setShowBox(false);
+    setShowBoxButton(false);
+    setBoxBuffer(new Set<string>());
+  };
+
   const getScrollLeft = () => (wrapperOuterRef.current as any).scrollLeft;
 
   const getScrollTop = () => (wrapperOuterRef.current as any).scrollTop;
@@ -859,7 +876,30 @@ const Chessboard = (props: ChessboardProps) => {
             dragConfig={dragConfig}
             operation={operation}
             showButton={showBoxButton}
+            onClickDelete={onClickBoxDelete}
           />
+          <div className={styles['box-effect']}>
+            {Array.from(boxBuffer).map(v => {
+              const [line, column, width, height] = parseBuildingKey(v);
+              const boxShadowColor =
+                operation === OperationType.Select
+                  ? 'var(--ant-primary-color-hover)'
+                  : 'var(--ant-error-color-hover)';
+              return (
+                <div
+                  key={`box-effect-${v}`}
+                  style={{
+                    position: 'absolute',
+                    top: `${(line - 1) * 3}rem`,
+                    left: `${(column - 1) * 3}rem`,
+                    width: `${width * 3}rem`,
+                    height: `${height * 3}rem`,
+                    boxShadow: `inset 0 0 1rem 0.5rem ${boxShadowColor}`,
+                  }}
+                ></div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>

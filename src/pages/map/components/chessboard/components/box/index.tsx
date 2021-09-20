@@ -7,6 +7,7 @@ interface BoxProps {
   show: boolean;
   operation: OperationType;
   showButton: boolean;
+  onClickDelete: any;
 }
 
 export default function Box(props: BoxProps) {
@@ -15,6 +16,7 @@ export default function Box(props: BoxProps) {
     show,
     operation,
     showButton,
+    onClickDelete,
   } = props;
 
   const [showRoadHelper, setShowRoadHelper] = useState(false);
@@ -113,6 +115,7 @@ export default function Box(props: BoxProps) {
           top: '-4.8rem',
           left: Math.abs(initX - curX) / 2 - 21,
         }}
+        onClick={onClickDelete}
       >
         <span id="box-delete-text" className={styles['icon-font']}>
           &#xe625;
