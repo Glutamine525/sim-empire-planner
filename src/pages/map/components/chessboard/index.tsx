@@ -310,7 +310,7 @@ const Chessboard = (props: ChessboardProps) => {
   }, [operation]); // eslint-disable-line
 
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
-    const { clientX, clientY } = event;
+    const { target, clientX, clientY } = event;
     setIsDragging(true);
     switch (operation) {
       case OperationType.Empty:
@@ -357,8 +357,11 @@ const Chessboard = (props: ChessboardProps) => {
           });
         }
         break;
-      case OperationType.Select: // eslint-disable-line
+      case OperationType.Select:
       case OperationType.Delete:
+        if ((target as any).id) {
+          break;
+        }
         setShowBox(true);
         setShowBoxButton(false);
         setDragConfig({
@@ -374,7 +377,7 @@ const Chessboard = (props: ChessboardProps) => {
   };
 
   const onWrapperMouseMove: MouseEventHandler<HTMLDivElement> = async event => {
-    const { pageX, pageY, clientX, clientY } = event;
+    const { pageX, pageY, clientX, clientY, target } = event;
     const [offsetX, offsetY] = [
       pageX + getScrollLeft() - 86,
       pageY + getScrollTop() - 80,
@@ -391,8 +394,8 @@ const Chessboard = (props: ChessboardProps) => {
         const occupied = cells.getOccupied(line, column);
         if (occupied) {
           const [li, co] = parseBuildingKey(occupied);
-          const target = cells.getBuilding(li, co);
-          if (!target.IsBarrier && !target.IsRoad) {
+          const targetBuilding = cells.getBuilding(li, co);
+          if (!targetBuilding.IsBarrier && !targetBuilding.IsRoad) {
             setMoveConfig({
               line: li,
               offsetLine: 0,
@@ -401,7 +404,7 @@ const Chessboard = (props: ChessboardProps) => {
             });
             setShowBuilding(true);
             setCellOccupied(false);
-            setHoveredBuilding(target);
+            setHoveredBuilding(targetBuilding);
             setBuildingMarker(building.Marker);
           } else {
             setShowBuilding(false);
@@ -463,6 +466,9 @@ const Chessboard = (props: ChessboardProps) => {
       case OperationType.Select: // eslint-disable-line
       case OperationType.Delete:
         if (!isDragging) return;
+        if ((target as any).id) {
+          break;
+        }
         setDragConfig(state => ({
           ...state,
           curX: getScrollLeft() + clientX - 86,
@@ -486,31 +492,23 @@ const Chessboard = (props: ChessboardProps) => {
           let initLi = Math.floor(startY / 30);
           let curCo = Math.floor(endX / 30);
           let curLi = Math.floor(endY / 30);
+          roadBuffer.forEach(key => {
+            const [line, column] = parseBuildingKey(key);
+            deleteBuilding(line, column, true);
+          });
           if (!updateRoad && initLi === curLi) {
-            roadBuffer.forEach(key => {
-              const [line, column] = parseBuildingKey(key);
-              deleteBuilding(line, column, true);
-            });
             for (let i = initCo; i <= curCo; i++) {
               const occupied = cells.getOccupied(initLi + 1, i + 1);
               if (occupied) continue;
               placeBuilding(buildingConfig, initLi + 1, i + 1, true);
             }
           } else if (!updateRoad && initCo === curCo) {
-            roadBuffer.forEach(key => {
-              const [line, column] = parseBuildingKey(key);
-              deleteBuilding(line, column, true);
-            });
             for (let i = initLi; i <= curLi; i++) {
               const occupied = cells.getOccupied(i + 1, initCo + 1);
               if (occupied) continue;
               placeBuilding(buildingConfig, i + 1, initCo + 1, true);
             }
           } else {
-            roadBuffer.forEach(key => {
-              const [line, column] = parseBuildingKey(key);
-              deleteBuilding(line, column, true);
-            });
             roadBuffer.forEach(key => {
               const [line, column] = parseBuildingKey(key);
               placeBuilding(buildingConfig, line, column, true);

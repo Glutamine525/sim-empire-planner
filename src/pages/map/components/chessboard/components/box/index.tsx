@@ -105,49 +105,74 @@ export default function Box(props: BoxProps) {
       }}
     >
       <div
+        id="box-delete"
         className={`${styles['icon-button']} ${styles.delete}`}
         style={{
           display:
             showButton && operation === OperationType.Delete ? 'block' : 'none',
+          top: '-4.8rem',
+          left: Math.abs(initX - curX) / 2 - 21,
         }}
       >
-        <span className={styles['icon-font']}>&#xe625;</span>
+        <span id="box-delete-text" className={styles['icon-font']}>
+          &#xe625;
+        </span>
       </div>
       <div
+        id="box-select-down"
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
+          bottom: '-4.8rem',
+          left: Math.abs(initX - curX) / 2 - 21,
         }}
       >
-        <span className={styles['icon-font']}>&#xe621;</span>
+        <span id="box-select-down-text" className={styles['icon-font']}>
+          &#xe621;
+        </span>
       </div>
       <div
+        id="box-select-up"
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
+          top: '-4.8rem',
+          left: Math.abs(initX - curX) / 2 - 21,
         }}
       >
-        <span className={styles['icon-font']}>&#xe622;</span>
+        <span id="box-select-up-text" className={styles['icon-font']}>
+          &#xe622;
+        </span>
       </div>
       <div
+        id="box-select-left"
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
+          top: Math.abs(initY - curY) / 2 - 21,
+          left: '-4.8rem',
         }}
       >
-        <span className={styles['icon-font']}>&#xe623;</span>
+        <span id="box-select-left-text" className={styles['icon-font']}>
+          &#xe623;
+        </span>
       </div>
       <div
+        id="box-select-right"
         className={`${styles['icon-button']} ${styles.select}`}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
+          top: Math.abs(initY - curY) / 2 - 21,
+          right: '-4.8rem',
         }}
       >
-        <span className={styles['icon-font']}>&#xe624;</span>
+        <span id="box-select-right-text" className={styles['icon-font']}>
+          &#xe624;
+        </span>
       </div>
     </div>
   );
