@@ -4,9 +4,16 @@ import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { ThemeType } from '@/types/theme';
 
+export const changeIsLoading = (isLoading: boolean) => {
+  return {
+    type: ActionType.ChangeIsLoading,
+    isLoading,
+  };
+};
+
 export const changeHamButton = (isHamActive: boolean) => {
   return {
-    type: ActionType.ClickHamButton,
+    type: ActionType.ChangeHamButton,
     isHamActive,
   };
 };

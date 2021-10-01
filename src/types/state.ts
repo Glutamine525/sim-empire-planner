@@ -5,6 +5,16 @@ import { CounterType } from './couter';
 import { OperationType } from './operation';
 import { ThemeType } from './theme';
 
+export interface AppAction {
+  type: ActionType;
+  isLoading: boolean;
+}
+
+export const InitAppState: AppAction = {
+  type: ActionType.Empty,
+  isLoading: true,
+};
+
 export interface TopMenuAction {
   type: ActionType;
   isHamActive: boolean;

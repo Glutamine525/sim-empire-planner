@@ -225,7 +225,7 @@ export class Cells {
       records = this.updateRoadMarker(line, column);
     }
 
-    return records;
+    return { marker,  records };
   }
 
   delete(line: number, column: number, force?: boolean) {

@@ -9,12 +9,13 @@ import TopMenuContainer from './components/top-menu';
 import styles from './index.less';
 
 interface MapProps {
+  isLoading: boolean;
   isHamActive: boolean;
   onChangeHamButton: any;
 }
 
 const Map: FC<MapProps> = (props: MapProps) => {
-  const { isHamActive, onChangeHamButton } = props;
+  const { isLoading, isHamActive, onChangeHamButton } = props;
 
   const onClickHamButton = () => {
     let chessboard = document.getElementById('chessboard-wrapper-outer');
@@ -28,7 +29,11 @@ const Map: FC<MapProps> = (props: MapProps) => {
   };
 
   return (
-    <main id="map" className={styles.container}>
+    <main
+      id="map"
+      className={styles.container}
+      style={{ filter: isLoading ? 'blur(5px)' : 'none' }}
+    >
       <div className={styles['ham-container']}>
         <HamButton isActive={isHamActive} onClick={onClickHamButton} />
       </div>
@@ -42,6 +47,7 @@ const Map: FC<MapProps> = (props: MapProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
+    isLoading: state.App.isLoading,
     isHamActive: state.TopMenu.isHamActive,
   };
 };

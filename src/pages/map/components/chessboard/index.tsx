@@ -42,6 +42,7 @@ import {
 } from '@/utils/screenshot';
 import Range from './components/range';
 import {
+  changeIsLoading,
   placeOrDeleteBuilding,
   resetCounter,
   setCopiedBuilding,
@@ -49,6 +50,7 @@ import {
 import { BuildingFixed } from '@/types/building-fixed';
 import Coord from './components/coord';
 import Box from './components/box';
+import { message } from 'antd';
 
 interface ChessboardProps {
   mapType: number;
@@ -57,6 +59,7 @@ interface ChessboardProps {
   theme: ThemeType;
   operation: OperationType;
   buildingConfig: Building;
+  onChangeIsLoading: any;
   onResetCounter: any;
   onPlaceOrDeleteBuilding: any;
   setCopiedBuilding: any;
@@ -106,6 +109,7 @@ const Chessboard = (props: ChessboardProps) => {
     theme,
     operation,
     buildingConfig,
+    onChangeIsLoading,
     onResetCounter,
     onPlaceOrDeleteBuilding,
     setCopiedBuilding,
@@ -167,6 +171,7 @@ const Chessboard = (props: ChessboardProps) => {
 
   useEffect(() => {
     console.time('useEffect []');
+    onChangeIsLoading(true);
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
       wheelSpeed: 1,
     });
@@ -186,11 +191,13 @@ const Chessboard = (props: ChessboardProps) => {
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     window.addEventListener('resize', updateScroll);
+    onChangeIsLoading(false);
     console.timeEnd('useEffect []');
   }, []);
 
   useEffect(() => {
     console.time('useEffect [MapType, Civil]');
+    onChangeIsLoading(true);
     setBuildingMarker(0);
     onResetCounter();
     let canvas: any = buildingCanvasRef.current;
@@ -202,12 +209,14 @@ const Chessboard = (props: ChessboardProps) => {
     cells.init(mapType, civil);
     placeBarrier();
     placeFixed();
+    onChangeIsLoading(false);
     console.timeEnd('useEffect [MapType, Civil]');
   }, [mapType, civil]); // eslint-disable-line
 
   useEffect(() => {
     (async () => {
       console.time('useEffect [IsNoWood]');
+      onChangeIsLoading(true);
       const keys = BuildingFixed[BarrierType.Tree][mapType - 3];
       const color = BarrierColor[BarrierType.Tree];
       if (isNoWood) {
@@ -241,12 +250,14 @@ const Chessboard = (props: ChessboardProps) => {
         ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
         barriers = {};
       }
+      onChangeIsLoading(false);
       console.timeEnd('useEffect [IsNoWood]');
     })();
   }, [isNoWood]); // eslint-disable-line
 
   useEffect(() => {
     console.time('useEffect [Theme]');
+    onChangeIsLoading(true);
     const canvas: any = cellCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -274,6 +285,7 @@ const Chessboard = (props: ChessboardProps) => {
         }
       }
     }
+    onChangeIsLoading(false);
     console.timeEnd('useEffect [Theme]');
   }, [theme]);
 
@@ -576,6 +588,7 @@ const Chessboard = (props: ChessboardProps) => {
     column: number,
     isRoad?: boolean
   ) => {
+    //
     const canvas: any = markerCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     let markerColor: MarkerColor =
@@ -594,7 +607,7 @@ const Chessboard = (props: ChessboardProps) => {
     column: number,
     updateRoad?: boolean
   ) => {
-    const records = cells.place(building, line, column);
+    const { marker, records } = cells.place(building, line, column);
     if (building.IsProtection) updateRecordMarker(records);
     else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
     onPlaceOrDeleteBuilding(building, 1);
@@ -615,7 +628,7 @@ const Chessboard = (props: ChessboardProps) => {
       );
     }
     if (showMarker(building)) {
-      placeMarker(cells.getBuilding(line, column).Marker, line, column);
+      await updateMarker(marker, line, column);
     }
   };
 
@@ -630,7 +643,11 @@ const Chessboard = (props: ChessboardProps) => {
     );
   };
 
-  const deleteBuilding = (line: number, column: number, force?: boolean) => {
+  const deleteBuilding = async (
+    line: number,
+    column: number,
+    force?: boolean
+  ) => {
     const occupied = cells.getOccupied(line, column);
     if (!occupied) return false;
     const [originLine, originColumn, width, height] =
@@ -638,8 +655,8 @@ const Chessboard = (props: ChessboardProps) => {
     const target = cells.getBuilding(originLine, originColumn);
     if (target.IsFixed && !force) return false;
     const records = cells.delete(line, column, force);
-    if (target.IsProtection) updateRecordMarker(records);
-    else if (target.IsRoad && !force) updateRoadDisplay(records);
+    if (target.IsProtection) await updateRecordMarker(records);
+    else if (target.IsRoad && !force) await updateRoadDisplay(records);
     onPlaceOrDeleteBuilding(target, -1);
     deleteMarker(originLine, originColumn);
     const canvas: any = buildingCanvasRef.current;
@@ -724,23 +741,23 @@ const Chessboard = (props: ChessboardProps) => {
       });
   };
 
-  const updateMarker = (
+  const updateMarker = async (
     value: number,
     line: number,
     column: number,
     isRoad?: boolean
   ) => {
     deleteMarker(line, column);
-    placeMarker(value, line, column, isRoad);
+    await placeMarker(value, line, column, isRoad);
   };
 
-  const updateRecordMarker = (records: string[]) => {
+  const updateRecordMarker = async (records: string[]) => {
     for (let v of records) {
       const [li, co] = parseBuildingKey(v);
       const target = cells.getBuilding(li, co);
       const { Width, Height } = target;
       const [, marker] = cells.canPlace(li, co, Width, Height);
-      updateMarker(marker, li, co);
+      await updateMarker(marker, li, co);
     }
   };
 
@@ -750,7 +767,7 @@ const Chessboard = (props: ChessboardProps) => {
     for (let v of roads) {
       const [li, co] = parseBuildingKey(v);
       const target = cells.getBuilding(li, co);
-      if (target.isRoadVertex) updateMarker(target.Marker, li, co, true);
+      if (target.isRoadVertex) await updateMarker(target.Marker, li, co, true);
       else deleteMarker(li, co);
       const key = `${target.BorderTStyle} ${target.BorderRStyle} ${target.BorderBStyle} ${target.BorderLStyle}`;
       ctx.drawImage(
@@ -771,7 +788,7 @@ const Chessboard = (props: ChessboardProps) => {
     setBoxBuffer(new Set<string>());
   };
 
-  const onClickBoxMove = (event: any) => {
+  const onClickBoxMove = async (event: any) => {
     const {
       target: { id },
     } = event;
@@ -813,15 +830,20 @@ const Chessboard = (props: ChessboardProps) => {
       }
     }
     if (!canMove) {
-      console.log("can't move on this direction!");
+      message.error('无法朝该方向移动！');
       return;
     }
-    console.log(boxBuffer);
+    onChangeIsLoading(true);
+    let buildingBuffer = [] as any[];
     for (let v of boxBuffer) {
       const [line, column] = parseBuildingKey(v);
       const building = cells.getBuilding(line, column);
-      deleteBuilding(line, column);
-      placeBuilding(building, line + dir[0], column + dir[1], true);
+      buildingBuffer.push({ building, line, column });
+      await deleteBuilding(line, column);
+    }
+    for (let v of buildingBuffer) {
+      const { building, line, column } = v;
+      await placeBuilding(building, line + dir[0], column + dir[1], true);
     }
     let { initX, initY, curX, curY } = dragConfig;
     initX = initX + dir[1] * 30;
@@ -842,9 +864,10 @@ const Chessboard = (props: ChessboardProps) => {
         setBoxBuffer(state => state.add(occupied));
       }
     }
-    setDragConfig({ initX, initY, curX, curY });
     if (dir[0]) setScrollTop(getScrollTop() + dir[0] * 30);
     else setScrollLeft(getScrollLeft() + dir[1] * 30);
+    setDragConfig({ initX, initY, curX, curY });
+    onChangeIsLoading(false);
   };
 
   const getScrollLeft = () => (wrapperOuterRef.current as any).scrollLeft;
@@ -1000,6 +1023,9 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    onChangeIsLoading: (isLoading: boolean) => {
+      dispatch(changeIsLoading(isLoading));
+    },
     onResetCounter: () => {
       dispatch(resetCounter());
     },

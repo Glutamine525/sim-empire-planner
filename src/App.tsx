@@ -6,13 +6,16 @@ import { connect } from 'react-redux';
 import { store } from '.';
 import { InitState } from '@/types/state';
 import { ActionType } from '@/types/action';
+import { message } from 'antd';
+import Loading from './components/loading';
 
 interface AppProps {
-  Theme: ThemeType;
+  isLoading: boolean;
+  theme: ThemeType;
 }
 
 const App: FC<AppProps> = (props: AppProps) => {
-  const { Theme } = props;
+  const { isLoading, theme } = props;
 
   useEffect(() => {
     const isDarkMode = window.matchMedia(
@@ -25,10 +28,15 @@ const App: FC<AppProps> = (props: AppProps) => {
         theme: ThemeType.Dark,
       });
     }
+    message.config({
+      top: 50,
+      duration: 2,
+      maxCount: 3,
+    });
   }, []);
 
   useEffect(() => {
-    if (Theme === ThemeType.Light) {
+    if (theme === ThemeType.Light) {
       // ConfigProvider.config({
       //   theme: {
       //     primaryColor: '#25b864',
@@ -51,18 +59,22 @@ const App: FC<AppProps> = (props: AppProps) => {
       document.body.classList.add('dark');
       document.body.classList.remove('light');
     }
-  }, [Theme]);
+  }, [theme]);
 
   return (
-    <Router>
-      <Route exact path="/" component={Map} />
-    </Router>
+    <>
+      <Router>
+        <Route exact path="/" component={Map} />
+      </Router>
+      <Loading isLoading={isLoading} />
+    </>
   );
 };
 
 const mapStateToProps = (state: any) => {
   return {
-    Theme: state.TopMenu.theme,
+    theme: state.TopMenu.theme,
+    isLoading: state.App.isLoading,
   };
 };
 

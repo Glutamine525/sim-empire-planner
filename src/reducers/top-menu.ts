@@ -3,7 +3,7 @@ import { InitTopMenuState, TopMenuAction } from '@/types/state';
 
 const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
   switch (action.type) {
-    case ActionType.ClickHamButton:
+    case ActionType.ChangeHamButton:
       return { ...state, isHamActive: action.isHamActive };
     case ActionType.ChangeMapType:
       return { ...state, mapType: action.mapType };

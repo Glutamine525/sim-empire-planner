@@ -1,6 +1,7 @@
 export enum ActionType {
   Empty,
-  ClickHamButton,
+  ChangeIsLoading,
+  ChangeHamButton,
   ChangeMapType,
   ChangeCivil,
   ChangeNoWood,
