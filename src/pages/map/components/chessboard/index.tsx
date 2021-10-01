@@ -49,7 +49,6 @@ import {
 import { BuildingFixed } from '@/types/building-fixed';
 import Coord from './components/coord';
 import Box from './components/box';
-import Operation from 'antd/lib/transfer/operation';
 
 interface ChessboardProps {
   mapType: number;
@@ -559,6 +558,7 @@ const Chessboard = (props: ChessboardProps) => {
 
   const onWrapperDoubleClick: MouseEventHandler<HTMLDivElement> = event => {
     if (operation === OperationType.Placing && cellOccupied) return;
+    if (operation === OperationType.Select) return;
     const { pageX, pageY } = event;
     const [offsetX, offsetY] = [
       pageX + getScrollLeft() - 86,
@@ -601,15 +601,15 @@ const Chessboard = (props: ChessboardProps) => {
     if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
     const canvas: any = buildingCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    if (building.IsFixed) {
+    if (operation === OperationType.Placing) {
       ctx.drawImage(
-        await getBuildingImage(building),
+        await buildingBuffer,
         (column - 1) * 30 * RATIO,
         (line - 1) * 30 * RATIO
       );
     } else {
       ctx.drawImage(
-        await buildingBuffer,
+        await getBuildingImage(building),
         (column - 1) * 30 * RATIO,
         (line - 1) * 30 * RATIO
       );
@@ -762,9 +762,89 @@ const Chessboard = (props: ChessboardProps) => {
   };
 
   const onClickBoxDelete = () => {
+    boxBuffer.forEach(v => {
+      const [line, column] = parseBuildingKey(v);
+      deleteBuilding(line, column);
+    });
     setShowBox(false);
     setShowBoxButton(false);
     setBoxBuffer(new Set<string>());
+  };
+
+  const onClickBoxMove = (event: any) => {
+    const {
+      target: { id },
+    } = event;
+
+    let dir = [0, 0];
+    if (id.includes('up')) dir = [-1, 0];
+    else if (id.includes('down')) dir = [1, 0];
+    else if (id.includes('left')) dir = [0, -1];
+    else if (id.includes('right')) dir = [0, 1];
+    else return;
+    let canMove = true;
+    for (let v of boxBuffer) {
+      if (!canMove) break;
+      const [line, column, width, height] = parseBuildingKey(v);
+      const start = dir[0] ? column : line;
+      const end = dir[0] ? column + width : line + height;
+      for (let i = start; i < end; i++) {
+        if (dir[0]) {
+          // vertical
+          const newLine = line + (dir[0] === 1 ? height : -1);
+          const occupied = cells.getOccupied(newLine, i);
+          if (
+            !isInRange(newLine, i) ||
+            (occupied && !boxBuffer.has(occupied))
+          ) {
+            canMove = false;
+          }
+        } else {
+          // horizontal
+          const newColumn = column + (dir[1] === 1 ? width : -1);
+          const occupied = cells.getOccupied(i, newColumn);
+          if (
+            !isInRange(i, newColumn) ||
+            (occupied && !boxBuffer.has(occupied))
+          ) {
+            canMove = false;
+          }
+        }
+      }
+    }
+    if (!canMove) {
+      console.log("can't move on this direction!");
+      return;
+    }
+    console.log(boxBuffer);
+    for (let v of boxBuffer) {
+      const [line, column] = parseBuildingKey(v);
+      const building = cells.getBuilding(line, column);
+      deleteBuilding(line, column);
+      placeBuilding(building, line + dir[0], column + dir[1], true);
+    }
+    let { initX, initY, curX, curY } = dragConfig;
+    initX = initX + dir[1] * 30;
+    initY = initY + dir[0] * 30;
+    curX = curX + dir[1] * 30;
+    curY = curY + dir[0] * 30;
+    const initCo = Math.floor(initX / 30);
+    const initLi = Math.floor(initY / 30);
+    const curCo = Math.ceil(curX / 30);
+    const curLi = Math.ceil(curY / 30);
+    setBoxBuffer(new Set<string>());
+    for (let i = initLi + 1; i <= curLi; i++) {
+      for (let j = initCo + 1; j <= curCo; j++) {
+        const occupied = cells.getOccupied(i, j);
+        if (!occupied) continue;
+        const building = cells.getBuilding(occupied);
+        if (building.IsFixed) continue;
+        setBoxBuffer(state => state.add(occupied));
+      }
+    }
+    setDragConfig({ initX, initY, curX, curY });
+    if (dir[0]) setScrollTop(getScrollTop() + dir[0] * 30);
+    else setScrollLeft(getScrollLeft() + dir[1] * 30);
   };
 
   const getScrollLeft = () => (wrapperOuterRef.current as any).scrollLeft;
@@ -876,6 +956,7 @@ const Chessboard = (props: ChessboardProps) => {
             dragConfig={dragConfig}
             operation={operation}
             showButton={showBoxButton}
+            onClickMove={onClickBoxMove}
             onClickDelete={onClickBoxDelete}
           />
           <div className={styles['box-effect']}>

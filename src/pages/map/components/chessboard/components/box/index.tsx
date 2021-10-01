@@ -7,6 +7,7 @@ interface BoxProps {
   show: boolean;
   operation: OperationType;
   showButton: boolean;
+  onClickMove: any;
   onClickDelete: any;
 }
 
@@ -16,6 +17,7 @@ export default function Box(props: BoxProps) {
     show,
     operation,
     showButton,
+    onClickMove,
     onClickDelete,
   } = props;
 
@@ -124,6 +126,7 @@ export default function Box(props: BoxProps) {
       <div
         id="box-select-down"
         className={`${styles['icon-button']} ${styles.select}`}
+        onClick={onClickMove}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
@@ -138,6 +141,7 @@ export default function Box(props: BoxProps) {
       <div
         id="box-select-up"
         className={`${styles['icon-button']} ${styles.select}`}
+        onClick={onClickMove}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
@@ -152,6 +156,7 @@ export default function Box(props: BoxProps) {
       <div
         id="box-select-left"
         className={`${styles['icon-button']} ${styles.select}`}
+        onClick={onClickMove}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
@@ -166,6 +171,7 @@ export default function Box(props: BoxProps) {
       <div
         id="box-select-right"
         className={`${styles['icon-button']} ${styles.select}`}
+        onClick={onClickMove}
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',

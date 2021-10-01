@@ -194,7 +194,7 @@ export class Cells {
     this.data[line][column].building = { ...building };
     this.data[line][column].building.Marker = marker;
 
-    let record: string[] = [];
+    let records: string[] = [];
     if (building.IsProtection) {
       for (let i = line - Range; i < line + Height + Range; i++) {
         for (let j = column - Range; j < column + Width + Range; j++) {
@@ -214,18 +214,18 @@ export class Cells {
           const [li, co] = parseBuildingKey(occupied);
           const { building: target } = this.data[li][co];
           if (!showMarker(target)) continue;
-          if (!record.includes(occupied)) record.push(occupied);
+          if (!records.includes(occupied)) records.push(occupied);
         }
       }
-      this.updateRecordMarker(record);
+      this.updateRecordMarker(records);
     }
 
     if (building.IsRoad) {
       this.data[line][column].building.Marker = 1;
-      record = this.updateRoadMarker(line, column);
+      records = this.updateRoadMarker(line, column);
     }
 
-    return record;
+    return records;
   }
 
   delete(line: number, column: number, force?: boolean) {
