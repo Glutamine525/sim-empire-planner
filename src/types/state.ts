@@ -72,6 +72,7 @@ export const InitChessboardState: ChessboardAction = {
     Agriculture: 0,
     Industry: 0,
     General: 0,
+    Fixed: 0,
     Total: 0,
     Road: 0,
   },

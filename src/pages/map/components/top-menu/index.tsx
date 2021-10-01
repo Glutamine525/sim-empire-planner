@@ -12,9 +12,10 @@ import {
   changeMiniMap,
   changeNoWood,
   changeRotateMap,
+  changeIsLoading,
 } from '@/actions';
 import { ThemeType } from '@/types/theme';
-import { Dropdown, Menu } from 'antd';
+import { Dropdown, Menu, Modal } from 'antd';
 import { MINOR_PATCH, VERSION } from '@/utils/config';
 
 interface TopMenuProps {
@@ -27,6 +28,7 @@ interface TopMenuProps {
   operation: OperationType;
   operationSub: string;
   counter: CounterType;
+  onChangeIsLoading: any;
   onChangeMapType: any;
   onChangeCivil: any;
   onChangeNoWood: any;
@@ -46,6 +48,7 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
     operation,
     operationSub,
     counter,
+    onChangeIsLoading,
     onChangeMapType,
     onChangeCivil,
     onChangeNoWood,
@@ -60,9 +63,29 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         width: '4.8rem',
         textAlign: 'center',
       }}
-      onClick={item => {
+      onClick={async item => {
         const { key } = item;
-        onChangeMapType(Number(key));
+        if (Number(key) === mapType) return;
+        const { Total, Fixed, Road } = counter;
+        const callback = () => {
+          onChangeIsLoading(true);
+          onChangeMapType(Number(key));
+        };
+        if (Total - Fixed || Road - 1) {
+          Modal.confirm({
+            title: '警告',
+            content:
+              '当前地图内仍有放置的建筑，更换地图类型后将删除所有建筑，是否确定更换？',
+            centered: true,
+            okText: '确认',
+            cancelText: '取消',
+            onOk: () => {
+              callback();
+            },
+          });
+        } else {
+          callback();
+        }
       }}
     >
       {[5, 4, 3].map(v => {
@@ -79,7 +102,27 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
       }}
       onClick={item => {
         const { key } = item;
-        onChangeCivil(key);
+        if (key === civil) return;
+        const { Total, Fixed, Road } = counter;
+        const callback = () => {
+          onChangeIsLoading(true);
+          onChangeCivil(key);
+        };
+        if (Total - Fixed || Road - 1) {
+          Modal.confirm({
+            title: '警告',
+            content:
+              '当前地图内仍有放置的建筑，更换文明后将删除所有建筑，是否确定更换？',
+            centered: true,
+            okText: '确认',
+            cancelText: '取消',
+            onOk: () => {
+              callback();
+            },
+          });
+        } else {
+          callback();
+        }
       }}
     >
       {CivilArray.map(v => {
@@ -89,10 +132,12 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   );
 
   const onClickNoWood = () => {
+    onChangeIsLoading(true);
     onChangeNoWood(!isNoWood);
   };
 
   const onClickTheme = () => {
+    onChangeIsLoading(true);
     onChangeTheme(theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
   };
 
@@ -250,6 +295,9 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    onChangeIsLoading: (isLoading: boolean) => {
+      dispatch(changeIsLoading(isLoading));
+    },
     onChangeMapType: (mapType: number) => {
       dispatch(changeMapType(mapType));
     },

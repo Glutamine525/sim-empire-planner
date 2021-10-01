@@ -100,3 +100,16 @@ img + .ant-menu-title-content {
   box-sizing: border-box;
   color: var(--text-regular);
 }
+
+.ant-modal-content {
+  border-radius: 0.8rem;
+  background: var(--background-lighter);
+}
+
+.ant-modal-confirm-title {
+  color: var(--text-primary) !important;
+}
+
+.ant-modal-confirm-content {
+  color: var(--text-regular) !important;
+}

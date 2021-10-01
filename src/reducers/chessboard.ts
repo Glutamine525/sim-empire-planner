@@ -15,6 +15,7 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
           Agriculture: 0,
           Industry: 0,
           General: 0,
+          Fixed: 0,
           Total: 0,
           Road: 0,
         },
@@ -24,6 +25,8 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
       const { building, diff } = action;
       if (building.IsRoad) counter.Road++;
       if (!building.IsBarrier && !building.IsRoad) counter.Total += diff;
+      if (!building.IsBarrier && !building.IsRoad && building.IsFixed)
+        counter.Fixed += 1;
       if (building.Catalog === CatalogType.Residence) {
         if (building.Name === '普通住宅') counter.OridinaryHouse += diff;
         else if (building.Name === '高级住宅') counter.HighEndHouse += diff;

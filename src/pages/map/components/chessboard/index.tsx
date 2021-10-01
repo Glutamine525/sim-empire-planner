@@ -99,6 +99,8 @@ const usePrevState = (value: any) => {
   return ref.current;
 };
 
+console.time('useEffect []');
+
 const Chessboard = (props: ChessboardProps) => {
   const cells = Cells.getInstance();
 
@@ -170,8 +172,6 @@ const Chessboard = (props: ChessboardProps) => {
   const hideMarker = useMemo(() => !showMarker(building), [building]);
 
   useEffect(() => {
-    console.time('useEffect []');
-    onChangeIsLoading(true);
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
       wheelSpeed: 1,
     });
@@ -193,11 +193,10 @@ const Chessboard = (props: ChessboardProps) => {
     window.addEventListener('resize', updateScroll);
     onChangeIsLoading(false);
     console.timeEnd('useEffect []');
-  }, []);
+  }, []); // eslint-disable-line
 
   useEffect(() => {
     console.time('useEffect [MapType, Civil]');
-    onChangeIsLoading(true);
     setBuildingMarker(0);
     onResetCounter();
     let canvas: any = buildingCanvasRef.current;
@@ -216,7 +215,6 @@ const Chessboard = (props: ChessboardProps) => {
   useEffect(() => {
     (async () => {
       console.time('useEffect [IsNoWood]');
-      onChangeIsLoading(true);
       const keys = BuildingFixed[BarrierType.Tree][mapType - 3];
       const color = BarrierColor[BarrierType.Tree];
       if (isNoWood) {
@@ -257,7 +255,6 @@ const Chessboard = (props: ChessboardProps) => {
 
   useEffect(() => {
     console.time('useEffect [Theme]');
-    onChangeIsLoading(true);
     const canvas: any = cellCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -287,7 +284,7 @@ const Chessboard = (props: ChessboardProps) => {
     }
     onChangeIsLoading(false);
     console.timeEnd('useEffect [Theme]');
-  }, [theme]);
+  }, [theme]); // eslint-disable-line
 
   useEffect(() => {
     console.time('useEffect [Operation]');
