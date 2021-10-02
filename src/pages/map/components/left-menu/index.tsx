@@ -104,17 +104,8 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       onChangeOperation(OperationType.Empty, '', {} as any);
       return;
     }
-    const {
-      Catalog,
-      Name,
-      Text,
-      Width,
-      Height,
-      Range,
-      Color,
-      Background,
-      IsRoad,
-    } = copiedBuilding;
+    const { Catalog, Name, Text, Width, Height, Range, Background, IsRoad } =
+      copiedBuilding;
     let keyPath = IsRoad ? [Catalog] : [Catalog, Name];
     dispatchBuilding(keyPath, {
       name: Name,
@@ -122,7 +113,6 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       width: Width,
       height: Height,
       range: Range,
-      color: Color,
       background: Background,
       isRoad: IsRoad,
     });
@@ -232,7 +222,6 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       // css
       Width: building.size || building.width,
       Height: building.size || building.height,
-      Color: building.color,
       FontSize: 1.4,
       Background: building.background,
       BorderColor: 'black',

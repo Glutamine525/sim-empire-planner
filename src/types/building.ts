@@ -1,14 +1,17 @@
+import { BuildingAztec } from './building-aztec';
 import { BuildingChina } from './building-china';
 import { BuildingColor } from './building-color';
+import { BuildingEgypt } from './building-egypt';
+import { BuildingGreece } from './building-greece';
 import { BuildingPersian } from './building-persian';
 import { CivilType } from './civil';
 
 export const CivilBuilding: { [key in CivilType]: any } = {
   [CivilType.China]: BuildingChina,
   [CivilType.Persian]: BuildingPersian,
-  [CivilType.Egypt]: undefined,
-  [CivilType.Greece]: undefined,
-  [CivilType.Aztec]: undefined,
+  [CivilType.Egypt]: BuildingEgypt,
+  [CivilType.Greece]: BuildingGreece,
+  [CivilType.Aztec]: BuildingAztec,
   [CivilType.Custom]: undefined,
 };
 
@@ -111,7 +114,6 @@ export interface Building {
   // css
   Width: number;
   Height: number;
-  Color: string;
   FontSize: number;
   Background: string;
   BorderColor: string;
@@ -134,7 +136,6 @@ export const GeneralBuilding = [
     text: '2x2',
     size: 2,
     range: 0,
-    color: BuildingColor.Black,
     background: BuildingColor['通用'][0],
   },
   {
@@ -142,7 +143,6 @@ export const GeneralBuilding = [
     text: '3x3',
     size: 3,
     range: 0,
-    color: BuildingColor.Black,
     background: BuildingColor['通用'][1],
   },
   {
@@ -150,7 +150,6 @@ export const GeneralBuilding = [
     text: '4x4',
     size: 4,
     range: 0,
-    color: BuildingColor.Black,
     background: BuildingColor['通用'][2],
   },
   {
@@ -158,7 +157,6 @@ export const GeneralBuilding = [
     text: '5x5',
     size: 5,
     range: 0,
-    color: BuildingColor.Black,
     background: BuildingColor['通用'][3],
   },
 ];

@@ -42,7 +42,6 @@ export const BuildingChina = {
       text: '宅',
       size: 1,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['住宅'][0],
     },
     {
@@ -50,7 +49,6 @@ export const BuildingChina = {
       text: '高级住宅',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['住宅'][1],
     },
   ],
@@ -60,7 +58,6 @@ export const BuildingChina = {
       text: '水稻田',
       size: 5,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][0],
     },
     {
@@ -68,7 +65,6 @@ export const BuildingChina = {
       text: '白菜地',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][1],
     },
     {
@@ -76,7 +72,6 @@ export const BuildingChina = {
       text: '梨园',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][2],
     },
     {
@@ -84,7 +79,6 @@ export const BuildingChina = {
       text: '猎户',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][3],
     },
     {
@@ -92,7 +86,6 @@ export const BuildingChina = {
       text: '高粱地',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][4],
     },
     {
@@ -100,7 +93,6 @@ export const BuildingChina = {
       text: '茶树小屋',
       size: 4,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][5],
     },
     {
@@ -108,7 +100,6 @@ export const BuildingChina = {
       text: '养蚕小屋',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['农业'][6],
     },
   ],
@@ -118,7 +109,6 @@ export const BuildingChina = {
       text: '瓦窑',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][0],
     },
     {
@@ -126,7 +116,6 @@ export const BuildingChina = {
       text: '砖窑',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][1],
     },
     {
@@ -134,7 +123,6 @@ export const BuildingChina = {
       text: '炼铜厂',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][2],
     },
     {
@@ -142,7 +130,6 @@ export const BuildingChina = {
       text: '瓷器场',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][3],
     },
     {
@@ -150,7 +137,6 @@ export const BuildingChina = {
       text: '铜器厂',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][4],
     },
     {
@@ -158,7 +144,6 @@ export const BuildingChina = {
       text: '酒厂',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][5],
     },
     {
@@ -166,7 +151,6 @@ export const BuildingChina = {
       text: '造纸厂',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][6],
     },
     {
@@ -174,7 +158,6 @@ export const BuildingChina = {
       text: '染坊',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['工业'][7],
     },
   ],
@@ -184,7 +167,6 @@ export const BuildingChina = {
       text: '粮',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][0],
     },
     {
@@ -192,7 +174,6 @@ export const BuildingChina = {
       text: '菜',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][1],
     },
     {
@@ -200,7 +181,6 @@ export const BuildingChina = {
       text: '果',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][2],
     },
     {
@@ -208,7 +188,6 @@ export const BuildingChina = {
       text: '肉',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][3],
     },
     {
@@ -216,7 +195,6 @@ export const BuildingChina = {
       text: '鱼',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][4],
     },
     {
@@ -224,7 +202,6 @@ export const BuildingChina = {
       text: '瓷',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][5],
     },
     {
@@ -232,7 +209,6 @@ export const BuildingChina = {
       text: '铜',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][6],
     },
     {
@@ -240,7 +216,6 @@ export const BuildingChina = {
       text: '酒',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][7],
     },
     {
@@ -248,7 +223,6 @@ export const BuildingChina = {
       text: '纸',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][8],
     },
     {
@@ -256,7 +230,6 @@ export const BuildingChina = {
       text: '茶',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][9],
     },
     {
@@ -264,7 +237,6 @@ export const BuildingChina = {
       text: '绸',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['商业'][10],
     },
   ],
@@ -274,7 +246,6 @@ export const BuildingChina = {
       text: '水',
       size: 1,
       range: 4,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['水'],
     },
     {
@@ -282,7 +253,6 @@ export const BuildingChina = {
       text: '值',
       size: 1,
       range: 6,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['防'],
     },
     {
@@ -290,7 +260,6 @@ export const BuildingChina = {
       text: '捕',
       size: 1,
       range: 6,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['防'],
     },
     {
@@ -298,7 +267,6 @@ export const BuildingChina = {
       text: '永和',
       size: 2,
       range: 7,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['防'],
     },
     {
@@ -306,7 +274,6 @@ export const BuildingChina = {
       text: '粮仓',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['粮'],
     },
     {
@@ -314,7 +281,6 @@ export const BuildingChina = {
       text: '货栈',
       size: 4,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['货'],
     },
     {
@@ -322,7 +288,6 @@ export const BuildingChina = {
       text: '皇宫',
       size: 6,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['殿'],
       isPalace: true,
     },
@@ -331,7 +296,6 @@ export const BuildingChina = {
       text: '衙门',
       size: 3,
       range: 7,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['职'],
     },
     {
@@ -339,7 +303,6 @@ export const BuildingChina = {
       text: '贸易站',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['贸'],
     },
     {
@@ -347,7 +310,6 @@ export const BuildingChina = {
       text: '税',
       size: 1,
       range: 4,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['税'],
     },
     {
@@ -355,7 +317,6 @@ export const BuildingChina = {
       text: '大磨坊',
       size: 2,
       range: 4,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['磨'],
     },
     {
@@ -363,7 +324,6 @@ export const BuildingChina = {
       text: '浇灌渠',
       size: 2,
       range: 4,
-      color: BuildingColor.Black,
       background: BuildingColor['市政']['浇'],
     },
   ],
@@ -373,7 +333,6 @@ export const BuildingChina = {
       text: '武馆',
       size: 3,
       range: 8,
-      color: BuildingColor.Black,
       background: BuildingColor['文化'][0],
     },
     {
@@ -381,7 +340,6 @@ export const BuildingChina = {
       text: '擂台',
       size: 2,
       range: 9,
-      color: BuildingColor.Black,
       background: BuildingColor['文化'][1],
     },
     {
@@ -389,7 +347,6 @@ export const BuildingChina = {
       text: '书院',
       size: 4,
       range: 9,
-      color: BuildingColor.Black,
       background: BuildingColor['文化'][2],
     },
     {
@@ -397,7 +354,6 @@ export const BuildingChina = {
       text: '戏台',
       size: 3,
       range: 8,
-      color: BuildingColor.Black,
       background: BuildingColor['文化'][3],
     },
     {
@@ -405,7 +361,6 @@ export const BuildingChina = {
       text: '观象台',
       size: 4,
       range: 10,
-      color: BuildingColor.Black,
       background: BuildingColor['文化'][4],
     },
   ],
@@ -415,7 +370,6 @@ export const BuildingChina = {
       text: '庙',
       size: 1,
       range: 5,
-      color: BuildingColor.Black,
       background: BuildingColor['宗教'][0],
     },
     {
@@ -423,7 +377,6 @@ export const BuildingChina = {
       text: '佛寺',
       size: 3,
       range: 8,
-      color: BuildingColor.Black,
       background: BuildingColor['宗教'][1],
     },
     {
@@ -431,7 +384,6 @@ export const BuildingChina = {
       text: '道观',
       size: 3,
       range: 8,
-      color: BuildingColor.Black,
       background: BuildingColor['宗教'][2],
     },
     {
@@ -439,7 +391,6 @@ export const BuildingChina = {
       text: '佛塔',
       size: 2,
       range: 9,
-      color: BuildingColor.Black,
       background: BuildingColor['宗教'][3],
     },
   ],
@@ -449,7 +400,6 @@ export const BuildingChina = {
       text: '步兵',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['军事'][0],
     },
     {
@@ -457,7 +407,6 @@ export const BuildingChina = {
       text: '弩兵',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['军事'][1],
     },
     {
@@ -465,7 +414,6 @@ export const BuildingChina = {
       text: '骑兵兵营',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['军事'][2],
     },
     {
@@ -473,7 +421,6 @@ export const BuildingChina = {
       text: '祭坛',
       size: 3,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['军事'][3],
     },
     {
@@ -481,7 +428,6 @@ export const BuildingChina = {
       text: '武器铺',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['军事'][4],
     },
     {
@@ -489,7 +435,6 @@ export const BuildingChina = {
       text: '马厩',
       size: 2,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['军事'][5],
     },
   ],
@@ -499,7 +444,6 @@ export const BuildingChina = {
       text: '树',
       size: 1,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['美化']['树'],
     },
     {
@@ -507,7 +451,6 @@ export const BuildingChina = {
       text: '墙',
       size: 1,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['美化']['墙'],
     },
     {
@@ -515,7 +458,6 @@ export const BuildingChina = {
       text: '门',
       size: 1,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['美化']['门'],
     },
   ],
@@ -525,7 +467,6 @@ export const BuildingChina = {
       text: '大雁塔',
       size: 5,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['奇迹'][0],
     },
     {
@@ -533,7 +474,6 @@ export const BuildingChina = {
       text: '乐山大佛',
       size: 9,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['奇迹'][1],
     },
     {
@@ -541,7 +481,6 @@ export const BuildingChina = {
       text: '天坛',
       size: 8,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['奇迹'][2],
     },
     {
@@ -549,7 +488,6 @@ export const BuildingChina = {
       text: '布达拉宫',
       size: 16,
       range: 0,
-      color: BuildingColor.Black,
       background: BuildingColor['奇迹'][3],
     },
   ],

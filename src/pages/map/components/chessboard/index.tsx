@@ -333,24 +333,33 @@ const Chessboard = (props: ChessboardProps) => {
         }
         const { line, offsetLine, column, offsetColumn } = moveConfig;
         const { Width, Height } = buildingConfig;
-        if (
-          !cells.canPlace(
-            line + offsetLine,
-            column + offsetColumn,
-            Height,
-            Width
-          )[0]
-        ) {
-          return;
-        }
-        setCellOccupied(true);
-        setUpdateRoad(false);
-        placeBuilding(
-          buildingConfig,
+        const [canPlace] = cells.canPlace(
           line + offsetLine,
           column + offsetColumn,
-          updateRoad
+          Width,
+          Height
         );
+        const [canReplace, , generalLine, generalColumn] = cells.canReplace(
+          line,
+          column,
+          Width,
+          Height
+        );
+        if (canReplace) {
+          setCellOccupied(true);
+          setUpdateRoad(false);
+          deleteBuilding(generalLine, generalColumn);
+          placeBuilding(buildingConfig, generalLine, generalColumn);
+        } else if (canPlace) {
+          setCellOccupied(true);
+          setUpdateRoad(false);
+          placeBuilding(
+            buildingConfig,
+            line + offsetLine,
+            column + offsetColumn,
+            updateRoad
+          );
+        }
         if (buildingConfig.IsRoad) {
           roadBuffer.add(`${line}-${column}`);
           setShowBox(true);
@@ -449,10 +458,24 @@ const Chessboard = (props: ChessboardProps) => {
           Width,
           Height
         );
-        setBuildingMarker(marker);
-        setShowBuilding(true);
-        setCellOccupied(!canPlace);
-        setMoveConfig({ line, offsetLine, column, offsetColumn });
+        const [canReplace, generalMarker, generalLine, generalColumn] =
+          cells.canReplace(line, column, Width, Height);
+        if (canReplace) {
+          setBuildingMarker(generalMarker);
+          setShowBuilding(true);
+          setCellOccupied(false);
+          setMoveConfig({
+            line: generalLine,
+            offsetLine: 0,
+            column: generalColumn,
+            offsetColumn: 0,
+          });
+        } else {
+          setBuildingMarker(marker);
+          setShowBuilding(true);
+          setCellOccupied(!canPlace);
+          setMoveConfig({ line, offsetLine, column, offsetColumn });
+        }
         if (buildingConfig.IsRoad) {
           setDragConfig(state => {
             const curX = getScrollLeft() + clientX - 86;
@@ -460,14 +483,19 @@ const Chessboard = (props: ChessboardProps) => {
             return { ...state, curX, curY };
           });
         }
-        if (!isDragging || !canPlace) return;
+        if (!isDragging || (!canPlace && !canReplace)) return;
         if (buildingConfig.IsRoad) roadBuffer.add(`${line}-${column}`);
-        placeBuilding(
-          buildingConfig,
-          line + offsetLine,
-          column + offsetColumn,
-          updateRoad
-        );
+        if (canReplace) {
+          deleteBuilding(generalLine, generalColumn);
+          placeBuilding(buildingConfig, generalLine, generalColumn);
+        } else {
+          placeBuilding(
+            buildingConfig,
+            line + offsetLine,
+            column + offsetColumn,
+            updateRoad
+          );
+        }
         break;
       case OperationType.Select:
       case OperationType.Delete:
@@ -717,7 +745,6 @@ const Chessboard = (props: ChessboardProps) => {
               IsGeneral: false,
               Width: FixedBuildingSize[v],
               Height: FixedBuildingSize[v],
-              Color: '#000000',
               FontSize: 1.4,
               Background: FixedBuildingColor[v],
               BorderColor: '#000000',
@@ -772,11 +799,11 @@ const Chessboard = (props: ChessboardProps) => {
     }
   };
 
-  const onClickBoxDelete = () => {
-    boxBuffer.forEach(v => {
+  const onClickBoxDelete = async () => {
+    for (let v of boxBuffer) {
       const [line, column] = parseBuildingKey(v);
-      deleteBuilding(line, column);
-    });
+      await deleteBuilding(line, column);
+    }
     setShowBox(false);
     setShowBoxButton(false);
     setBoxBuffer(new Set<string>());
@@ -922,7 +949,6 @@ const Chessboard = (props: ChessboardProps) => {
               display: showBuilding ? 'flex' : 'none',
               width: `${building.Width * 3}rem`,
               height: `${building.Height * 3}rem`,
-              color: building.Color,
               fontSize: `${building.FontSize}rem`,
               background: building.Background,
               borderWidth: `${building.BorderWidth}rem`,

@@ -17,7 +17,7 @@ export async function getBuildingImage(building: Building) {
   div.innerText = building.Text;
   div.style.width = `${Width * 30}px`;
   div.style.height = `${Height * 30}px`;
-  div.style.color = building.Color;
+  div.style.color = '#000000';
   div.style.fontFamily = `'PingFang SC', 'Microsoft Yahei', monospace`;
   div.style.fontSize = `${building.FontSize * 10}px`;
   div.style.background = building.Background;

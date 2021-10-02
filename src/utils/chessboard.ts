@@ -180,6 +180,23 @@ export class Cells {
     return [!isOccupied, records.length];
   }
 
+  canReplace(
+    line: number,
+    column: number,
+    width: number,
+    height: number
+  ): [boolean, number, number, number] {
+    const occupied = this.getOccupied(line, column);
+    if (!occupied) return [false, -1, -1, -1];
+    const [oriLi, oriCo] = parseBuildingKey(occupied);
+    const building = this.getBuilding(occupied);
+    if (!building.IsGeneral) return [false, -1, -1, -1];
+    if (building.Width === width && building.Height === height) {
+      return [true, building.Marker, oriLi, oriCo];
+    }
+    return [false, -1, -1, -1];
+  }
+
   place(building: Building, line: number, column: number) {
     const key = getBuildingKey(building, line, column);
     const { Width, Height, Range, Name } = building;
@@ -225,7 +242,7 @@ export class Cells {
       records = this.updateRoadMarker(line, column);
     }
 
-    return { marker,  records };
+    return { marker, records };
   }
 
   delete(line: number, column: number, force?: boolean) {
