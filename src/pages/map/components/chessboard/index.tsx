@@ -144,22 +144,15 @@ const Chessboard = (props: ChessboardProps) => {
     [buildingConfig]
   );
   const roadMarkerBuffer = useMemo(
-    () =>
-      Array.from(Array(LENGTH + 1), (_, i) => i).map(v =>
-        getMarkerImage(v, MarkerColor.Normal)
-      ),
+    () => Array.from(Array(LENGTH + 1), () => null) as any[],
     []
   );
   const markerBuffer = useMemo(() => {
+    const num = protectionNum + 1;
     return {
       [MarkerColor.Normal]: roadMarkerBuffer,
-      [MarkerColor.Safe]: Array.from(Array(protectionNum + 1), (_, i) => i).map(
-        v => getMarkerImage(v, MarkerColor.Safe)
-      ),
-      [MarkerColor.Danger]: Array.from(
-        Array(protectionNum + 1),
-        (_, i) => i
-      ).map(v => getMarkerImage(v, MarkerColor.Danger)),
+      [MarkerColor.Safe]: Array.from(Array(num), () => null) as any[],
+      [MarkerColor.Danger]: Array.from(Array(num), () => null) as any[],
     };
   }, [roadMarkerBuffer, protectionNum]);
   const roadImageBuffer = useMemo(() => getRoadImageBuffer(), []);
@@ -592,8 +585,11 @@ const Chessboard = (props: ChessboardProps) => {
     let markerColor: MarkerColor =
       value >= protectionNum ? MarkerColor.Safe : MarkerColor.Danger;
     markerColor = isRoad ? MarkerColor.Normal : markerColor;
+    if (markerBuffer[markerColor][value] === null) {
+      markerBuffer[markerColor][value] = getMarkerImage(value, markerColor);
+    }
     ctx.drawImage(
-      await markerBuffer[markerColor][value],
+      await markerBuffer[markerColor][value]!,
       (column - 1) * 30 * RATIO,
       (line - 1) * 30 * RATIO
     );
