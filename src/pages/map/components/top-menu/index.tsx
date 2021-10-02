@@ -15,7 +15,7 @@ import {
   changeIsLoading,
 } from '@/actions';
 import { ThemeType } from '@/types/theme';
-import { Dropdown, Menu, Modal } from 'antd';
+import { Dropdown, Menu, Modal, Tooltip } from 'antd';
 import { MINOR_PATCH, VERSION } from '@/utils/config';
 
 interface TopMenuProps {
@@ -36,6 +36,54 @@ interface TopMenuProps {
   onChangeMiniMap: any;
   onChangeRotateMap: any;
 }
+
+const helper = () => {
+  return (
+    <div>
+      <div>
+        <strong>快捷键</strong>
+      </div>
+      <div>- 空格: 取消操作</div> <div>- A: 道路</div>
+      <div>- S: 选中建筑</div> <div>- D: 删除建筑</div>
+      <div>- ZXC(V): 三(四)防建筑</div>
+      <div>- QWER: 2x2 3x3 4x4 5x5 通用建筑</div>
+      <div>- 1234567890-=: 对应的12个商业建筑</div>
+      <div className={styles['helper-splitter']}></div>
+      <div>
+        <strong>其它操作</strong>
+      </div>
+      <div>- 右键点击住宅建筑可以查询需求结果</div>
+      <div>- 查询需求结果里的建筑可以选中</div>
+      <div>- 双击建筑可以删除建筑</div>
+      <div>- 按住Ctrl键可以在选中操作时拖动地图</div>
+      <div>- 使用相同大小的建筑可以覆盖通用建筑</div>
+      <div>- 鼠标悬停在建筑上，按Ctrl+C可以复制建筑</div>
+      <div>- 如果无法放置建筑，尝试按一次Ctrl</div>
+      <div className={styles['helper-splitter']}></div>
+      <div>
+        <strong>注意事项</strong>
+      </div>
+      <div>- 特殊建筑的数据会被导入导出</div>
+      <div>- 编辑者自定义的水印会被导入导出</div>
+      <div>- 自动保存不会保存特殊建筑和编辑者水印</div>
+      <div>- 菜单中「添加水印」里的截图才会生成编辑者水印</div>
+      <div>- 版权水印总是会生成</div>
+      <div>- 旋转地图开启后，无法编辑，只能截图</div>
+      <div className={styles['helper-splitter']}></div>
+      <div>
+        作者邮箱:
+        <strong
+          style={{
+            cursor: 'pointer',
+            marginLeft: 8,
+          }}
+        >
+          glutamine525@gmail.com
+        </strong>
+      </div>
+    </div>
+  );
+};
 
 const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   const {
@@ -263,7 +311,18 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             </div>
           </div>
         </div>
-        <div className={styles.helper}>?</div>
+        <Tooltip
+          placement="bottom"
+          title={helper}
+          overlayInnerStyle={{
+            borderRadius: 8,
+            width: '30rem',
+            fontSize: '1.2rem',
+            color: 'var(-text-regular)',
+          }}
+        >
+          <div className={styles.helper}>?</div>
+        </Tooltip>
         <div className={styles.version}>
           <div>
             <span>模拟帝国地图编辑器 </span>

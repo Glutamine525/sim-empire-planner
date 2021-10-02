@@ -293,7 +293,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   };
 
   return (
-    <aside className={styles.wrapper}>
+    <aside className={`left-menu ${styles.wrapper}`}>
       <div
         className={styles.container}
         style={{ overflow: overflow }}

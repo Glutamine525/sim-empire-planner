@@ -5,9 +5,23 @@
   background: var(--background-lighter);
 }
 
+.ant-tooltip-inner {
+  border-radius: 4px;
+  box-shadow: 0 3px 6px -4px rgb(0 0 0 / 12%), 0 6px 16px 0 rgb(0 0 0 / 8%), 0 9px 28px 8px rgb(0 0 0 / 5%);
+}
+
+.dark .ant-tooltip-inner {
+  box-shadow: 0 3px 6px -4px rgb(255 255 255 / 12%), 0 6px 16px 0 rgb(255 255 255 / 8%), 0 9px 28px 8px rgb(255 255 255 / 5%);
+}
+
 .ant-tooltip-arrow-content {
   width: 0.5rem;
   height: 0.5rem;
+  box-shadow: -3px -3px 7px rgb(0 0 0 / 7%) !important;
+}
+
+.dark .ant-tooltip-arrow-content {
+  box-shadow: -3px -3px 7px rgb(255 255 255 / 7%) !important;
 }
 
 .ant-dropdown-menu,
