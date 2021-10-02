@@ -1,12 +1,14 @@
 .wrapper {
   position: absolute;
   top: 0;
+  left: 0;
+  z-index: 1000;
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
+  background: radial-gradient(circle farthest-corner at center, #3c4b57bf 0%, #1c262bbf 100%);
 }
 
 .container {
@@ -26,22 +28,22 @@
   &:nth-of-type(1) {
     top: 0%;
     left: 0%;
-    border-bottom: 0.3rem solid #5c5edc;
+    border-bottom: 0.3rem solid var(--ant-primary-color);
     animation: rotate-one 1.15s linear infinite;
   }
 
   &:nth-of-type(2) {
     top: 0%;
     right: 0%;
-    border-right: 0.3rem solid #9e85c3;
+    border-right: 0.3rem solid var(--ant-success-color);
     animation: rotate-two 1.15s linear infinite;
   }
 
   &:nth-of-type(3) {
     right: 0%;
     bottom: 0%;
+    border-top: 0.3rem solid var(--ant-error-color);
     animation: rotate-three 1.15s linear infinite;
-    border-top: 0.3rem solid #e9908a;
   }
 }
 

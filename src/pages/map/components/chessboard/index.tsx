@@ -192,6 +192,7 @@ const Chessboard = (props: ChessboardProps) => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     window.addEventListener('resize', updateScroll);
     onChangeIsLoading(false);
+    document.body.removeChild(document.getElementById('init-loading')!);
     console.timeEnd('useEffect []');
   }, []); // eslint-disable-line
 

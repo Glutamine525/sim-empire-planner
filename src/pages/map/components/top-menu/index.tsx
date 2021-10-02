@@ -40,7 +40,11 @@ interface TopMenuProps {
 const helper = () => {
   return (
     <div>
-      <div>
+      <div style={{ textAlign: 'center' }}>
+        <strong>建议使用Chrome浏览器访问</strong>
+      </div>
+      <div className={styles['helper-splitter']}></div>
+      <div style={{ textAlign: 'center' }}>
         <strong>快捷键</strong>
       </div>
       <div>- 空格: 取消操作</div> <div>- A: 道路</div>
@@ -49,7 +53,7 @@ const helper = () => {
       <div>- QWER: 2x2 3x3 4x4 5x5 通用建筑</div>
       <div>- 1234567890-=: 对应的12个商业建筑</div>
       <div className={styles['helper-splitter']}></div>
-      <div>
+      <div style={{ textAlign: 'center' }}>
         <strong>其它操作</strong>
       </div>
       <div>- 右键点击住宅建筑可以查询需求结果</div>
@@ -60,7 +64,7 @@ const helper = () => {
       <div>- 鼠标悬停在建筑上，按Ctrl+C可以复制建筑</div>
       <div>- 如果无法放置建筑，尝试按一次Ctrl</div>
       <div className={styles['helper-splitter']}></div>
-      <div>
+      <div style={{ textAlign: 'center' }}>
         <strong>注意事项</strong>
       </div>
       <div>- 特殊建筑的数据会被导入导出</div>
@@ -70,7 +74,7 @@ const helper = () => {
       <div>- 版权水印总是会生成</div>
       <div>- 旋转地图开启后，无法编辑，只能截图</div>
       <div className={styles['helper-splitter']}></div>
-      <div>
+      <div style={{ textAlign: 'center' }}>
         作者邮箱:
         <strong
           style={{
@@ -199,7 +203,17 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
 
   return (
     <nav className={styles.wrapper}>
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        style={
+          'backdrop-filter' in document.documentElement.style
+            ? {
+                backdropFilter: 'blur(1.5rem)',
+                textShadow: `var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem`,
+              }
+            : { background: 'var(--border-lighter)' }
+        }
+      >
         <div className={styles.controller}>
           <div style={{ width: '4rem', height: '4rem' }}></div>
           <div>

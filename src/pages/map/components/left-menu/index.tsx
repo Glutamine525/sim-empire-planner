@@ -304,7 +304,11 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           onClick={onClick}
           mode="vertical"
           inlineCollapsed={true}
-          className={styles.menu}
+          style={
+            'backdrop-filter' in document.documentElement.style
+              ? { backdropFilter: 'blur(1.5rem)' }
+              : { background: 'var(--border-lighter)' }
+          }
         >
           {Object.keys(catalog).map((v: string) => {
             const icon = (
