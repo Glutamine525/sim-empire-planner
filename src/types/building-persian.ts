@@ -448,7 +448,7 @@ export const BuildingPersian = {
       text: '礼',
       size: 1,
       range: 6,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['宗教'][0],
     },
     {
@@ -456,7 +456,7 @@ export const BuildingPersian = {
       text: '小清真',
       size: 2,
       range: 8,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['宗教'][1],
     },
     {
@@ -464,7 +464,7 @@ export const BuildingPersian = {
       text: '大清真寺',
       size: 4,
       range: 10,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['宗教'][2],
     },
   ],
@@ -474,7 +474,7 @@ export const BuildingPersian = {
       text: '步兵',
       size: 2,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][0],
     },
     {
@@ -482,7 +482,7 @@ export const BuildingPersian = {
       text: '射手',
       size: 2,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][1],
     },
     {
@@ -490,7 +490,7 @@ export const BuildingPersian = {
       text: '骑兵',
       size: 2,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][2],
     },
     {
@@ -498,7 +498,7 @@ export const BuildingPersian = {
       text: '军事',
       size: 3,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][3],
     },
     {
@@ -506,7 +506,7 @@ export const BuildingPersian = {
       text: '武器铺',
       size: 2,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][4],
     },
     {
@@ -514,7 +514,7 @@ export const BuildingPersian = {
       text: '马厩',
       size: 2,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][5],
     },
     {
@@ -522,7 +522,7 @@ export const BuildingPersian = {
       text: '象棚',
       size: 3,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['军事'][6],
     },
   ],
@@ -542,7 +542,7 @@ export const BuildingPersian = {
       text: '通天塔',
       size: 6,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['奇迹'][0],
     },
     {
@@ -550,7 +550,7 @@ export const BuildingPersian = {
       text: '空中花园',
       size: 10,
       range: 0,
-      color: BuildingColor.White,
+      color: BuildingColor.Black,
       background: BuildingColor['奇迹'][1],
     },
   ],

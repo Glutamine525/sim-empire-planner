@@ -9,6 +9,7 @@ const SVG_XMLNS = 'http://www.w3.org/2000/svg';
 const DIV_XMLNS = 'http://www.w3.org/1999/xhtml';
 
 export async function getBuildingImage(building: Building) {
+  if (!Object.keys(building).length) return new Image();
   const { Width, Height } = building;
   const { cellSize } = DEFAULT_SIZE;
   const size = cellSize * RATIO;
@@ -31,7 +32,8 @@ export async function getBuildingImage(building: Building) {
   div.style.justifyContent = 'center';
   div.style.alignItems = 'center';
   div.style.fontWeight = 'bold';
-  div.style.textShadow = 'white 0 1px 10px';
+  div.style.textShadow =
+    'white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px';
   div.style.transform = `scale(${RATIO}00%)`;
   div.style.transformOrigin = 'top left';
   if (building.IsRoad) {
@@ -81,7 +83,8 @@ export async function getMarkerImage(marker: number, color: MarkerColor) {
   div.style.top = '0px';
   div.style.left = '6px';
   div.style.fontWeight = 'bold';
-  div.style.textShadow = 'white 0px 1px 10px';
+  div.style.textShadow =
+    'white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px';
   div.style.transform = `scale(${0.8 * RATIO})`;
   div.style.transformOrigin = 'top left';
   document.documentElement.append(div);

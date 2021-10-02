@@ -940,7 +940,9 @@ const Chessboard = (props: ChessboardProps) => {
                 operation === OperationType.Empty ? 'scale(1.02)' : ''
               }`,
               boxShadow:
-                operation === OperationType.Empty ? 'white 0 0 0.6rem' : '',
+                operation === OperationType.Empty
+                  ? 'var(--text-secondary) 0 0 0.6rem'
+                  : '',
               transition:
                 operation === OperationType.Placing
                   ? 'transform 30ms ease-in-out'
