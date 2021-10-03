@@ -119,6 +119,7 @@ const Chessboard = (props: ChessboardProps) => {
     setCopiedBuilding,
   } = props;
 
+  const [isCtrlDown, setIsCtrlDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
   const [moveConfig, setMoveConfig] = useState({ ...initMoveConfig });
@@ -188,6 +189,16 @@ const Chessboard = (props: ChessboardProps) => {
     window.addEventListener('resize', updateScroll);
     onChangeIsLoading(false);
     document.body.removeChild(document.getElementById('init-loading')!);
+    document.addEventListener('keydown', event => {
+      const { key } = event;
+      if (key !== 'Control') return;
+      setIsCtrlDown(true);
+    });
+    document.addEventListener('keyup', event => {
+      const { key } = event;
+      if (key !== 'Control') return;
+      setIsCtrlDown(false);
+    });
     console.timeEnd('useEffect []');
   }, []); // eslint-disable-line
 
@@ -319,6 +330,15 @@ const Chessboard = (props: ChessboardProps) => {
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
     const { target, clientX, clientY } = event;
     setIsDragging(true);
+    if (isCtrlDown) {
+      setDragConfig({
+        initX: getScrollLeft() + clientX,
+        initY: getScrollTop() + clientY,
+        curX: getScrollLeft() + clientX,
+        curY: getScrollTop() + clientY,
+      });
+      return;
+    }
     switch (operation) {
       case OperationType.Empty:
         setDragConfig({
@@ -347,7 +367,7 @@ const Chessboard = (props: ChessboardProps) => {
           Width,
           Height
         );
-        if (canReplace) {
+        if (!buildingConfig.IsGeneral && canReplace) {
           setCellOccupied(true);
           setUpdateRoad(false);
           deleteBuilding(generalLine, generalColumn);
@@ -406,6 +426,12 @@ const Chessboard = (props: ChessboardProps) => {
       column,
       offsetColumn: 0,
     });
+    if (isDragging && isCtrlDown) {
+      const { initX, initY } = dragConfig;
+      setScrollLeft(initX - clientX);
+      setScrollTop(initY - clientY);
+      return;
+    }
     switch (operation) {
       case OperationType.Empty:
         const occupied = cells.getOccupied(line, column);
@@ -462,7 +488,7 @@ const Chessboard = (props: ChessboardProps) => {
         );
         const [canReplace, generalMarker, generalLine, generalColumn] =
           cells.canReplace(line, column, Width, Height);
-        if (canReplace) {
+        if (!buildingConfig.IsGeneral && canReplace) {
           setBuildingMarker(generalMarker);
           setShowBuilding(true);
           setCellOccupied(false);
@@ -516,7 +542,7 @@ const Chessboard = (props: ChessboardProps) => {
     }
   };
 
-  const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = event => {
+  const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = () => {
     setIsDragging(false);
     switch (operation) {
       case OperationType.Placing:
@@ -585,8 +611,9 @@ const Chessboard = (props: ChessboardProps) => {
     }
   };
 
-  const onWrapperMouseLeave: MouseEventHandler<HTMLDivElement> = event => {
+  const onWrapperMouseLeave: MouseEventHandler<HTMLDivElement> = () => {
     setIsDragging(false);
+    setIsCtrlDown(false);
   };
 
   const onWrapperDoubleClick: MouseEventHandler<HTMLDivElement> = event => {

@@ -54,6 +54,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       取消操作: { sub: [] },
       选中建筑: { sub: [] },
       删除建筑: { sub: [] },
+      水印模式: { sub: [] },
       导入导出: {
         sub: [
           { name: '导入新文明' },
@@ -258,6 +259,9 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           return;
         case '删除建筑':
           onChangeOperation(OperationType.Delete, '', {} as any);
+          return;
+        case '水印模式':
+          onChangeOperation(OperationType.Watermark, '', {} as any);
           return;
         case '导入导出':
           return;

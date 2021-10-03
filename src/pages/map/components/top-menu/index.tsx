@@ -70,7 +70,7 @@ const helper = () => {
       <div>- 特殊建筑的数据会被导入导出</div>
       <div>- 编辑者自定义的水印会被导入导出</div>
       <div>- 自动保存不会保存特殊建筑和编辑者水印</div>
-      <div>- 菜单中「添加水印」里的截图才会生成编辑者水印</div>
+      <div>- 在「水印模式」里截图才会添加编辑者水印</div>
       <div>- 版权水印总是会生成</div>
       <div>- 旋转地图开启后，无法编辑，只能截图</div>
       <div className={styles['helper-splitter']}></div>
@@ -330,9 +330,10 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
           title={helper}
           overlayInnerStyle={{
             borderRadius: 8,
-            width: '30rem',
             fontSize: '1.2rem',
             color: 'var(-text-regular)',
+            whiteSpace: 'nowrap',
+            width: 'max-content',
           }}
         >
           <div className={styles.helper}>?</div>

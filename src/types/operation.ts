@@ -4,4 +4,5 @@ export enum OperationType {
   Copying = '复制建筑中...',
   Select = '选中建筑',
   Delete = '删除建筑',
+  Watermark = '水印模式',
 }
