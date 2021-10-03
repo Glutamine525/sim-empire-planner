@@ -51,7 +51,7 @@ const helper = () => {
       <div>- S: 选中建筑</div> <div>- D: 删除建筑</div>
       <div>- ZXC(V): 三(四)防建筑</div>
       <div>- QWER: 2x2 3x3 4x4 5x5 通用建筑</div>
-      <div>- 1234567890-=: 对应的12个商业建筑</div>
+      <div>- 1234567890: 对应的10个商业建筑</div>
       <div className={styles['helper-splitter']}></div>
       <div style={{ textAlign: 'center' }}>
         <strong>其它操作</strong>

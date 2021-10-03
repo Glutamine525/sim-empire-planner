@@ -10,12 +10,14 @@ import {
 import { BuildingColor } from '@/types/building-color';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
-import { Menu } from 'antd';
+import { Menu, message } from 'antd';
 import React, { FC, useEffect, useMemo, useState } from 'react';
 import { connect } from 'react-redux';
 import styles from './index.less';
 
 const { SubMenu } = Menu;
+
+const KEYS = 'asdqwerzxcv1234567890';
 
 interface LeftMenuProps {
   mapType: number;
@@ -58,12 +60,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       删除建筑: { sub: [] },
       水印模式: { sub: [] },
       导入导出: {
-        sub: [
-          { name: '导入新文明' },
-          { name: '导入地图数据' },
-          { name: '导出地图数据' },
-          { name: '截图' },
-        ],
+        sub: [{ name: '导入新文明' }, { name: '导入地图' }, { name: '截图' }],
       },
     });
     document.addEventListener('keydown', event => {
@@ -128,10 +125,13 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isMapRotated) return;
       const { key, ctrlKey } = event;
-      const digits = Array.from(Array(10), (_, i) => i.toString());
+      if (isMapRotated && KEYS.includes(key)) {
+        message.warning('旋转地图后无法进行编辑！');
+        return;
+      }
       if (ctrlKey) return;
+      const digits = Array.from(Array(10), (_, i) => i.toString());
       let keyPath: string[];
       let building: any;
       let parent: CatalogType = CatalogType.Road;
@@ -243,12 +243,22 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   };
 
   const onClick = (e: any) => {
-    if (isMapRotated) return;
     console.log('[on click left menu]', e);
     e.keyPath.reverse();
+    if (
+      isMapRotated &&
+      ![
+        CatalogType.Watermark,
+        CatalogType.Cancel,
+        CatalogType.ImportExport,
+      ].includes(e.keyPath[0])
+    ) {
+      message.warning('旋转地图后无法进行编辑！');
+      return;
+    }
     let building: any;
     if (e.keyPath.length === 1 || e.keyPath[0] === '导入导出') {
-      switch (e.key as CatalogType) {
+      switch (e.key) {
         case '道路':
           building = {
             name: '道路',
@@ -272,7 +282,11 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
         case '水印模式':
           onChangeOperation(OperationType.Watermark, '', {} as any);
           return;
-        case '导入导出':
+        case '导入新文明':
+          return;
+        case '导入地图':
+          return;
+        case '截图':
           return;
         default:
           return;
