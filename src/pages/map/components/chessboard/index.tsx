@@ -54,7 +54,7 @@ import Coord from './components/coord';
 import Box from './components/box';
 import { message, Modal } from 'antd';
 import { Cells } from '@/utils/cells';
-import MiniMap, { MINI_MAP_SIZE } from './components/mini-map';
+import MiniMap, { MINI_MAP_RATIO, MINI_MAP_SIZE } from './components/mini-map';
 
 interface ChessboardProps {
   mapType: number;
@@ -305,7 +305,12 @@ const Chessboard = (props: ChessboardProps) => {
             const canvas: any = miniMapCanvasRef.current;
             const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
             ctx.fillStyle = color;
-            ctx.fillRect((column - 1) * 4, (line - 1) * 4, 4, 4);
+            ctx.fillRect(
+              (column - 1) * MINI_MAP_RATIO,
+              (line - 1) * MINI_MAP_RATIO,
+              MINI_MAP_RATIO,
+              MINI_MAP_RATIO
+            );
           }
           const canvas: any = buildingCanvasRef.current;
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -763,7 +768,12 @@ const Chessboard = (props: ChessboardProps) => {
     canvas = miniMapCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.fillStyle = building.Background;
-    ctx.fillRect((column - 1) * 4, (line - 1) * 4, 4, 4);
+    ctx.fillRect(
+      (column - 1) * MINI_MAP_RATIO,
+      (line - 1) * MINI_MAP_RATIO,
+      MINI_MAP_RATIO * building.Width,
+      MINI_MAP_RATIO * building.Height
+    );
     if (showMarker(building)) {
       await updateMarker(marker, line, column);
     }
@@ -806,7 +816,12 @@ const Chessboard = (props: ChessboardProps) => {
     );
     canvas = miniMapCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    ctx.clearRect((column - 1) * 4, (line - 1) * 4, 4, 4);
+    ctx.clearRect(
+      (column - 1) * MINI_MAP_RATIO,
+      (line - 1) * MINI_MAP_RATIO,
+      MINI_MAP_RATIO * target.Width,
+      MINI_MAP_RATIO * target.Height
+    );
     return true;
   };
 
@@ -834,7 +849,12 @@ const Chessboard = (props: ChessboardProps) => {
           const canvas: any = miniMapCanvasRef.current;
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
           ctx.fillStyle = color;
-          ctx.fillRect((column - 1) * 4, (line - 1) * 4, 4, 4);
+          ctx.fillRect(
+            (column - 1) * MINI_MAP_RATIO,
+            (line - 1) * MINI_MAP_RATIO,
+            MINI_MAP_RATIO,
+            MINI_MAP_RATIO
+          );
         }
         return null;
       });
@@ -922,7 +942,12 @@ const Chessboard = (props: ChessboardProps) => {
       canvas = miniMapCanvasRef.current;
       ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
       ctx.fillStyle = FixedBuildingColor[FixedBuildingType.Road];
-      ctx.fillRect((co - 1) * 4, (li - 1) * 4, 4, 4);
+      ctx.fillRect(
+        (co - 1) * MINI_MAP_RATIO,
+        (li - 1) * MINI_MAP_RATIO,
+        MINI_MAP_RATIO,
+        MINI_MAP_RATIO
+      );
     }
   };
 

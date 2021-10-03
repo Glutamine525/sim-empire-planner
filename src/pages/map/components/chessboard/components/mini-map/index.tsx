@@ -4,7 +4,9 @@ import { LENGTH } from '@/utils/config';
 import React, { MouseEventHandler, useEffect, useRef } from 'react';
 import styles from './index.less';
 
-export const MINI_MAP_SIZE = 232;
+export const MINI_MAP_SIZE = LENGTH * 2;
+
+export const MINI_MAP_RATIO = 4;
 
 interface MiniMapProps {
   forwardedRef: React.LegacyRef<HTMLCanvasElement>;
@@ -79,14 +81,14 @@ export default function MiniMap(props: MiniMapProps) {
       >
         <canvas
           ref={baseRef}
-          width={MINI_MAP_SIZE * 2}
-          height={MINI_MAP_SIZE * 2}
+          width={LENGTH * MINI_MAP_RATIO}
+          height={LENGTH * MINI_MAP_RATIO}
           className={styles.map}
         ></canvas>
         <canvas
           ref={forwardedRef}
-          width={MINI_MAP_SIZE * 2}
-          height={MINI_MAP_SIZE * 2}
+          width={LENGTH * MINI_MAP_RATIO}
+          height={LENGTH * MINI_MAP_RATIO}
           className={styles.map}
         ></canvas>
         <div
