@@ -159,6 +159,7 @@ const Chessboard = (props: ChessboardProps) => {
   const cellCanvasRef = useRef<HTMLCanvasElement>(null);
   const buildingCanvasRef = useRef<HTMLCanvasElement>(null);
   const markerCanvasRef = useRef<HTMLCanvasElement>(null);
+  const miniMapCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const protection = useMemo(() => CivilBuilding[civil]['防护'], [civil]);
   const protectionNum = useMemo(() => protection.length, [protection]);
@@ -206,16 +207,16 @@ const Chessboard = (props: ChessboardProps) => {
     canvas = markerCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas = miniMapCanvasRef.current;
+    ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     window.addEventListener('resize', () => {
       scroll.update();
       updateMiniMapConfig(true);
     });
-    document
-      .getElementById('chessboard-wrapper-outer')!
-      .addEventListener('ps-scroll-x', () => updateMiniMapConfig());
-    document
-      .getElementById('chessboard-wrapper-outer')!
-      .addEventListener('ps-scroll-y', () => updateMiniMapConfig());
+    const wrapperOuter = document.getElementById('chessboard-wrapper-outer');
+    wrapperOuter!.addEventListener('ps-scroll-x', () => updateMiniMapConfig());
+    wrapperOuter!.addEventListener('ps-scroll-y', () => updateMiniMapConfig());
     document.addEventListener('mousedown', () => setIsMouseDown(true));
     document.addEventListener('mouseup', () => setIsMouseDown(false));
     document.addEventListener('mouseleave', () => setIsMouseDown(false));
@@ -242,6 +243,9 @@ const Chessboard = (props: ChessboardProps) => {
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     canvas = markerCanvasRef.current;
+    ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    canvas = miniMapCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     cells.init(mapType, civil);
@@ -298,6 +302,10 @@ const Chessboard = (props: ChessboardProps) => {
               R: !keys.includes(right),
             };
             cells.placeBarrier(line, column);
+            const canvas: any = miniMapCanvasRef.current;
+            const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+            ctx.fillStyle = color;
+            ctx.fillRect((column - 1) * 2, (line - 1) * 2, 2, 2);
           }
           const canvas: any = buildingCanvasRef.current;
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -737,8 +745,8 @@ const Chessboard = (props: ChessboardProps) => {
     else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
     onPlaceOrDeleteBuilding(building, 1);
     if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
-    const canvas: any = buildingCanvasRef.current;
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    let canvas: any = buildingCanvasRef.current;
+    let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     if (operation === OperationType.Placing) {
       ctx.drawImage(
         await buildingBuffer,
@@ -752,6 +760,10 @@ const Chessboard = (props: ChessboardProps) => {
         (line - 1) * 30 * RATIO
       );
     }
+    canvas = miniMapCanvasRef.current;
+    ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.fillStyle = building.Background;
+    ctx.fillRect((column - 1) * 2, (line - 1) * 2, 2, 2);
     if (showMarker(building)) {
       await updateMarker(marker, line, column);
     }
@@ -784,14 +796,17 @@ const Chessboard = (props: ChessboardProps) => {
     else if (target.IsRoad && !force) await updateRoadDisplay(records);
     onPlaceOrDeleteBuilding(target, -1);
     deleteMarker(originLine, originColumn);
-    const canvas: any = buildingCanvasRef.current;
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    let canvas: any = buildingCanvasRef.current;
+    let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(
       (originColumn - 1) * 30 * RATIO,
       (originLine - 1) * 30 * RATIO,
       width * 30 * RATIO,
       height * 30 * RATIO
     );
+    canvas = miniMapCanvasRef.current;
+    ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+    ctx.clearRect((column - 1) * 2, (line - 1) * 2, 2, 2);
     return true;
   };
 
@@ -816,6 +831,10 @@ const Chessboard = (props: ChessboardProps) => {
             R: !keys.includes(right),
           };
           cells.placeBarrier(line, column);
+          const canvas: any = miniMapCanvasRef.current;
+          const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+          ctx.fillStyle = color;
+          ctx.fillRect((column - 1) * 2, (line - 1) * 2, 2, 2);
         }
         return null;
       });
@@ -887,19 +906,23 @@ const Chessboard = (props: ChessboardProps) => {
   };
 
   const updateRoadDisplay = async (roads: string[]) => {
-    const canvas: any = buildingCanvasRef.current;
-    const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     for (let v of roads) {
       const [li, co] = parseBuildingKey(v);
       const target = cells.getBuilding(li, co);
       if (target.isRoadVertex) await updateMarker(target.Marker, li, co, true);
       else deleteMarker(li, co);
       const key = `${target.BorderTStyle} ${target.BorderRStyle} ${target.BorderBStyle} ${target.BorderLStyle}`;
+      let canvas: any = buildingCanvasRef.current;
+      let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
       ctx.drawImage(
         await roadImageBuffer[key],
         (co - 1) * 30 * RATIO,
         (li - 1) * 30 * RATIO
       );
+      canvas = miniMapCanvasRef.current;
+      ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+      ctx.fillStyle = FixedBuildingColor[FixedBuildingType.Road];
+      ctx.fillRect((co - 1) * 2, (li - 1) * 2, 2, 2);
     }
   };
 
@@ -1188,7 +1211,9 @@ const Chessboard = (props: ChessboardProps) => {
         </div>
       </div>
       <MiniMap
+        forwardedRef={miniMapCanvasRef}
         show={showMiniMap}
+        theme={theme}
         {...miniMapConfig}
         onMouseDown={onMiniMapMouseDown}
         onMouseMove={onMiniMapMouseMove}

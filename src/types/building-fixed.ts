@@ -2876,7 +2876,7 @@ export enum FixedBuildingType {
 }
 
 export const FixedBuildingColor = {
-  [FixedBuildingType.Road]: '',
+  [FixedBuildingType.Road]: '#fdfebd',
   [FixedBuildingType.Stone]: '#d9d9d9',
   [FixedBuildingType.Copper]: '#ffd966',
   [FixedBuildingType.Wood]: '#00b050',
