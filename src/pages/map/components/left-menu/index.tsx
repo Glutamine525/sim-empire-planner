@@ -20,12 +20,14 @@ const { SubMenu } = Menu;
 interface LeftMenuProps {
   mapType: number;
   civil: CivilType;
+  isMapRotated: boolean;
   copiedBuilding: Building;
   onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
 }
 
 const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
-  const { mapType, civil, copiedBuilding, onChangeOperation } = props;
+  const { mapType, civil, isMapRotated, copiedBuilding, onChangeOperation } =
+    props;
 
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
@@ -71,6 +73,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       onChangeOperation(OperationType.Empty, '', {} as any);
     });
     document.addEventListener('keyup', event => {
+      if (isMapRotated) return;
       const { key, ctrlKey } = event;
       if (key !== 'c' || !ctrlKey) return;
       onChangeOperation(OperationType.Copying, '', {} as any);
@@ -101,6 +104,10 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [mapType, civil]); // eslint-disable-line
 
   useEffect(() => {
+    if (isMapRotated) onChangeOperation(OperationType.Empty, '', {} as any);
+  }, [isMapRotated]); // eslint-disable-line
+
+  useEffect(() => {
     if (!Object.keys(copiedBuilding).length) {
       onChangeOperation(OperationType.Empty, '', {} as any);
       return;
@@ -121,6 +128,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (isMapRotated) return;
       const { key, ctrlKey } = event;
       const digits = Array.from(Array(10), (_, i) => i.toString());
       if (ctrlKey) return;
@@ -200,7 +208,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [catalog]); // eslint-disable-line
+  }, [catalog, isMapRotated]); // eslint-disable-line
 
   const dispatchBuilding = (keyPath: string[], building: any) => {
     onChangeOperation(OperationType.Placing, keyPath.join('-'), {
@@ -235,6 +243,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   };
 
   const onClick = (e: any) => {
+    if (isMapRotated) return;
     console.log('[on click left menu]', e);
     e.keyPath.reverse();
     let building: any;
@@ -338,6 +347,7 @@ const mapStateToProps = (state: any) => {
   return {
     mapType: state.TopMenu.mapType,
     civil: state.TopMenu.civil,
+    isMapRotated: state.TopMenu.isMapRotated,
     copiedBuilding: state.Chessboard.copiedBuilding,
   };
 };

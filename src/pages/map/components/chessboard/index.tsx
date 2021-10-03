@@ -60,6 +60,7 @@ interface ChessboardProps {
   civil: CivilType;
   isNoWood: boolean;
   theme: ThemeType;
+  isMapRotated: boolean;
   operation: OperationType;
   buildingConfig: Building;
   onChangeIsLoading: any;
@@ -115,6 +116,7 @@ const Chessboard = (props: ChessboardProps) => {
     civil,
     isNoWood,
     theme,
+    isMapRotated,
     operation,
     buildingConfig,
     onChangeIsLoading,
@@ -360,6 +362,7 @@ const Chessboard = (props: ChessboardProps) => {
           const building = cells.getBuilding(li, co);
           if (building.IsFixed) {
             setCopiedBuilding(prevBuildingConfig);
+            console.timeEnd('useEffect [Operation]');
             return;
           }
           setCopiedBuilding(building);
@@ -996,7 +999,12 @@ const Chessboard = (props: ChessboardProps) => {
         onMouseLeave={onWrapperMouseLeave}
         onDoubleClickCapture={onWrapperDoubleClick}
       >
-        <div className={styles.container}>
+        <div
+          className={styles.container}
+          style={{
+            transform: isMapRotated ? 'rotate(45deg)' : 'none',
+          }}
+        >
           <canvas
             ref={cellCanvasRef}
             width={3480}
@@ -1112,6 +1120,7 @@ const mapStateToProps = (state: any) => {
     civil: state.TopMenu.civil,
     isNoWood: state.TopMenu.isNoWood,
     theme: state.TopMenu.theme,
+    isMapRotated: state.TopMenu.isMapRotated,
     operation: state.LeftMenu.operation,
     buildingConfig: state.LeftMenu.buildingConfig,
   };

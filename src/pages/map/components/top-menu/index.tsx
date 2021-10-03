@@ -2,7 +2,7 @@ import Switcher from '@/components/switcher';
 import React, { FC } from 'react';
 import { CivilArray, CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
-import { CounterType } from '@/types/couter';
+import { Counter } from '@/types/couter';
 import styles from './index.less';
 import { connect } from 'react-redux';
 import {
@@ -27,7 +27,7 @@ interface TopMenuProps {
   isMapRotated: boolean;
   operation: OperationType;
   operationSub: string;
-  counter: CounterType;
+  counter: Counter;
   onChangeIsLoading: any;
   onChangeMapType: any;
   onChangeCivil: any;
@@ -74,6 +74,10 @@ const helper = () => {
       <div>- 版权水印总是会生成</div>
       <div>- 旋转地图开启后，无法编辑，只能截图</div>
       <div className={styles['helper-splitter']}></div>
+      <div style={{ textAlign: 'center' }}>
+        <span>模拟帝国地图编辑器 </span>
+        <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
+      </div>
       <div style={{ textAlign: 'center' }}>
         作者邮箱:
         <strong
@@ -338,15 +342,8 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         >
           <div className={styles.helper}>?</div>
         </Tooltip>
-        <div className={styles.version}>
-          <div>
-            <span>模拟帝国地图编辑器 </span>
-            <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
-          </div>
-          <div>
-            <span>作者：</span>
-            <strong>咕噜他命</strong>
-          </div>
+        <div className={styles.account}>
+          <div className={styles.login}>登录</div>
         </div>
       </div>
     </nav>

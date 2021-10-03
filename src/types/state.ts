@@ -1,7 +1,7 @@
 import { ActionType } from './action';
 import { Building } from './building';
 import { CivilType } from './civil';
-import { CounterType } from './couter';
+import { Counter } from './couter';
 import { OperationType } from './operation';
 import { ThemeType } from './theme';
 
@@ -56,7 +56,7 @@ export interface ChessboardAction {
   building: Building;
   diff: number;
   copiedBuilding: Building;
-  counter: CounterType;
+  counter: Counter;
 }
 
 export const InitChessboardState: ChessboardAction = {
