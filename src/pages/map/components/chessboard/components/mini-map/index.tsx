@@ -4,6 +4,8 @@ import { LENGTH } from '@/utils/config';
 import React, { MouseEventHandler, useEffect, useRef } from 'react';
 import styles from './index.less';
 
+export const MINI_MAP_SIZE = 232;
+
 interface MiniMapProps {
   forwardedRef: React.LegacyRef<HTMLCanvasElement>;
   show: boolean;
@@ -39,21 +41,21 @@ export default function MiniMap(props: MiniMapProps) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'black';
     ctx.beginPath();
-    ctx.moveTo(0, 58 * 2 + 1);
-    ctx.lineTo(58 * 2 + 1, 0);
-    ctx.lineTo(58 * 2 + 2, 0);
-    ctx.lineTo(116 * 2, 57 * 2 + 1);
-    ctx.lineTo(116 * 2, 57 * 2 + 2);
-    ctx.lineTo(57 * 2 + 2, 116 * 2);
-    ctx.lineTo(57 * 2 + 1, 116 * 2);
-    ctx.lineTo(0, 58 * 2 + 2);
+    ctx.moveTo(0, 58 * 4 + 1);
+    ctx.lineTo(58 * 4 + 1, 0);
+    ctx.lineTo(58 * 4 + 4, 0);
+    ctx.lineTo(116 * 4, 57 * 4 + 1);
+    ctx.lineTo(116 * 4, 57 * 4 + 4);
+    ctx.lineTo(57 * 4 + 4, 116 * 4);
+    ctx.lineTo(57 * 4 + 1, 116 * 4);
+    ctx.lineTo(0, 58 * 4 + 4);
     ctx.closePath();
     ctx.fill();
     ctx.fillStyle = ThemeColor[theme]['--background-lighter'];
     for (let i = 1; i <= LENGTH; i++) {
       for (let j = 1; j <= LENGTH; j++) {
         if (!isInRange(i, j)) continue;
-        ctx.fillRect((j - 1) * 2, (i - 1) * 2, 2, 2);
+        ctx.fillRect((j - 1) * 4, (i - 1) * 4, 4, 4);
       }
     }
   }, [theme]);
@@ -77,22 +79,24 @@ export default function MiniMap(props: MiniMapProps) {
       >
         <canvas
           ref={baseRef}
-          width={232}
-          height={232}
+          width={MINI_MAP_SIZE * 2}
+          height={MINI_MAP_SIZE * 2}
           className={styles.map}
         ></canvas>
         <canvas
           ref={forwardedRef}
-          width={232}
-          height={232}
+          width={MINI_MAP_SIZE * 2}
+          height={MINI_MAP_SIZE * 2}
           className={styles.map}
         ></canvas>
         <div
           className={styles.focus}
           style={{
-            width: focusWidth * 174,
-            height: focusHeight * 174,
-            transform: `translate(${focusLeft * 174}px,${focusTop * 174}px)`,
+            width: focusWidth * MINI_MAP_SIZE,
+            height: focusHeight * MINI_MAP_SIZE,
+            transform: `translate(${focusLeft * MINI_MAP_SIZE}px,${
+              focusTop * MINI_MAP_SIZE
+            }px)`,
           }}
         ></div>
       </div>
