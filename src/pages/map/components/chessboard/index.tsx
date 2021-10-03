@@ -415,7 +415,7 @@ const Chessboard = (props: ChessboardProps) => {
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
     const { target, clientX, clientY } = event;
     setIsDragging(true);
-    if (isCtrlDown) {
+    if (isCtrlDown || isMapRotated) {
       setDragConfig({
         initX: getScrollLeft() + clientX,
         initY: getScrollTop() + clientY,
@@ -511,13 +511,14 @@ const Chessboard = (props: ChessboardProps) => {
       column,
       offsetColumn: 0,
     });
-    if (isDragging && isCtrlDown) {
+    if (isDragging && (isCtrlDown || isMapRotated)) {
       const { initX, initY } = dragConfig;
       setScrollLeft(initX - clientX);
       setScrollTop(initY - clientY);
       updateMiniMapConfig();
       return;
     }
+    if (isMapRotated) return;
     switch (operation) {
       case OperationType.Empty:
         const occupied = cells.getOccupied(line, column);
