@@ -35,6 +35,7 @@ import {
 import Range from './components/range';
 import {
   changeIsLoading,
+  changeNoWood,
   placeOrDeleteBuilding,
   resetCounter,
   setCopiedBuilding,
@@ -51,7 +52,7 @@ import {
 } from '@/types/building-fixed';
 import Coord from './components/coord';
 import Box from './components/box';
-import { message } from 'antd';
+import { message, Modal } from 'antd';
 import { Cells } from '@/utils/cells';
 
 interface ChessboardProps {
@@ -62,6 +63,7 @@ interface ChessboardProps {
   operation: OperationType;
   buildingConfig: Building;
   onChangeIsLoading: any;
+  onChangeNoWood: any;
   onResetCounter: any;
   onPlaceOrDeleteBuilding: any;
   setCopiedBuilding: any;
@@ -93,6 +95,8 @@ let barriers = {} as {
 
 let roadBuffer = new Set<string>();
 
+let cancelNoWoodConfirmation = false;
+
 const usePrevState = (value: any) => {
   const ref = useRef();
   useEffect(() => {
@@ -114,6 +118,7 @@ const Chessboard = (props: ChessboardProps) => {
     operation,
     buildingConfig,
     onChangeIsLoading,
+    onChangeNoWood,
     onResetCounter,
     onPlaceOrDeleteBuilding,
     setCopiedBuilding,
@@ -225,40 +230,79 @@ const Chessboard = (props: ChessboardProps) => {
       const keys = BuildingFixed[BarrierType.Tree][mapType - 3];
       const color = BarrierColor[BarrierType.Tree];
       if (isNoWood) {
+        if (cancelNoWoodConfirmation) {
+          cancelNoWoodConfirmation = false;
+          console.timeEnd('useEffect [IsNoWood]');
+          return;
+        }
         for (let key of keys) {
           const [line, column] = parseBuildingKey(key);
           deleteBuilding(line, column, true);
         }
+        onChangeIsLoading(false);
+        console.timeEnd('useEffect [IsNoWood]');
       } else {
+        let needConfirm = false;
         for (let key of keys) {
           const [line, column] = parseBuildingKey(key);
           const occupied = cells.getOccupied(line, column);
           if (occupied) {
-            const [oLi, oCo] = parseBuildingKey(occupied);
-            deleteBuilding(oLi, oCo, true);
+            needConfirm = true;
+            break;
           }
-          const top = `${line - 1}-${column}`;
-          const bottom = `${line + 1}-${column}`;
-          const left = `${line}-${column - 1}`;
-          const right = `${line}-${column + 1}`;
-          barriers[key] = {
-            background: color,
-            T: !keys.includes(top),
-            B: !keys.includes(bottom),
-            L: !keys.includes(left),
-            R: !keys.includes(right),
-          };
-          cells.placeBarrier(line, column);
         }
-        const canvas: any = buildingCanvasRef.current;
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
-        barriers = {};
+        const callback = async () => {
+          for (let key of keys) {
+            const [line, column] = parseBuildingKey(key);
+            const occupied = cells.getOccupied(line, column);
+            if (occupied) {
+              const [oLi, oCo] = parseBuildingKey(occupied);
+              await deleteBuilding(oLi, oCo);
+            }
+            const top = `${line - 1}-${column}`;
+            const bottom = `${line + 1}-${column}`;
+            const left = `${line}-${column - 1}`;
+            const right = `${line}-${column + 1}`;
+            barriers[key] = {
+              background: color,
+              T: !keys.includes(top),
+              B: !keys.includes(bottom),
+              L: !keys.includes(left),
+              R: !keys.includes(right),
+            };
+            cells.placeBarrier(line, column);
+          }
+          const canvas: any = buildingCanvasRef.current;
+          const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+          ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+          barriers = {};
+          onChangeIsLoading(false);
+          console.timeEnd('useEffect [IsNoWood]');
+        };
+        if (needConfirm) {
+          Modal.confirm({
+            title: '警告',
+            content:
+              '树木的地方已经被占据，开启无木之地后，有冲突的建筑将被直接删除，是否确定开启？',
+            centered: true,
+            okText: '确认',
+            cancelText: '取消',
+            onOk: async () => {
+              await callback();
+            },
+            onCancel: () => {
+              cancelNoWoodConfirmation = true;
+              onChangeNoWood(true);
+              onChangeIsLoading(false);
+              console.timeEnd('useEffect [IsNoWood]');
+            },
+          });
+        } else {
+          await callback();
+        }
       }
-      onChangeIsLoading(false);
-      console.timeEnd('useEffect [IsNoWood]');
     })();
-  }, [isNoWood]); // eslint-disable-line
+  }, [isNoWood, mapType, civil]); // eslint-disable-line
 
   useEffect(() => {
     console.time('useEffect [Theme]');
@@ -725,6 +769,7 @@ const Chessboard = (props: ChessboardProps) => {
     Object.keys(BarrierType)
       .map(v => v.toLowerCase() as BarrierType)
       .map((v: BarrierType) => {
+        if (v === BarrierType.Tree) return null;
         const keys = BuildingFixed[v][mapType - 3];
         const color = BarrierColor[v];
         for (let key of keys) {
@@ -1076,6 +1121,9 @@ const mapDispatchToProps = (dispatch: any) => {
   return {
     onChangeIsLoading: (isLoading: boolean) => {
       dispatch(changeIsLoading(isLoading));
+    },
+    onChangeNoWood: (isNoWood: boolean) => {
+      dispatch(changeNoWood(isNoWood));
     },
     onResetCounter: () => {
       dispatch(resetCounter());
