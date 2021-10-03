@@ -1,3 +1,5 @@
+import { message } from 'antd';
+
 export const DEFAULT_SIZE = {
   width: 1920,
   cellSize: 30,
@@ -28,4 +30,32 @@ export function getCoord(offsetX: number, offsetY: number) {
   const column = Math.ceil(offsetX / cellSize);
   const line = Math.ceil(offsetY / cellSize);
   return { line, column };
+}
+
+export function copyText(text: string) {
+  let textarea = document.createElement('textarea');
+  const currentFocus = document.activeElement;
+  const toolBoxwrap = document.getElementById('map');
+  toolBoxwrap!.appendChild(textarea);
+  textarea.value = text;
+  textarea.focus();
+  if ('setSelectionRange' in textarea) {
+    textarea.setSelectionRange(0, textarea.value.length);
+  } else {
+    textarea.select();
+  }
+  let flag = true;
+  try {
+    flag = document.execCommand('copy');
+  } catch (_) {
+    flag = false;
+  }
+  toolBoxwrap!.removeChild(textarea);
+  (currentFocus as any).focus();
+  return flag;
+}
+
+export function copyLink(link: string) {
+  if (copyText(link)) message.success('已复制该链接！');
+  else message.error('复制链接失败！');
 }

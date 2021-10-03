@@ -16,7 +16,8 @@ import {
 } from '@/actions';
 import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu, Modal, Tooltip } from 'antd';
-import { MINOR_PATCH, VERSION } from '@/utils/config';
+import { EMAIL, MINOR_PATCH, VERSION } from '@/utils/config';
+import { copyLink } from '@/utils/browser';
 
 interface TopMenuProps {
   mapType: number;
@@ -75,18 +76,12 @@ const helper = () => {
       <div>- 旋转地图开启后，无法编辑，只能截图</div>
       <div className={styles['helper-splitter']}></div>
       <div style={{ textAlign: 'center' }}>
-        <span>模拟帝国地图编辑器 </span>
-        <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
+        模拟帝国地图编辑器 <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
       </div>
       <div style={{ textAlign: 'center' }}>
-        作者邮箱:
-        <strong
-          style={{
-            cursor: 'pointer',
-            marginLeft: 8,
-          }}
-        >
-          glutamine525@gmail.com
+        作者邮箱:{' '}
+        <strong className={styles.link} onClick={() => copyLink(EMAIL)}>
+          {EMAIL}
         </strong>
       </div>
     </div>
