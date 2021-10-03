@@ -1,4 +1,6 @@
-export const BuildingFixed: any = {
+import { CatalogType } from './building';
+
+export const BuildingFixed = {
   water: [
     [
       '99-43',
@@ -2850,22 +2852,61 @@ export const BuildingFixed: any = {
     ['60-27-3', '63-28-3', '75-31-3', '78-32-3'],
     ['75-29-3', '78-30-3', '96-47-3', '99-48-3'],
   ],
-  color_road: '#fdfebd',
-  color_mountain: '#808080',
-  color_water: '#0070c0',
-  color_tree: '#92d050',
-  color_stone: '#d9d9d9',
-  color_copper: '#ffd966',
-  color_wood: '#00b050',
-  color_clay: '#ed7d31',
-  color_wharf: '#00b0f0',
-  text_road: '',
-  text_mountain: '',
-  text_water: '',
-  text_tree: '',
-  text_stone: '采石场',
-  text_copper: '铜矿场',
-  text_wood: '伐木场',
-  text_clay: '粘土矿',
-  text_wharf: '码头',
+};
+
+export enum BarrierType {
+  Tree = 'tree',
+  Water = 'water',
+  Mountain = 'mountain',
+}
+
+export const BarrierColor = {
+  [BarrierType.Tree]: '#92d050',
+  [BarrierType.Water]: '#0070c0',
+  [BarrierType.Mountain]: '#808080',
+};
+
+export enum FixedBuildingType {
+  Road = 'road',
+  Stone = 'stone',
+  Copper = 'copper',
+  Wood = 'wood',
+  Clay = 'clay',
+  Wharf = 'wharf',
+}
+
+export const FixedBuildingColor = {
+  [FixedBuildingType.Road]: '',
+  [FixedBuildingType.Stone]: '#d9d9d9',
+  [FixedBuildingType.Copper]: '#ffd966',
+  [FixedBuildingType.Wood]: '#00b050',
+  [FixedBuildingType.Clay]: '#ed7d31',
+  [FixedBuildingType.Wharf]: '#00b0f0',
+};
+
+export const FixedBuildingText = {
+  [FixedBuildingType.Road]: '',
+  [FixedBuildingType.Stone]: '采石场',
+  [FixedBuildingType.Copper]: '铜矿场',
+  [FixedBuildingType.Wood]: '伐木场',
+  [FixedBuildingType.Clay]: '粘土矿',
+  [FixedBuildingType.Wharf]: '码头',
+};
+
+export const FixedBuildingSize = {
+  [FixedBuildingType.Road]: 1,
+  [FixedBuildingType.Stone]: 2,
+  [FixedBuildingType.Copper]: 2,
+  [FixedBuildingType.Wood]: 2,
+  [FixedBuildingType.Clay]: 2,
+  [FixedBuildingType.Wharf]: 3,
+};
+
+export const FixedBuildingCatalog = {
+  [FixedBuildingType.Road]: CatalogType.Road,
+  [FixedBuildingType.Stone]: CatalogType.Industry,
+  [FixedBuildingType.Copper]: CatalogType.Industry,
+  [FixedBuildingType.Wood]: CatalogType.Industry,
+  [FixedBuildingType.Clay]: CatalogType.Industry,
+  [FixedBuildingType.Wharf]: CatalogType.Agriculture,
 };

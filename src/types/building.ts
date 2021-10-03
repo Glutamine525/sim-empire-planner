@@ -6,13 +6,13 @@ import { BuildingGreece } from './building-greece';
 import { BuildingPersian } from './building-persian';
 import { CivilType } from './civil';
 
-export const CivilBuilding: { [key in CivilType]: any } = {
+export const CivilBuilding: { [key in CivilType]: typeof BuildingChina } = {
   [CivilType.China]: BuildingChina,
   [CivilType.Persian]: BuildingPersian,
   [CivilType.Egypt]: BuildingEgypt,
   [CivilType.Greece]: BuildingGreece,
   [CivilType.Aztec]: BuildingAztec,
-  [CivilType.Custom]: undefined,
+  [CivilType.Custom]: undefined as any,
 };
 
 export enum CatalogType {
@@ -40,63 +40,6 @@ export enum BorderStyleType {
   Dashed = 'dashed',
   None = 'none',
 }
-
-export enum BarrierType {
-  Tree = 'tree',
-  Water = 'water',
-  Mountain = 'mountain',
-}
-
-export const BarrierColor = {
-  [BarrierType.Tree]: '#92d050',
-  [BarrierType.Water]: '#0070c0',
-  [BarrierType.Mountain]: '#808080',
-};
-
-export enum FixedBuildingType {
-  Road = 'road',
-  Stone = 'stone',
-  Copper = 'copper',
-  Wood = 'wood',
-  Clay = 'clay',
-  Wharf = 'wharf',
-}
-
-export const FixedBuildingColor = {
-  [FixedBuildingType.Road]: '',
-  [FixedBuildingType.Stone]: '#d9d9d9',
-  [FixedBuildingType.Copper]: '#ffd966',
-  [FixedBuildingType.Wood]: '#00b050',
-  [FixedBuildingType.Clay]: '#ed7d31',
-  [FixedBuildingType.Wharf]: '#00b0f0',
-};
-
-export const FixedBuildingText = {
-  [FixedBuildingType.Road]: '',
-  [FixedBuildingType.Stone]: '采石场',
-  [FixedBuildingType.Copper]: '铜矿场',
-  [FixedBuildingType.Wood]: '伐木场',
-  [FixedBuildingType.Clay]: '粘土矿',
-  [FixedBuildingType.Wharf]: '码头',
-};
-
-export const FixedBuildingSize = {
-  [FixedBuildingType.Road]: 1,
-  [FixedBuildingType.Stone]: 2,
-  [FixedBuildingType.Copper]: 2,
-  [FixedBuildingType.Wood]: 2,
-  [FixedBuildingType.Clay]: 2,
-  [FixedBuildingType.Wharf]: 3,
-};
-
-export const FixedBuildingCatalog = {
-  [FixedBuildingType.Road]: CatalogType.Road,
-  [FixedBuildingType.Stone]: CatalogType.Industry,
-  [FixedBuildingType.Copper]: CatalogType.Industry,
-  [FixedBuildingType.Wood]: CatalogType.Industry,
-  [FixedBuildingType.Clay]: CatalogType.Industry,
-  [FixedBuildingType.Wharf]: CatalogType.Agriculture,
-};
 
 export interface Building {
   Name: string;

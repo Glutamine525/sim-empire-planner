@@ -29,7 +29,7 @@ export const DarkColor: { [key: string]: string } = {
   '--background-lighter': '#353b48',
 };
 
-export const ThemeColor: { [key in ThemeType]: any } = {
+export const ThemeColor: { [key in ThemeType]: typeof LightColor } = {
   Light: LightColor,
   Dark: DarkColor,
 };

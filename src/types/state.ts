@@ -48,7 +48,7 @@ export const InitLeftMenuState: LeftMenuAction = {
   type: ActionType.Empty,
   operation: OperationType.Empty,
   operationSub: '',
-  buildingConfig: {} as any,
+  buildingConfig: {} as Building,
 };
 
 export interface ChessboardAction {

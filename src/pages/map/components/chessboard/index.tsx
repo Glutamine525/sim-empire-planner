@@ -1,7 +1,6 @@
 import PerfectScrollbar from 'perfect-scrollbar';
 import { ThemeColor, ThemeType } from '@/types/theme';
 import {
-  Cells,
   getRoadImageBuffer,
   isAllInRange,
   isInRange,
@@ -21,16 +20,9 @@ import styles from './index.less';
 import { getScreenSize, getCoord } from '@/utils/browser';
 import { OperationType } from '@/types/operation';
 import {
-  BarrierColor,
-  BarrierType,
   BorderStyleType,
   Building,
   CivilBuilding,
-  FixedBuildingCatalog,
-  FixedBuildingColor,
-  FixedBuildingSize,
-  FixedBuildingText,
-  FixedBuildingType,
   MarkerColor,
 } from '@/types/building';
 import { CivilType } from '@/types/civil';
@@ -47,10 +39,20 @@ import {
   resetCounter,
   setCopiedBuilding,
 } from '@/actions';
-import { BuildingFixed } from '@/types/building-fixed';
+import {
+  BarrierColor,
+  BarrierType,
+  BuildingFixed,
+  FixedBuildingCatalog,
+  FixedBuildingColor,
+  FixedBuildingSize,
+  FixedBuildingText,
+  FixedBuildingType,
+} from '@/types/building-fixed';
 import Coord from './components/coord';
 import Box from './components/box';
 import { message } from 'antd';
+import { Cells } from '@/utils/cells';
 
 interface ChessboardProps {
   mapType: number;
@@ -131,11 +133,11 @@ const Chessboard = (props: ChessboardProps) => {
 
   const prevBuildingConfig = usePrevState(buildingConfig);
 
-  const wrapperOuterRef = useRef(null);
-  const wrapperIuterRef = useRef(null);
-  const cellCanvasRef = useRef(null);
-  const buildingCanvasRef = useRef(null);
-  const markerCanvasRef = useRef(null);
+  const wrapperOuterRef = useRef<HTMLDivElement>(null);
+  const wrapperIuterRef = useRef<HTMLDivElement>(null);
+  const cellCanvasRef = useRef<HTMLCanvasElement>(null);
+  const buildingCanvasRef = useRef<HTMLCanvasElement>(null);
+  const markerCanvasRef = useRef<HTMLCanvasElement>(null);
 
   const protection = useMemo(() => CivilBuilding[civil]['防护'], [civil]);
   const protectionNum = useMemo(() => protection.length, [protection]);
