@@ -1,0 +1,98 @@
+.wrapper {
+  position: fixed;
+  right: 1.8rem;
+  bottom: 1.8rem;
+  padding: 0.4rem;
+  border: 1px solid var(--border-base);
+  background: var(--background-base);
+  opacity: 0.9;
+  transition: transform 0.3s ease-in-out, background 0.3s ease-in-out, border 0.3s ease-in-out;
+}
+
+.container {
+  position: relative;
+  width: 17.4rem;
+  height: 17.4rem;
+  box-sizing: content-box;
+  border: 1px solid var(--ant-warning-color);
+}
+
+.map {
+  width: 100%;
+  height: 100%;
+}
+
+.focus {
+  position: absolute;
+  top: 0;
+  border: 1px solid var(--ant-primary-color);
+  background: var(--ant-primary-color-hover);
+  opacity: 0.4;
+  transition: transform 0.2s;
+}
+
+.wrapper span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+}
+
+.wrapper span:nth-child(1) {
+  transform: rotate(0deg);
+}
+
+.wrapper span:nth-child(2) {
+  transform: rotate(90deg);
+}
+
+.wrapper span:nth-child(3) {
+  transform: rotate(180deg);
+}
+
+.wrapper span:nth-child(4) {
+  transform: rotate(270deg);
+}
+
+.wrapper span:nth-child(2)::before {
+  animation-delay: -2s;
+}
+
+.wrapper span:nth-child(4)::before {
+  animation-delay: -2s;
+}
+
+.wrapper span::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 0.3rem;
+  background: var(--ant-primary-color);
+  animation: spin-border 4s linear infinite;
+}
+
+@keyframes spin-border {
+
+  0% {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  50% {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  50.1% {
+    transform: scaleX(1);
+    transform-origin: right;
+  }
+
+  100% {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}

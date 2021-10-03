@@ -54,12 +54,14 @@ import Coord from './components/coord';
 import Box from './components/box';
 import { message, Modal } from 'antd';
 import { Cells } from '@/utils/cells';
+import MiniMap from './components/mini-map';
 
 interface ChessboardProps {
   mapType: number;
   civil: CivilType;
   isNoWood: boolean;
   theme: ThemeType;
+  showMiniMap: boolean;
   isMapRotated: boolean;
   operation: OperationType;
   buildingConfig: Building;
@@ -82,6 +84,13 @@ const initMoveConfig = {
   column: -1,
   offsetLine: -1,
   offsetColumn: -1,
+};
+
+const initMiniMapConfig = {
+  focusWidth: 0,
+  focusHeight: 0,
+  focusTop: 0,
+  focusLeft: 0,
 };
 
 let barriers = {} as {
@@ -116,6 +125,7 @@ const Chessboard = (props: ChessboardProps) => {
     civil,
     isNoWood,
     theme,
+    showMiniMap,
     isMapRotated,
     operation,
     buildingConfig,
@@ -126,6 +136,7 @@ const Chessboard = (props: ChessboardProps) => {
     setCopiedBuilding,
   } = props;
 
+  const [isMouseDown, setIsMouseDown] = useState(false); // 全局标记鼠标是否按下
   const [isCtrlDown, setIsCtrlDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
@@ -138,11 +149,13 @@ const Chessboard = (props: ChessboardProps) => {
   const [buildingMarker, setBuildingMarker] = useState(0);
   const [hoveredBuilding, setHoveredBuilding] = useState({} as Building);
   const [boxBuffer, setBoxBuffer] = useState(new Set<string>());
+  const [miniMapConfig, setMiniMapConfig] = useState({ ...initMiniMapConfig });
+  const [isDraggingMiniMapFocus, setIsDraggingMiniMapFocus] = useState(false);
 
   const prevBuildingConfig = usePrevState(buildingConfig);
 
   const wrapperOuterRef = useRef<HTMLDivElement>(null);
-  const wrapperIuterRef = useRef<HTMLDivElement>(null);
+  const wrapperInnerRef = useRef<HTMLDivElement>(null);
   const cellCanvasRef = useRef<HTMLCanvasElement>(null);
   const buildingCanvasRef = useRef<HTMLCanvasElement>(null);
   const markerCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -178,12 +191,12 @@ const Chessboard = (props: ChessboardProps) => {
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
       wheelSpeed: 1,
     });
-    const updateScroll = () => scroll.update();
-    updateScroll();
     const [W, H] = getWrapperSize();
     const [w, h] = getScreenSize();
     setScrollTop((H - h) / 2);
     setScrollLeft((W - w) / 2);
+    scroll.update();
+    updateMiniMapConfig(true);
     let canvas: any = cellCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -193,9 +206,19 @@ const Chessboard = (props: ChessboardProps) => {
     canvas = markerCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    window.addEventListener('resize', updateScroll);
-    onChangeIsLoading(false);
-    document.body.removeChild(document.getElementById('init-loading')!);
+    window.addEventListener('resize', () => {
+      scroll.update();
+      updateMiniMapConfig(true);
+    });
+    document
+      .getElementById('chessboard-wrapper-outer')!
+      .addEventListener('ps-scroll-x', () => updateMiniMapConfig());
+    document
+      .getElementById('chessboard-wrapper-outer')!
+      .addEventListener('ps-scroll-y', () => updateMiniMapConfig());
+    document.addEventListener('mousedown', () => setIsMouseDown(true));
+    document.addEventListener('mouseup', () => setIsMouseDown(false));
+    document.addEventListener('mouseleave', () => setIsMouseDown(false));
     document.addEventListener('keydown', event => {
       const { key } = event;
       if (key !== 'Control') return;
@@ -206,6 +229,8 @@ const Chessboard = (props: ChessboardProps) => {
       if (key !== 'Control') return;
       setIsCtrlDown(false);
     });
+    document.body.removeChild(document.getElementById('init-loading')!);
+    onChangeIsLoading(false);
     console.timeEnd('useEffect []');
   }, []); // eslint-disable-line
 
@@ -477,6 +502,7 @@ const Chessboard = (props: ChessboardProps) => {
       const { initX, initY } = dragConfig;
       setScrollLeft(initX - clientX);
       setScrollTop(initY - clientY);
+      updateMiniMapConfig();
       return;
     }
     switch (operation) {
@@ -508,6 +534,7 @@ const Chessboard = (props: ChessboardProps) => {
         const { initX, initY } = dragConfig;
         setScrollLeft(initX - clientX);
         setScrollTop(initY - clientY);
+        updateMiniMapConfig();
         break;
       case OperationType.Placing:
         const [offsetLine, offsetColumn] = [
@@ -968,6 +995,56 @@ const Chessboard = (props: ChessboardProps) => {
     onChangeIsLoading(false);
   };
 
+  const updateMiniMapConfig = (resize?: boolean) => {
+    const { clientWidth, clientHeight } = wrapperInnerRef.current!;
+    const focusTop = getScrollTop() / clientHeight;
+    const focusLeft = getScrollLeft() / clientWidth;
+    if (resize) {
+      let { clientWidth: focusWidth, clientHeight: focusHeight } =
+        document.documentElement;
+      focusWidth /= clientWidth;
+      focusHeight /= clientHeight;
+      setMiniMapConfig({ focusWidth, focusHeight, focusTop, focusLeft });
+      return;
+    }
+    setMiniMapConfig(state => {
+      return { ...state, focusTop, focusLeft };
+    });
+  };
+
+  const onMiniMapMouseDown: MouseEventHandler<HTMLDivElement> = event => {
+    setIsDraggingMiniMapFocus(true);
+    dragMiniMapFocus(event);
+  };
+
+  const onMiniMapMouseMove: MouseEventHandler<HTMLDivElement> = event => {
+    if (!isMouseDown) return;
+    if (!isDraggingMiniMapFocus) return;
+    dragMiniMapFocus(event);
+  };
+
+  const onMiniMapMouseUp: MouseEventHandler<HTMLDivElement> = _ => {
+    setIsDraggingMiniMapFocus(false);
+  };
+
+  const dragMiniMapFocus = (
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) => {
+    const {
+      nativeEvent: { layerX, layerY },
+    } = event as any;
+    const { focusWidth, focusHeight } = miniMapConfig;
+    const { clientWidth, clientHeight } = wrapperInnerRef.current!;
+    const MAP_SIZE = 174;
+    setScrollTop(
+      ((layerY - (focusHeight * MAP_SIZE) / 2) / MAP_SIZE) * clientHeight
+    );
+    setScrollLeft(
+      ((layerX - (focusWidth * MAP_SIZE) / 2) / MAP_SIZE) * clientWidth
+    );
+    updateMiniMapConfig();
+  };
+
   const getScrollLeft = () => (wrapperOuterRef.current as any).scrollLeft;
 
   const getScrollTop = () => (wrapperOuterRef.current as any).scrollTop;
@@ -979,7 +1056,7 @@ const Chessboard = (props: ChessboardProps) => {
     ((wrapperOuterRef.current as any).scrollTop = val);
 
   const getWrapperSize = () => {
-    const { clientWidth, clientHeight } = wrapperIuterRef.current as any;
+    const { clientWidth, clientHeight } = wrapperInnerRef.current as any;
     return [clientWidth, clientHeight];
   };
 
@@ -991,7 +1068,7 @@ const Chessboard = (props: ChessboardProps) => {
     >
       <Coord line={moveConfig.line} column={moveConfig.column} />
       <div
-        ref={wrapperIuterRef}
+        ref={wrapperInnerRef}
         className={styles['wrapper-inner']}
         onMouseDownCapture={onWrapperMouseDown}
         onMouseMoveCapture={onWrapperMouseMove}
@@ -1110,6 +1187,13 @@ const Chessboard = (props: ChessboardProps) => {
           </div>
         </div>
       </div>
+      <MiniMap
+        show={showMiniMap}
+        {...miniMapConfig}
+        onMouseDown={onMiniMapMouseDown}
+        onMouseMove={onMiniMapMouseMove}
+        onMouseUp={onMiniMapMouseUp}
+      />
     </div>
   );
 };
@@ -1120,6 +1204,7 @@ const mapStateToProps = (state: any) => {
     civil: state.TopMenu.civil,
     isNoWood: state.TopMenu.isNoWood,
     theme: state.TopMenu.theme,
+    showMiniMap: state.TopMenu.showMiniMap,
     isMapRotated: state.TopMenu.isMapRotated,
     operation: state.LeftMenu.operation,
     buildingConfig: state.LeftMenu.buildingConfig,
