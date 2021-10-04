@@ -42,6 +42,10 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
   };
 
   const onClickInsert = () => {
+    if (name.includes('@')) {
+      message.error('建筑名称不允许含有@！');
+      return;
+    }
     if (specials.some(v => v.name === name)) {
       message.error('建筑名称重复！');
       return;

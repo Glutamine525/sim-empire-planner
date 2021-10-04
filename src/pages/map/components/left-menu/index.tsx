@@ -238,8 +238,6 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [catalog, isHamActive, isMapRotated]); // eslint-disable-line
 
   const dispatchBuilding = (keyPath: string[], building: SimpleBuilding) => {
-    console.log(building);
-
     onChangeOperation(OperationType.Placing, keyPath.join('-'), {
       Name: building.name,
       Text: building.text || '',
@@ -276,21 +274,21 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
   const onClick = (e: any) => {
     console.log('[on click left menu]', e);
-    e.keyPath.reverse();
+    const keyPath = e.key.split('@');
     if (
       isMapRotated &&
       ![
         CatalogType.Watermark,
         CatalogType.Cancel,
         CatalogType.ImportExport,
-      ].includes(e.keyPath[0])
+      ].includes(keyPath[0])
     ) {
       message.warning('旋转地图后无法进行编辑！');
       return;
     }
-    let building: any;
-    if (e.keyPath.length === 1 || e.keyPath[0] === '导入导出') {
-      switch (e.key) {
+    let building: SimpleBuilding;
+    if (keyPath.length === 1 || keyPath[0] === '导入导出') {
+      switch (keyPath[0]) {
         case '道路':
           building = {
             name: '道路',
@@ -324,12 +322,12 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           return;
       }
     } else {
-      building = catalog[e.keyPath[0] as CatalogType].sub.find(
-        (v: { name: string }) => v.name === e.key
-      );
+      building = catalog[keyPath[0] as CatalogType].sub.find(
+        (v: { name: string }) => v.name === keyPath[1]
+      )!;
       building = { ...building, isRoad: false };
     }
-    dispatchBuilding(e.keyPath, building);
+    dispatchBuilding(keyPath, building);
   };
 
   const onMouseEnter = () => {
@@ -373,7 +371,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
                   {catalog[v as CatalogType].sub.map(
                     (w: any, index: number) => {
                       return (
-                        <Menu.Item key={w.name}>
+                        <Menu.Item key={`${v}@${w.name}`}>
                           {`${index + 1}. ${w.name}`}
                         </Menu.Item>
                       );
