@@ -12,7 +12,7 @@ import { BuildingColor } from '@/types/building-color';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { Menu, message } from 'antd';
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import styles from './index.less';
 
@@ -40,6 +40,9 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     specials,
     onChangeOperation,
   } = props;
+
+  const isHamActiveRef = useRef<boolean>();
+  isHamActiveRef.current = isHamActive;
 
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
@@ -74,6 +77,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       },
     });
     document.addEventListener('keydown', event => {
+      if (isHamActiveRef.current) return;
       const { key } = event;
       if (key !== ' ') return;
       event.preventDefault();

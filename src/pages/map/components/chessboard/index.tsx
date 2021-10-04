@@ -55,6 +55,7 @@ import Box from './components/box';
 import { message, Modal } from 'antd';
 import { Cells } from '@/utils/cells';
 import MiniMap, { MINI_MAP_RATIO, MINI_MAP_SIZE } from './components/mini-map';
+import { usePrevState } from '@/utils/hook';
 
 interface ChessboardProps {
   mapType: number;
@@ -106,14 +107,6 @@ let barriers = {} as {
 let roadBuffer = new Set<string>();
 
 let cancelNoWoodConfirmation = false;
-
-const usePrevState = (value: any) => {
-  const ref = useRef();
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-};
 
 console.time('useEffect []');
 

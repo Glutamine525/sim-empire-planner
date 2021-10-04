@@ -92,6 +92,8 @@ img + .ant-menu-title-content {
 
 .ant-tabs-nav {
   position: fixed !important;
+  z-index: 1000;
+  margin: 0 !important;
   padding-top: 0.2rem;
   width: 100%;
   background: var(--background-lighter);
@@ -110,7 +112,7 @@ img + .ant-menu-title-content {
 }
 
 .ant-tabs-content-holder {
-  padding-top: 6.4rem;
+  padding-top: 4.8rem;
   box-sizing: border-box;
   color: var(--text-regular);
 }

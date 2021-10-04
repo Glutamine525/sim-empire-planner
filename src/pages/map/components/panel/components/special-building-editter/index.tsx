@@ -94,243 +94,247 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.list}>
-        {specials.map((v, index) => {
-          const {
-            name,
-            text,
-            width,
-            height,
-            fontSize,
-            range,
-            color,
-            background,
-            isDecoration,
-            isWonder,
-          } = v;
-
-          const content = () => (
-            <div style={{ fontSize: 12 }}>
-              <div style={{ textAlign: 'center' }}>
-                <strong style={{ color: 'var(--ant-warning-color)' }}>
-                  拖动可改变顺序
-                </strong>
-              </div>
-              <div>
-                建筑名称：<strong>{name}</strong>
-              </div>
-              <div>
-                显示名称：<strong>{text}</strong>
-              </div>
-              <div>
-                建筑宽度：<strong>{width}</strong>格
-              </div>
-              <div>
-                建筑高度：<strong>{height}</strong>格
-              </div>
-              <div>
-                文字大小：<strong>{fontSize! * 10}</strong>px
-              </div>
-              <div>
-                影响范围：<strong>{range}</strong>格
-              </div>
-              <div>
-                美化建筑：<strong>{isDecoration ? '√' : '×'}</strong>
-              </div>
-              <div>
-                奇迹建筑：<strong>{isWonder ? '√' : '×'}</strong>
-              </div>
-            </div>
-          );
-
-          return (
-            <Tooltip
-              key={`special-${name}-${hash}`}
-              placement="bottom"
-              title={content}
+    <div className={styles.wrapper}>
+      <div className={styles.container}>
+        <div className={styles.column}>
+          <div className={styles.preview}>
+            <div
+              className={styles.building}
+              style={{
+                width: `${width * 30}px`,
+                height: `${height * 30}px`,
+                color: `rgb(${color.r} ${color.g} ${color.b})`,
+                background: `rgb(${background.r} ${background.g} ${background.b})`,
+                fontSize: `${fontSize}rem`,
+              }}
             >
-              <Tag
-                color="blue"
-                closable
-                onClose={() => onClickDelete(name)}
-                draggable
-                onDragStart={() => onDragStart(index)}
-                onDrop={() => onDrop(index)}
-                onDragOver={e => e.preventDefault()}
+              {text}
+              {!isDecoration && !isWonder ? (
+                <div
+                  className={styles.marker}
+                  style={{
+                    color: isFullProtection
+                      ? 'var(--ant-success-color)'
+                      : 'var(--ant-error-color)',
+                  }}
+                >
+                  {isFullProtection ? CivilBuilding[civil]['防'].length : 0}
+                </div>
+              ) : null}
+            </div>
+          </div>
+          <div>
+            <Button
+              type="primary"
+              danger
+              onClick={() => setIsFullProtection(false)}
+            >
+              防护未满
+            </Button>
+            <Button
+              type="primary"
+              style={{
+                background: 'var(--ant-success-color)',
+                borderColor: 'var(--ant-success-color)',
+                margin: '0 2rem',
+              }}
+              onClick={() => setIsFullProtection(true)}
+            >
+              防护已满
+            </Button>
+          </div>
+        </div>
+        <div className={styles.column}>
+          <div>
+            已添加
+            <strong> {specials.length} </strong>
+            个建筑，拖动下方标签可改变他们的顺序。
+          </div>
+          <div className={styles.list}>
+            {specials.map((v, index) => {
+              const {
+                name,
+                text,
+                width,
+                height,
+                fontSize,
+                range,
+                color,
+                background,
+                isDecoration,
+                isWonder,
+              } = v;
+
+              const content = () => (
+                <div style={{ fontSize: 12 }}>
+                  <div>
+                    建筑名称：<strong>{name}</strong>
+                  </div>
+                  <div>
+                    显示名称：<strong>{text}</strong>
+                  </div>
+                  <div>
+                    建筑宽度：<strong>{width}</strong>格
+                  </div>
+                  <div>
+                    建筑高度：<strong>{height}</strong>格
+                  </div>
+                  <div>
+                    文字大小：<strong>{fontSize! * 10}</strong>px
+                  </div>
+                  <div>
+                    影响范围：<strong>{range}</strong>格
+                  </div>
+                  <div>
+                    美化建筑：<strong>{isDecoration ? '√' : '×'}</strong>
+                  </div>
+                  <div>
+                    奇迹建筑：<strong>{isWonder ? '√' : '×'}</strong>
+                  </div>
+                </div>
+              );
+
+              return (
+                <Tooltip
+                  key={`special-${name}-${hash}`}
+                  placement="bottom"
+                  title={content}
+                >
+                  <Tag
+                    color="blue"
+                    closable
+                    onClose={() => onClickDelete(name)}
+                    draggable
+                    onDragStart={() => onDragStart(index)}
+                    onDrop={() => onDrop(index)}
+                    onDragOver={e => e.preventDefault()}
+                    style={{
+                      color: color,
+                      background: background,
+                      borderColor: '#000000',
+                      cursor: 'pointer',
+                      margin: 0,
+                      textShadow:
+                        'white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px',
+                    }}
+                  >
+                    {name}
+                  </Tag>
+                </Tooltip>
+              );
+            })}
+          </div>
+          <div className={styles.config}>
+            <div>
+              建筑名称：
+              <Input
+                placeholder="请输入..."
+                allowClear
+                className={styles.input}
+                value={name}
+                onChange={e => setName(e.target.value)}
+              />
+            </div>
+            <div>
+              显示名称：
+              <Input
+                placeholder="请输入..."
+                allowClear
+                className={styles.input}
+                value={text}
+                onChange={e => setText(e.target.value)}
+              />
+            </div>
+            <div>
+              建筑宽度：
+              <InputNumber min={1} max={20} value={width} onChange={setWidth} />
+            </div>
+            <div>
+              建筑高度：
+              <InputNumber
+                min={1}
+                max={20}
+                value={height}
+                onChange={setHeight}
+              />
+            </div>
+            <div>
+              文字大小：
+              <InputNumber
+                min={1.2}
+                max={10}
+                value={fontSize}
+                onChange={setFontSize}
+                step={0.1}
+              />
+            </div>
+            <div>
+              影响范围：
+              <InputNumber min={0} max={20} value={range} onChange={setRange} />
+            </div>
+            <div>
+              文字颜色：
+              <ColorPicker
+                id="picker-text"
+                value={color}
+                handleChange={onChangeTextColor}
+              />
+            </div>
+            <div>
+              背景颜色：
+              <ColorPicker
+                id="picker-bg"
+                value={background}
+                handleChange={onChangBgColor}
+              />
+            </div>
+            <div>
+              美化建筑：
+              <div
                 style={{
-                  color: color,
-                  background: background,
-                  borderColor: '#000000',
-                  cursor: 'pointer',
-                  textShadow:
-                    'white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px',
+                  position: 'relative',
+                  left: -4,
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
               >
-                {name}
-              </Tag>
-            </Tooltip>
-          );
-        })}
-      </div>
-      <div className={styles.preview}>
-        <div
-          className={styles.building}
-          style={{
-            width: `${width * 30}px`,
-            height: `${height * 30}px`,
-            color: `rgb(${color.r} ${color.g} ${color.b})`,
-            background: `rgb(${background.r} ${background.g} ${background.b})`,
-            fontSize: `${fontSize}rem`,
-          }}
-        >
-          {text}
-          {!isDecoration && !isWonder ? (
-            <div
-              className={styles.marker}
-              style={{
-                color: isFullProtection
-                  ? 'var(--ant-success-color)'
-                  : 'var(--ant-error-color)',
-              }}
-            >
-              {isFullProtection ? CivilBuilding[civil]['防'].length : 0}
+                <Switcher
+                  id="is-decoration"
+                  type="ordinary"
+                  value={isDecoration}
+                  onClick={() => {
+                    if (isWonder && !isDecoration) setIsWonder(false);
+                    setIsDecoration(!isDecoration);
+                  }}
+                />
+              </div>
             </div>
-          ) : null}
-        </div>
-      </div>
-      <div>
-        <Button
-          type="primary"
-          danger
-          onClick={() => setIsFullProtection(false)}
-        >
-          防护未满
-        </Button>
-        <Button
-          type="primary"
-          style={{
-            background: 'var(--ant-success-color)',
-            borderColor: 'var(--ant-success-color)',
-            margin: '0 2rem',
-          }}
-          onClick={() => setIsFullProtection(true)}
-        >
-          防护已满
-        </Button>
-        <Button type="primary" onClick={onClickInsert}>
-          添加
-        </Button>
-      </div>
-      <div className={styles.config}>
-        <div className={styles.row}>
-          <div>
-            建筑名称：
-            <Input
-              placeholder="请输入..."
-              allowClear
-              className={styles.input}
-              value={name}
-              onChange={e => setName(e.target.value)}
-            />
-          </div>
-          <div>
-            显示名称：
-            <Input
-              placeholder="请输入..."
-              allowClear
-              className={styles.input}
-              value={text}
-              onChange={e => setText(e.target.value)}
-            />
-          </div>
-        </div>
-        <div className={styles.row}>
-          <div>
-            建筑宽度：
-            <InputNumber min={1} max={20} value={width} onChange={setWidth} />
-          </div>
-          <div>
-            建筑高度：
-            <InputNumber min={1} max={20} value={height} onChange={setHeight} />
-          </div>
-        </div>
-        <div className={styles.row}>
-          <div>
-            文字大小：
-            <InputNumber
-              min={1.2}
-              max={10}
-              value={fontSize}
-              onChange={setFontSize}
-              step={0.1}
-            />
-          </div>
-          <div>
-            影响范围：
-            <InputNumber min={0} max={20} value={range} onChange={setRange} />
-          </div>
-        </div>
-        <div className={styles.row}>
-          <div>
-            文字颜色：
-            <ColorPicker
-              id="picker-text"
-              value={color}
-              handleChange={onChangeTextColor}
-            />
-          </div>
-          <div>
-            背景颜色：
-            <ColorPicker
-              id="picker-bg"
-              value={background}
-              handleChange={onChangBgColor}
-            />
-          </div>
-        </div>
-        <div className={styles.row}>
-          <div>
-            美化建筑：
-            <div
-              style={{
-                position: 'relative',
-                left: -4,
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Switcher
-                id="is-decoration"
-                type="ordinary"
-                value={isDecoration}
-                onClick={() => {
-                  if (isWonder && !isDecoration) setIsWonder(false);
-                  setIsDecoration(!isDecoration);
+            <div>
+              奇迹建筑：
+              <div
+                style={{
+                  position: 'relative',
+                  left: -4,
+                  display: 'flex',
+                  alignItems: 'center',
                 }}
-              />
+              >
+                <Switcher
+                  id="is-wonder"
+                  type="ordinary"
+                  value={isWonder}
+                  onClick={() => {
+                    if (isDecoration && !isWonder) setIsDecoration(false);
+                    setIsWonder(!isWonder);
+                  }}
+                />
+              </div>
             </div>
           </div>
           <div>
-            奇迹建筑：
-            <div
-              style={{
-                position: 'relative',
-                left: -4,
-                display: 'flex',
-                alignItems: 'center',
-              }}
-            >
-              <Switcher
-                id="is-wonder"
-                type="ordinary"
-                value={isWonder}
-                onClick={() => {
-                  if (isDecoration && !isWonder) setIsDecoration(false);
-                  setIsWonder(!isWonder);
-                }}
-              />
-            </div>
+            <Button type="primary" onClick={onClickInsert}>
+              添加
+            </Button>
           </div>
         </div>
       </div>
