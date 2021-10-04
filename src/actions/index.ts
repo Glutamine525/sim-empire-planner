@@ -21,6 +21,7 @@ export enum ActionType {
   SetCopiedBuilding,
   InsertSpecialBuilding,
   DeleteSpecialBuilding,
+  SwapSpecialBuilding,
 }
 
 export const changeIsLoading = (isLoading: boolean) => {
@@ -124,5 +125,13 @@ export const deleteSpecialBuilding = (targetSpecial: SimpleBuilding) => {
   return {
     type: ActionType.DeleteSpecialBuilding,
     targetSpecial,
+  };
+};
+
+export const swapSpecialBuilding = (dragIndex: number, dropIndex: number) => {
+  return {
+    type: ActionType.SwapSpecialBuilding,
+    dragIndex,
+    dropIndex,
   };
 };

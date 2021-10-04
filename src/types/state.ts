@@ -82,12 +82,16 @@ export interface PanelAction {
   type: ActionType;
   targetSpecial: SimpleBuilding;
   specials: SimpleBuilding[];
+  dragIndex: number;
+  dropIndex: number;
 }
 
 export const InitPanelState: PanelAction = {
   type: ActionType.Empty,
   targetSpecial: {} as SimpleBuilding,
   specials: [] as SimpleBuilding[],
+  dragIndex: 0,
+  dropIndex: 0,
 };
 
 export const InitState: TopMenuAction & LeftMenuAction & ChessboardAction = {

@@ -15,6 +15,15 @@ const Panel = (state = InitPanelState, action: PanelAction) => {
         ...state,
         specials: specials.filter(v => v.name !== action.targetSpecial.name),
       };
+    case ActionType.SwapSpecialBuilding:
+      [specials[action.dragIndex], specials[action.dropIndex]] = [
+        specials[action.dropIndex],
+        specials[action.dragIndex],
+      ];
+      return {
+        ...state,
+        specials,
+      };
     default:
       return state;
   }

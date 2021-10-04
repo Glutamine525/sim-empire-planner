@@ -6,7 +6,11 @@ import Switcher from '@/components/switcher';
 import { ColorChangeHandler } from 'react-color';
 import { connect } from 'react-redux';
 import { CivilBuilding, SimpleBuilding } from '@/types/building';
-import { deleteSpecialBuilding, insertSpecialBuilding } from '@/actions';
+import {
+  deleteSpecialBuilding,
+  insertSpecialBuilding,
+  swapSpecialBuilding,
+} from '@/actions';
 import { CivilType } from '@/types/civil';
 import { rgbToHex } from '@/utils/color';
 
@@ -15,11 +19,17 @@ interface SpecialBuildingEditterProps {
   specials: SimpleBuilding[];
   onInsertSpecialBuilding: any;
   onDeleteSpecialBuilding: any;
+  onSwapSpecialBuilding: any;
 }
 
 function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
-  const { civil, specials, onInsertSpecialBuilding, onDeleteSpecialBuilding } =
-    props;
+  const {
+    civil,
+    specials,
+    onInsertSpecialBuilding,
+    onDeleteSpecialBuilding,
+    onSwapSpecialBuilding,
+  } = props;
 
   const [isFullProtection, setIsFullProtection] = useState(false);
   const [name, setName] = useState('花坛');
@@ -32,6 +42,8 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
   const [background, setBackground] = useState({ r: 74, g: 200, b: 36, a: 1 });
   const [isDecoration, setIsDecoration] = useState(true);
   const [isWonder, setIsWonder] = useState(false);
+  const [dragIndex, setDragIndex] = useState(0);
+  const [hash, setHash] = useState(new Date().getTime().toString()); // 作为tooltip key的后缀，强制重新渲染
 
   const onChangeTextColor: ColorChangeHandler = color => {
     setColor(color.rgb as any);
@@ -42,6 +54,10 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
   };
 
   const onClickInsert = () => {
+    if (!name) {
+      message.error('建筑名称不允许为空！');
+      return;
+    }
     if (name.includes('@')) {
       message.error('建筑名称不允许含有@！');
       return;
@@ -68,10 +84,19 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
     onDeleteSpecialBuilding(specials.find(v => v.name === name));
   };
 
+  const onDragStart = (index: number) => {
+    setDragIndex(index);
+  };
+
+  const onDrop = (index: number) => {
+    setHash(new Date().getTime().toString());
+    onSwapSpecialBuilding(dragIndex, index);
+  };
+
   return (
     <div className={styles.container}>
       <div className={styles.list}>
-        {specials.map(v => {
+        {specials.map((v, index) => {
           const {
             name,
             text,
@@ -87,6 +112,11 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
 
           const content = () => (
             <div style={{ fontSize: 12 }}>
+              <div style={{ textAlign: 'center' }}>
+                <strong style={{ color: 'var(--ant-warning-color)' }}>
+                  拖动可改变顺序
+                </strong>
+              </div>
               <div>
                 建筑名称：<strong>{name}</strong>
               </div>
@@ -115,15 +145,24 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
           );
 
           return (
-            <Tooltip key={`special-${name}`} placement="bottom" title={content}>
+            <Tooltip
+              key={`special-${name}-${hash}`}
+              placement="bottom"
+              title={content}
+            >
               <Tag
                 color="blue"
                 closable
                 onClose={() => onClickDelete(name)}
+                draggable
+                onDragStart={() => onDragStart(index)}
+                onDrop={() => onDrop(index)}
+                onDragOver={e => e.preventDefault()}
                 style={{
                   color: color,
                   background: background,
                   borderColor: '#000000',
+                  cursor: 'pointer',
                   textShadow:
                     'white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px',
                 }}
@@ -313,6 +352,9 @@ const mapDispatchToProps = (dispatch: any) => {
     },
     onDeleteSpecialBuilding: (targetSpecial: SimpleBuilding) => {
       dispatch(deleteSpecialBuilding(targetSpecial));
+    },
+    onSwapSpecialBuilding: (dragIndex: number, dropIndex: number) => {
+      dispatch(swapSpecialBuilding(dragIndex, dropIndex));
     },
   };
 };
