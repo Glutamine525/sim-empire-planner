@@ -1,4 +1,4 @@
-import { Button, Input, InputNumber, message, Tag } from 'antd';
+import { Button, Input, InputNumber, message, Tag, Tooltip } from 'antd';
 import { ColorPicker } from '@/components/color-picker';
 import React, { useState } from 'react';
 import styles from './index.less';
@@ -72,16 +72,65 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
     <div className={styles.container}>
       <div className={styles.list}>
         {specials.map(v => {
-          const { name } = v;
+          const {
+            name,
+            text,
+            width,
+            height,
+            fontSize,
+            range,
+            color,
+            background,
+            isDecoration,
+            isWonder,
+          } = v;
+
+          const content = () => (
+            <div style={{ fontSize: 12 }}>
+              <div>
+                建筑名称：<strong>{name}</strong>
+              </div>
+              <div>
+                显示名称：<strong>{text}</strong>
+              </div>
+              <div>
+                建筑宽度：<strong>{width}</strong>格
+              </div>
+              <div>
+                建筑高度：<strong>{height}</strong>格
+              </div>
+              <div>
+                文字大小：<strong>{fontSize! * 10}</strong>px
+              </div>
+              <div>
+                影响范围：<strong>{range}</strong>格
+              </div>
+              <div>
+                美化建筑：<strong>{isDecoration ? '√' : '×'}</strong>
+              </div>
+              <div>
+                奇迹建筑：<strong>{isWonder ? '√' : '×'}</strong>
+              </div>
+            </div>
+          );
+
           return (
-            <Tag
-              color="blue"
-              closable
-              onClose={() => onClickDelete(name)}
-              key={`special-${name}`}
-            >
-              {name}
-            </Tag>
+            <Tooltip key={`special-${name}`} placement="bottom" title={content}>
+              <Tag
+                color="blue"
+                closable
+                onClose={() => onClickDelete(name)}
+                style={{
+                  color: color,
+                  background: background,
+                  borderColor: '#000000',
+                  textShadow:
+                    'white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px',
+                }}
+              >
+                {name}
+              </Tag>
+            </Tooltip>
           );
         })}
       </div>
