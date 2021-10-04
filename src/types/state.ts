@@ -1,5 +1,5 @@
 import { ActionType } from '@/actions';
-import { Building } from './building';
+import { Building, SimpleBuilding } from './building';
 import { CivilType } from './civil';
 import { Counter } from './couter';
 import { OperationType } from './operation';
@@ -78,8 +78,21 @@ export const InitChessboardState: ChessboardAction = {
   },
 };
 
+export interface PanelAction {
+  type: ActionType;
+  targetSpecial: SimpleBuilding;
+  specials: SimpleBuilding[];
+}
+
+export const InitPanelState: PanelAction = {
+  type: ActionType.Empty,
+  targetSpecial: {} as SimpleBuilding,
+  specials: [] as SimpleBuilding[],
+};
+
 export const InitState: TopMenuAction & LeftMenuAction & ChessboardAction = {
   ...InitTopMenuState,
   ...InitLeftMenuState,
   ...InitChessboardState,
+  ...InitPanelState,
 };

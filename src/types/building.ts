@@ -42,6 +42,22 @@ export enum BorderStyleType {
   None = 'none',
 }
 
+export interface SimpleBuilding {
+  name: string;
+  text?: string;
+  size?: number;
+  width?: number;
+  height?: number;
+  range?: number;
+  color?: string;
+  background?: string;
+  fontSize?: number;
+  isRoad?: boolean;
+  isWonder?: boolean;
+  isDecoration?: boolean;
+  isPalace?: boolean;
+}
+
 export interface Building {
   Name: string;
   Text: string;
@@ -58,6 +74,7 @@ export interface Building {
   // css
   Width: number;
   Height: number;
+  Color: string;
   FontSize: number;
   Background: string;
   BorderColor: string;

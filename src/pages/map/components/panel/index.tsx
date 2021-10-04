@@ -3,7 +3,7 @@ import PerfectScrollbar from 'perfect-scrollbar';
 import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import Archive from './components/archive';
-import CustomBuildingEditter from './components/custom-building-editter';
+import SpecialBuildingEditter from './components/special-building-editter';
 import styles from './index.less';
 
 const { TabPane } = Tabs;
@@ -46,7 +46,7 @@ function Panel(props: PanelProps) {
     >
       <Tabs activeKey={activeKey} onTabClick={onTabClick}>
         <TabPane tab="特殊建筑 & 存档" key="1" className={styles['panel-1']}>
-          <CustomBuildingEditter />
+          <SpecialBuildingEditter />
           <Archive />
         </TabPane>
         <TabPane tab="生成文明" key="2">

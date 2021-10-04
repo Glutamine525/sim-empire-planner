@@ -1,4 +1,4 @@
-import { Building } from '@/types/building';
+import { Building, SimpleBuilding } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { ThemeType } from '@/types/theme';
@@ -19,8 +19,8 @@ export enum ActionType {
   ChangeCounter,
   PlaceOrDeleteBuilding,
   SetCopiedBuilding,
-  InsertCustomBuilding,
-  DeleteCustomBuilding,
+  InsertSpecialBuilding,
+  DeleteSpecialBuilding,
 }
 
 export const changeIsLoading = (isLoading: boolean) => {
@@ -110,5 +110,19 @@ export const setCopiedBuilding = (building: Building) => {
   return {
     type: ActionType.SetCopiedBuilding,
     copiedBuilding: building,
+  };
+};
+
+export const insertSpecialBuilding = (targetSpecial: SimpleBuilding) => {
+  return {
+    type: ActionType.InsertSpecialBuilding,
+    targetSpecial,
+  };
+};
+
+export const deleteSpecialBuilding = (targetSpecial: SimpleBuilding) => {
+  return {
+    type: ActionType.DeleteSpecialBuilding,
+    targetSpecial,
   };
 };

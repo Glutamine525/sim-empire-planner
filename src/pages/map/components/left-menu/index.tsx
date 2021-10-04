@@ -6,6 +6,7 @@ import {
   CatalogType,
   CivilBuilding,
   GeneralBuilding,
+  SimpleBuilding,
 } from '@/types/building';
 import { BuildingColor } from '@/types/building-color';
 import { CivilType } from '@/types/civil';
@@ -25,6 +26,7 @@ interface LeftMenuProps {
   civil: CivilType;
   isMapRotated: boolean;
   copiedBuilding: Building;
+  specials: Building[];
   onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
 }
 
@@ -35,12 +37,13 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     civil,
     isMapRotated,
     copiedBuilding,
+    specials,
     onChangeOperation,
   } = props;
 
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
-    {} as { [key in CatalogType]: { sub: any[] } }
+    {} as { [key in CatalogType]: { sub: SimpleBuilding[] } }
   );
 
   const protection = useMemo(() => CivilBuilding[civil]['防护'], [civil]);
@@ -96,6 +99,16 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       ...newCatalog,
     }));
   }, [civil]);
+
+  useEffect(() => {
+    const newCatalog = {
+      特殊建筑: { sub: specials },
+    };
+    setCatalog((catalog: any) => ({
+      ...catalog,
+      ...newCatalog,
+    }));
+  }, [specials]);
 
   useEffect(() => {
     onChangeOperation(OperationType.Empty, '', {} as any);
@@ -224,30 +237,35 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     return () => document.removeEventListener('keydown', onKeyDown);
   }, [catalog, isHamActive, isMapRotated]); // eslint-disable-line
 
-  const dispatchBuilding = (keyPath: string[], building: any) => {
+  const dispatchBuilding = (keyPath: string[], building: SimpleBuilding) => {
+    console.log(building);
+
     onChangeOperation(OperationType.Placing, keyPath.join('-'), {
       Name: building.name,
-      Text: building.text,
-      Range: building.range,
+      Text: building.text || '',
+      Range: building.range || 0,
       Marker: 0,
       Catalog: keyPath[0] as CatalogType,
       IsFixed: false,
       IsBarrier: false,
-      IsRoad: building.isRoad,
+      IsRoad: building.isRoad || false,
       IsProtection:
         keyPath[0] === CatalogType.Municipal &&
         protection.includes(building.name),
       IsWonder:
+        building.isWonder ||
         keyPath[0] === CatalogType.Wonder ||
         typeof building.isPalace !== 'undefined',
-      IsDecoration: keyPath[0] === CatalogType.Decoration,
+      IsDecoration:
+        building.isDecoration || keyPath[0] === CatalogType.Decoration,
       IsGeneral: keyPath[0] === CatalogType.General,
       // css
-      Width: building.size || building.width,
-      Height: building.size || building.height,
-      FontSize: 1.4,
-      Background: building.background,
-      BorderColor: 'black',
+      Width: building.size || building.width || 1,
+      Height: building.size || building.height || 1,
+      Color: building.color || '#000000',
+      FontSize: building.fontSize || 1.4,
+      Background: building.background || '#ffffff',
+      BorderColor: '#000000',
       BorderWidth: 0.1,
       BorderTStyle: BorderStyleType.Solid,
       BorderRStyle: BorderStyleType.Solid,
@@ -378,6 +396,7 @@ const mapStateToProps = (state: any) => {
     civil: state.TopMenu.civil,
     isMapRotated: state.TopMenu.isMapRotated,
     copiedBuilding: state.Chessboard.copiedBuilding,
+    specials: state.Panel.specials,
   };
 };
 
