@@ -702,6 +702,8 @@ const Chessboard = (props: ChessboardProps) => {
   const onWrapperMouseLeave: MouseEventHandler<HTMLDivElement> = () => {
     setIsDragging(false);
     setIsCtrlDown(false);
+    setShowBuilding(false);
+    setHoveredBuilding({} as Building);
   };
 
   const onWrapperDoubleClick: MouseEventHandler<HTMLDivElement> = event => {
@@ -724,7 +726,6 @@ const Chessboard = (props: ChessboardProps) => {
     column: number,
     isRoad?: boolean
   ) => {
-    //
     const canvas: any = markerCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     let markerColor: MarkerColor =
@@ -1279,6 +1280,7 @@ const Chessboard = (props: ChessboardProps) => {
         forwardedRef={miniMapCanvasRef}
         show={showMiniMap}
         theme={theme}
+        rotated={isMapRotated}
         {...miniMapConfig}
         onMouseDown={onMiniMapMouseDown}
         onMouseMove={onMiniMapMouseMove}

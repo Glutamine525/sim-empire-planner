@@ -12,6 +12,7 @@ interface MiniMapProps {
   forwardedRef: React.LegacyRef<HTMLCanvasElement>;
   show: boolean;
   theme: ThemeType;
+  rotated: boolean;
   focusWidth: number;
   focusHeight: number;
   focusTop: number;
@@ -26,6 +27,7 @@ export default function MiniMap(props: MiniMapProps) {
     forwardedRef,
     show,
     theme,
+    rotated,
     focusWidth,
     focusHeight,
     focusTop,
@@ -66,7 +68,9 @@ export default function MiniMap(props: MiniMapProps) {
     <div
       className={styles.wrapper}
       style={{
-        transform: `translateX(${show ? 0 : 'calc(100% + 2rem)'})`,
+        // transform: `translateX(${show ? 0 : 'calc(100% + 2rem)'})`,
+        visibility: show ? 'visible' : 'hidden',
+        opacity: show ? '0.9' : '0',
       }}
     >
       <span></span>
@@ -79,18 +83,28 @@ export default function MiniMap(props: MiniMapProps) {
         onMouseMoveCapture={onMouseMove}
         onMouseUpCapture={onMouseUp}
       >
-        <canvas
-          ref={baseRef}
-          width={LENGTH * MINI_MAP_RATIO}
-          height={LENGTH * MINI_MAP_RATIO}
-          className={styles.map}
-        ></canvas>
-        <canvas
-          ref={forwardedRef}
-          width={LENGTH * MINI_MAP_RATIO}
-          height={LENGTH * MINI_MAP_RATIO}
-          className={styles.map}
-        ></canvas>
+        <div
+          style={{
+            width: '100%',
+            height: '100%',
+            transform: rotated ? 'rotate(45deg)' : 'none',
+            transformOrigin: 'center',
+            transition: 'transform 0.3s ease-in-out',
+          }}
+        >
+          <canvas
+            ref={baseRef}
+            width={LENGTH * MINI_MAP_RATIO}
+            height={LENGTH * MINI_MAP_RATIO}
+            className={styles.map}
+          ></canvas>
+          <canvas
+            ref={forwardedRef}
+            width={LENGTH * MINI_MAP_RATIO}
+            height={LENGTH * MINI_MAP_RATIO}
+            className={styles.map}
+          ></canvas>
+        </div>
         <div
           className={styles.focus}
           style={{

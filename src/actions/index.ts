@@ -3,6 +3,7 @@ import { Building } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { ThemeType } from '@/types/theme';
+import { setMiniMapInStorage, setThemeInStorage } from '@/utils/storage';
 
 export const changeIsLoading = (isLoading: boolean) => {
   return {
@@ -40,6 +41,7 @@ export const changeNoWood = (isNoWood: boolean) => {
 };
 
 export const changeTheme = (theme: ThemeType) => {
+  setThemeInStorage(theme);
   return {
     type: ActionType.ChangeTheme,
     theme,
@@ -47,6 +49,7 @@ export const changeTheme = (theme: ThemeType) => {
 };
 
 export const changeMiniMap = (showMiniMap: boolean) => {
+  setMiniMapInStorage(showMiniMap);
   return {
     type: ActionType.ChangeMiniMap,
     showMiniMap,
