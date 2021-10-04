@@ -1,4 +1,4 @@
-import { ActionType } from '@/types/action';
+import { ActionType } from '@/actions';
 import { InitAppState, AppAction } from '@/types/state';
 
 const App = (state = InitAppState, action: AppAction) => {

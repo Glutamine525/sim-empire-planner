@@ -1,4 +1,4 @@
-import { ActionType } from '@/types/action';
+import { ActionType } from '@/actions';
 import { InitLeftMenuState, LeftMenuAction } from '@/types/state';
 
 const LeftMenu = (state = InitLeftMenuState, action: LeftMenuAction) => {

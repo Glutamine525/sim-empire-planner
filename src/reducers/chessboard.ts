@@ -1,4 +1,4 @@
-import { ActionType } from '@/types/action';
+import { ActionType } from '@/actions';
 import { CatalogType } from '@/types/building';
 import { InitChessboardState, ChessboardAction } from '@/types/state';
 

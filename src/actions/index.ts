@@ -1,9 +1,27 @@
-import { ActionType } from '@/types/action';
 import { Building } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
 import { ThemeType } from '@/types/theme';
 import { setMiniMapInStorage, setThemeInStorage } from '@/utils/storage';
+
+export enum ActionType {
+  Empty,
+  ChangeIsLoading,
+  ChangeHamButton,
+  ChangeMapType,
+  ChangeCivil,
+  ChangeNoWood,
+  ChangeTheme,
+  ChangeMiniMap,
+  RotateMap,
+  ChangeOperation,
+  ResetCouter,
+  ChangeCounter,
+  PlaceOrDeleteBuilding,
+  SetCopiedBuilding,
+  InsertCustomBuilding,
+  DeleteCustomBuilding,
+}
 
 export const changeIsLoading = (isLoading: boolean) => {
   return {

@@ -152,7 +152,7 @@ const Chessboard = (props: ChessboardProps) => {
   const [miniMapConfig, setMiniMapConfig] = useState({ ...initMiniMapConfig });
   const [isDraggingMiniMapFocus, setIsDraggingMiniMapFocus] = useState(false);
 
-  const prevBuildingConfig = usePrevState(buildingConfig);
+  const prevBuildingConfig: any = usePrevState(buildingConfig);
 
   const wrapperOuterRef = useRef<HTMLDivElement>(null);
   const wrapperInnerRef = useRef<HTMLDivElement>(null);
@@ -394,16 +394,18 @@ const Chessboard = (props: ChessboardProps) => {
         const { line, column } = moveConfig;
         const occupied = cells.getOccupied(line, column);
         if (!occupied) {
+          message.error('当前位置没有建筑可以复制！');
           setCopiedBuilding(prevBuildingConfig);
         } else {
           const [li, co] = parseBuildingKey(occupied);
           const building = cells.getBuilding(li, co);
           if (building.IsFixed) {
+            message.error('该建筑不可复制！');
             setCopiedBuilding(prevBuildingConfig);
             console.timeEnd('useEffect [Operation]');
             return;
           }
-          setCopiedBuilding(building);
+          setCopiedBuilding({ ...building });
         }
         break;
       default:

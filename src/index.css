@@ -71,3 +71,23 @@ html {
 .ps__thumb-y {
   cursor: pointer;
 }
+
+.sketch-picker {
+  position: relative;
+  z-index: 1001;
+  background: var(--background-lighter) !important;
+}
+
+.sketch-picker * {
+  box-sizing: initial;
+  color: var(--text-regular) !important;
+}
+
+.sketch-picker input {
+  color: var(--text-primary);
+  background: var(--background-base) !important;
+}
+
+.sketch-picker .flexbox-fix {
+  border-top-color: var(--border-darker) !important;
+}

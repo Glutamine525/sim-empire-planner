@@ -1,4 +1,4 @@
-import { ActionType } from '@/types/action';
+import { ActionType } from '@/actions';
 import { InitTopMenuState, TopMenuAction } from '@/types/state';
 
 const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {

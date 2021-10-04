@@ -2,6 +2,8 @@ import { Tabs } from 'antd';
 import PerfectScrollbar from 'perfect-scrollbar';
 import React, { useEffect, useRef, useState } from 'react';
 import { connect } from 'react-redux';
+import Archive from './components/archive';
+import CustomBuildingEditter from './components/custom-building-editter';
 import styles from './index.less';
 
 const { TabPane } = Tabs;
@@ -43,19 +45,12 @@ function Panel(props: PanelProps) {
       }}
     >
       <Tabs activeKey={activeKey} onTabClick={onTabClick}>
-        <TabPane tab="自动保存" key="1">
-          Content of Tab Pane 1: 自动保存
-          {Array(100)
-            .fill(0)
-            .map((_, i) => (
-              <p key={i}>{i}</p>
-            ))}
+        <TabPane tab="特殊建筑 & 存档" key="1" className={styles['panel-1']}>
+          <CustomBuildingEditter />
+          <Archive />
         </TabPane>
-        <TabPane tab="特殊建筑" key="2">
-          Content of Tab Pane 2: 特殊建筑
-        </TabPane>
-        <TabPane tab="生成文明" key="3">
-          Content of Tab Pane 3: 生成文明
+        <TabPane tab="生成文明" key="2">
+          Content of Tab Pane 2: 生成文明
         </TabPane>
       </Tabs>
     </div>

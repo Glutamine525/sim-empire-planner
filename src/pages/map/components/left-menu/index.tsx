@@ -20,6 +20,7 @@ const { SubMenu } = Menu;
 const KEYS = 'asdqwerzxcv1234567890';
 
 interface LeftMenuProps {
+  isHamActive: boolean;
   mapType: number;
   civil: CivilType;
   isMapRotated: boolean;
@@ -28,8 +29,14 @@ interface LeftMenuProps {
 }
 
 const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
-  const { mapType, civil, isMapRotated, copiedBuilding, onChangeOperation } =
-    props;
+  const {
+    isHamActive,
+    mapType,
+    civil,
+    isMapRotated,
+    copiedBuilding,
+    onChangeOperation,
+  } = props;
 
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
@@ -68,12 +75,6 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       if (key !== ' ') return;
       event.preventDefault();
       onChangeOperation(OperationType.Empty, '', {} as any);
-    });
-    document.addEventListener('keyup', event => {
-      if (isMapRotated) return;
-      const { key, ctrlKey } = event;
-      if (key !== 'c' || !ctrlKey) return;
-      onChangeOperation(OperationType.Copying, '', {} as any);
     });
   }, []); // eslint-disable-line
 
@@ -124,7 +125,20 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [copiedBuilding]); // eslint-disable-line
 
   useEffect(() => {
+    const callback = (event: KeyboardEvent) => {
+      if (isHamActive) return;
+      if (isMapRotated) return;
+      const { key, ctrlKey } = event;
+      if (key !== 'c' || !ctrlKey) return;
+      onChangeOperation(OperationType.Copying, '', {} as any);
+    };
+    document.addEventListener('keyup', callback);
+    return () => document.removeEventListener('keyup', callback);
+  }, [isHamActive, isMapRotated]); // eslint-disable-line
+
+  useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      if (isHamActive) return;
       const { key, ctrlKey } = event;
       if (isMapRotated && KEYS.includes(key)) {
         message.warning('旋转地图后无法进行编辑！');
@@ -208,7 +222,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [catalog, isMapRotated]); // eslint-disable-line
+  }, [catalog, isHamActive, isMapRotated]); // eslint-disable-line
 
   const dispatchBuilding = (keyPath: string[], building: any) => {
     onChangeOperation(OperationType.Placing, keyPath.join('-'), {
@@ -359,6 +373,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
 const mapStateToProps = (state: any) => {
   return {
+    isHamActive: state.TopMenu.isHamActive,
     mapType: state.TopMenu.mapType,
     civil: state.TopMenu.civil,
     isMapRotated: state.TopMenu.isMapRotated,

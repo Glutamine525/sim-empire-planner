@@ -1,4 +1,4 @@
-import { ActionType } from './action';
+import { ActionType } from '@/actions';
 import { Building } from './building';
 import { CivilType } from './civil';
 import { Counter } from './couter';

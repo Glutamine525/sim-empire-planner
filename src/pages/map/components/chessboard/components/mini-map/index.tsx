@@ -68,9 +68,8 @@ export default function MiniMap(props: MiniMapProps) {
     <div
       className={styles.wrapper}
       style={{
-        // transform: `translateX(${show ? 0 : 'calc(100% + 2rem)'})`,
-        visibility: show ? 'visible' : 'hidden',
         opacity: show ? '0.9' : '0',
+        visibility: show ? 'visible' : 'hidden',
       }}
     >
       <span></span>
