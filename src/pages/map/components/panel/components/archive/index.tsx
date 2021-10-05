@@ -54,7 +54,7 @@ const columns = [
 ];
 
 const data = [] as any[];
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 10; i++) {
   data.push({
     order: i,
     mapType: 3,
@@ -75,6 +75,7 @@ export default function Archive() {
           dataSource={data}
           scroll={{ x: '100%', y: 'calc(100vh - 5.5rem - 4.8rem)' }}
           pagination={false}
+          rowKey={row => row.order}
         />
       </div>
     </div>

@@ -1,5 +1,12 @@
-import { changeOperation } from '@/actions';
+import {
+  changeCivil,
+  changeIsLoading,
+  changeMapType,
+  changeNoWood,
+  changeOperation,
+} from '@/actions';
 import MenuIcon from '@/components/menu-icon';
+import DragUpload from '@/pages/map/components/left-menu/components/drag-upload';
 import {
   BorderStyleType,
   Building,
@@ -11,7 +18,10 @@ import {
 import { BuildingColor } from '@/types/building-color';
 import { CivilType } from '@/types/civil';
 import { OperationType } from '@/types/operation';
+import { Cells } from '@/utils/cells';
+import { base64ToString } from '@/utils/file';
 import { Menu, message } from 'antd';
+import md5 from 'md5';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
 import styles from './index.less';
@@ -28,7 +38,13 @@ interface LeftMenuProps {
   copiedBuilding: Building;
   specials: Building[];
   onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
+  onChangeIsLoading: any;
+  onChangeMapType: any;
+  onChangeCivil: any;
+  onChangeNoWood: any;
 }
+
+const cells = Cells.getInstance();
 
 const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   const {
@@ -39,11 +55,17 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     copiedBuilding,
     specials,
     onChangeOperation,
+    onChangeIsLoading,
+    onChangeMapType,
+    onChangeCivil,
+    onChangeNoWood,
   } = props;
 
   const isHamActiveRef = useRef<boolean>();
   isHamActiveRef.current = isHamActive;
 
+  const [showUpload, setShowUpload] = useState(true);
+  const [uploadType, setUploadType] = useState('map');
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
     {} as { [key in CatalogType]: { sub: SimpleBuilding[] } }
@@ -292,7 +314,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     }
     let building: SimpleBuilding;
     if (keyPath.length === 1 || keyPath[0] === '导入导出') {
-      switch (keyPath[0]) {
+      switch (keyPath[keyPath.length - 1]) {
         case '道路':
           building = {
             name: '道路',
@@ -317,8 +339,12 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           onChangeOperation(OperationType.Watermark, '', {} as any);
           return;
         case '导入新文明':
+          setShowUpload(true);
+          setUploadType('civil');
           return;
         case '导入地图':
+          setShowUpload(true);
+          setUploadType('map');
           return;
         case '截图':
           return;
@@ -341,6 +367,77 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   const onMouseLeave = () => {
     setOverflow('hidden');
   };
+
+  const onImportTextData = (_data: any) => {
+    const data = JSON.parse(base64ToString(_data));
+    if (!data) {
+      message.error('该数据已被损坏，导入失败！');
+      return;
+    }
+    if (uploadType === 'civil') {
+      return;
+    }
+    const dataMD5 = data.md5;
+    delete data.md5;
+    if (dataMD5 !== md5(JSON.stringify(data))) {
+      message.error('该数据已被损坏，导入失败！');
+      return;
+    }
+    if (
+      typeof data.woodNum === 'undefined' ||
+      typeof data.civil === 'undefined' ||
+      typeof data.isNoWood === 'undefined' ||
+      typeof data.roads === 'undefined' ||
+      typeof data.buildings === 'undefined'
+    ) {
+      message.error('该文件不是地图数据，导入失败！');
+      return;
+    }
+    console.log(data);
+    onChangeIsLoading(true);
+    onChangeMapType(Number(data.woodNum));
+    onChangeCivil(data.civil);
+    onChangeNoWood(data.isNoWood);
+    data.roads.forEach((v: any) => {
+      const { line, column } = v;
+      cells.place(
+        {
+          Name: '道路',
+          Text: '',
+          Range: 0,
+          Catalog: '道路' as CatalogType,
+          Marker: 0,
+          IsBarrier: false,
+          IsDecoration: false,
+          IsFixed: false,
+          IsGeneral: false,
+          IsProtection: false,
+          IsRoad: true,
+          IsWonder: false,
+          Width: 1,
+          Height: 1,
+          FontSize: 1.4,
+          Background: '#fdfebd',
+          BorderColor: '#000000',
+          BorderWidth: 0.1,
+          Color: '#000000',
+          BorderTStyle: 'solid' as BorderStyleType,
+          BorderBStyle: 'solid' as BorderStyleType,
+          BorderRStyle: 'solid' as BorderStyleType,
+          BorderLStyle: 'solid' as BorderStyleType,
+        },
+        line,
+        column
+      );
+    });
+    let event: any = new Event('import');
+    event.cmd = 'repaint';
+    document.dispatchEvent(event);
+    setShowUpload(false);
+    message.success('已成功导入地图数据！');
+  };
+
+  const onImportImageData = (_data: any) => {};
 
   return (
     <aside className={`left-menu ${styles.wrapper}`}>
@@ -387,6 +484,15 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           })}
         </Menu>
       </div>
+      <DragUpload
+        show={showUpload}
+        type={uploadType as any}
+        onImportTextData={onImportTextData}
+        onImportImageData={onImportImageData}
+        onClickMask={() => {
+          setShowUpload(false);
+        }}
+      />
     </aside>
   );
 };
@@ -410,6 +516,18 @@ const mapDispatchToProps = (dispatch: any) => {
       buildingConfig: Building
     ) => {
       dispatch(changeOperation(operation, operationSub, buildingConfig));
+    },
+    onChangeIsLoading: (isLoading: boolean) => {
+      dispatch(changeIsLoading(isLoading));
+    },
+    onChangeMapType: (mapType: number) => {
+      dispatch(changeMapType(mapType));
+    },
+    onChangeCivil: (civil: CivilType) => {
+      dispatch(changeCivil(civil));
+    },
+    onChangeNoWood: (isNoWood: boolean) => {
+      dispatch(changeNoWood(isNoWood));
     },
   };
 };

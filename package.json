@@ -46,6 +46,7 @@
     "jest-circus": "26.6.0",
     "jest-resolve": "26.6.0",
     "jest-watch-typeahead": "0.6.1",
+    "md5": "^2.3.0",
     "mini-css-extract-plugin": "0.11.3",
     "optimize-css-assets-webpack-plugin": "5.0.4",
     "perfect-scrollbar": "^1.5.2",
@@ -162,6 +163,7 @@
     ]
   },
   "devDependencies": {
+    "@types/md5": "^2.3.1",
     "@types/react-color": "^3.0.5",
     "@types/react-router-dom": "^5.1.8",
     "@types/react-sticky": "^6.0.4",

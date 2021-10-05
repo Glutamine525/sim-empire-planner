@@ -34,13 +34,16 @@ const Map: FC<MapProps> = (props: MapProps) => {
       className={styles.container}
       style={{ filter: isLoading ? 'blur(5px)' : 'none' }}
     >
+      <Panel />
+      <TopMenuContainer />
       <div className={styles['ham-container']}>
         <HamButton isActive={isHamActive} onClick={onClickHamButton} />
       </div>
-      <TopMenuContainer />
       <LeftMenu />
       <Chessboard />
-      <Panel />
+      <a id="download" href="#!" style={{ display: 'none' }}>
+        #
+      </a>
     </main>
   );
 };

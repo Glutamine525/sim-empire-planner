@@ -129,3 +129,22 @@ img + .ant-menu-title-content {
 .ant-modal-confirm-content {
   color: var(--text-regular) !important;
 }
+
+.ant-upload-drag-container {
+  padding: 2rem 5rem;
+  width: max-content;
+}
+
+.ant-upload.ant-upload-drag {
+  border: none;
+  background: var(--background-base);
+  box-shadow: var(--border-base) 0 0 0.4rem;
+}
+
+.ant-upload-text {
+  color: var(--text-regular) !important;
+}
+
+.ant-upload-hint {
+  color: var(--text-secondary) !important;
+}
