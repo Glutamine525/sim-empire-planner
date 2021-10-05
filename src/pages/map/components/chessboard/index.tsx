@@ -22,8 +22,12 @@ import { OperationType } from '@/types/operation';
 import {
   BorderStyleType,
   Building,
+  BuildingType,
+  CatalogType,
   CivilBuilding,
+  GeneralBuilding,
   MarkerColor,
+  SimpleBuilding,
 } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import {
@@ -68,6 +72,7 @@ interface ChessboardProps {
   operation: OperationType;
   buildingConfig: Building;
   isImportingData: boolean;
+  specials: SimpleBuilding[];
   onChangeIsLoading: any;
   onChangeNoWood: any;
   onResetCounter: any;
@@ -126,6 +131,7 @@ const Chessboard = (props: ChessboardProps) => {
     operation,
     buildingConfig,
     isImportingData,
+    specials,
     onChangeIsLoading,
     onChangeNoWood,
     onResetCounter,
@@ -161,10 +167,6 @@ const Chessboard = (props: ChessboardProps) => {
 
   const protection = useMemo(() => CivilBuilding[civil]['防护'], [civil]);
   const protectionNum = useMemo(() => protection.length, [protection]);
-  const buildingBuffer = useMemo(
-    () => getBuildingImage(buildingConfig),
-    [buildingConfig]
-  );
   const roadMarkerBuffer = useMemo(
     () => Array.from(Array(LENGTH + 1), () => null) as any[],
     []
@@ -185,6 +187,39 @@ const Chessboard = (props: ChessboardProps) => {
     return {} as Building;
   }, [operation, hoveredBuilding, buildingConfig]);
   const hideMarker = useMemo(() => !showMarker(building), [building]);
+  const civilBuildingBuffer = useMemo(() => {
+    let result = {} as any;
+    Object.values(BuildingType).forEach(v => {
+      result[v] = {};
+      CivilBuilding[civil][v].forEach(w => {
+        result[v][w.name] = null as any;
+      });
+    });
+    return result;
+  }, [civil]);
+  const generalBuildingBuffer = useMemo(() => {
+    let result = {} as any;
+    result[CatalogType.General] = {};
+    GeneralBuilding.forEach(v => {
+      result[CatalogType.General][v.name] = null as any;
+    });
+    return result;
+  }, []);
+  const specialBuildingBuffer = useMemo(() => {
+    let result = {} as any;
+    result[CatalogType.Special] = {};
+    specials.forEach(v => {
+      result[CatalogType.Special][v.name] = null as any;
+    });
+    return result;
+  }, [specials]);
+  const buildingBuffer = useMemo(() => {
+    return {
+      ...civilBuildingBuffer,
+      ...generalBuildingBuffer,
+      ...specialBuildingBuffer,
+    };
+  }, [civilBuildingBuffer, generalBuildingBuffer, specialBuildingBuffer]);
 
   useEffect(() => {
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
@@ -246,8 +281,45 @@ const Chessboard = (props: ChessboardProps) => {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         placeBarrier(cells.mapType);
         placeFixed(cells.mapType);
-        let results = [] as Promise<void>[];
+        if (!cells.isNoWood) {
+          const keys = BuildingFixed[BarrierType.Tree][cells.mapType - 3];
+          const color = BarrierColor[BarrierType.Tree];
+          for (let key of keys) {
+            const [line, column] = parseBuildingKey(key);
+            const occupied = cells.getOccupied(line, column);
+            if (occupied) {
+              const [oLi, oCo] = parseBuildingKey(occupied);
+              await deleteBuilding(oLi, oCo);
+            }
+            const top = `${line - 1}-${column}`;
+            const bottom = `${line + 1}-${column}`;
+            const left = `${line}-${column - 1}`;
+            const right = `${line}-${column + 1}`;
+            barriers[key] = {
+              background: color,
+              T: !keys.includes(top),
+              B: !keys.includes(bottom),
+              L: !keys.includes(left),
+              R: !keys.includes(right),
+            };
+            cells.placeBarrier(line, column);
+            const canvas: any = miniMapCanvasRef.current;
+            const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+            ctx.fillStyle = color;
+            ctx.fillRect(
+              (column - 1) * MINI_MAP_RATIO,
+              (line - 1) * MINI_MAP_RATIO,
+              MINI_MAP_RATIO,
+              MINI_MAP_RATIO
+            );
+          }
+          const canvas: any = buildingCanvasRef.current;
+          const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+          ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+          barriers = {};
+        }
         for (let i = 1; i <= LENGTH; i++) {
+          let results = [] as Promise<void>[];
           for (let j = 0; j < LENGTH; j++) {
             const occupied = cells.getOccupied(i, j);
             if (!occupied) continue;
@@ -256,8 +328,8 @@ const Chessboard = (props: ChessboardProps) => {
             if (building.IsBarrier) continue;
             results.push(placeBuilding(building, i, j, { repaint: true }));
           }
+          await Promise.all(results);
         }
-        await Promise.all(results);
         onChangeIsLoading(false);
         onChangeIsImportingData(false);
         message.success('已成功导入地图数据！');
@@ -280,7 +352,7 @@ const Chessboard = (props: ChessboardProps) => {
     canvas = miniMapCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    cells.init(mapType, civil);
+    cells.init(mapType, civil, isNoWood);
     placeBarrier(mapType);
     placeFixed(mapType);
     onChangeIsLoading(false);
@@ -797,6 +869,7 @@ const Chessboard = (props: ChessboardProps) => {
     }
   ) => {
     const { updateRoad, repaint } = options;
+    onPlaceOrDeleteBuilding(building, 1);
     if (!repaint) {
       const { records } = cells.place(building, line, column);
       if (building.IsProtection) updateRecordMarker(records);
@@ -804,19 +877,30 @@ const Chessboard = (props: ChessboardProps) => {
       if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
     } else if (repaint && building.IsRoad) {
       updateRoadDisplay([`${line}-${column}`]);
+      return;
     }
-    onPlaceOrDeleteBuilding(building, 1);
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    if (operation === OperationType.Placing) {
+    // if (operation === OperationType.Placing) {
+    //   ctx.drawImage(
+    //     await buildingBuffer,
+    //     (column - 1) * 30 * RATIO,
+    //     (line - 1) * 30 * RATIO
+    //   );
+    // } else
+    if (building.IsRoad || building.IsFixed) {
       ctx.drawImage(
-        await buildingBuffer,
+        await getBuildingImage(building),
         (column - 1) * 30 * RATIO,
         (line - 1) * 30 * RATIO
       );
     } else {
+      const { Catalog, Name } = building;
+      if (buildingBuffer[Catalog][Name] === null) {
+        buildingBuffer[Catalog][Name] = await getBuildingImage(building);
+      }
       ctx.drawImage(
-        await getBuildingImage(building),
+        await buildingBuffer[Catalog][Name],
         (column - 1) * 30 * RATIO,
         (line - 1) * 30 * RATIO
       );
@@ -1360,6 +1444,7 @@ const mapStateToProps = (state: any) => {
     operation: state.LeftMenu.operation,
     buildingConfig: state.LeftMenu.buildingConfig,
     isImportingData: state.LeftMenu.isImportingData,
+    specials: state.Panel.specials,
   };
 };
 

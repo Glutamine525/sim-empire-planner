@@ -18,10 +18,11 @@ import {
 } from '@/types/building';
 import { BuildingColor } from '@/types/building-color';
 import { CivilType } from '@/types/civil';
+import { Counter } from '@/types/couter';
 import { OperationType } from '@/types/operation';
 import { Cells } from '@/utils/cells';
 import { base64ToString } from '@/utils/file';
-import { Menu, message } from 'antd';
+import { Menu, message, Modal } from 'antd';
 import md5 from 'md5';
 import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { connect } from 'react-redux';
@@ -37,7 +38,8 @@ interface LeftMenuProps {
   civil: CivilType;
   isMapRotated: boolean;
   copiedBuilding: Building;
-  specials: Building[];
+  counter: Counter;
+  specials: SimpleBuilding[];
   onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
   onChangeIsLoading: any;
   onChangeMapType: any;
@@ -55,6 +57,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     civil,
     isMapRotated,
     copiedBuilding,
+    counter,
     specials,
     onChangeOperation,
     onChangeIsLoading,
@@ -67,7 +70,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   const isHamActiveRef = useRef<boolean>();
   isHamActiveRef.current = isHamActive;
 
-  const [showUpload, setShowUpload] = useState(true);
+  const [showUpload, setShowUpload] = useState(false);
   const [uploadType, setUploadType] = useState('map');
   const [overflow, setOverflow] = useState('hidden');
   const [catalog, setCatalog] = useState(
@@ -346,8 +349,26 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           setUploadType('civil');
           return;
         case '导入地图':
-          setShowUpload(true);
-          setUploadType('map');
+          const callback = () => {
+            setShowUpload(true);
+            setUploadType('map');
+          };
+          const { Total, Fixed, Road } = counter;
+          if (Total - Fixed || Road - 1) {
+            Modal.confirm({
+              title: '警告',
+              content:
+                '当前地图内仍有放置的建筑，导入地图数据后将删除所有建筑，是否确定导入？',
+              centered: true,
+              okText: '确认',
+              cancelText: '取消',
+              onOk: () => {
+                callback();
+              },
+            });
+          } else {
+            callback();
+          }
           return;
         case '截图':
           return;
@@ -402,7 +423,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     onChangeMapType(Number(data.woodNum));
     onChangeCivil(data.civil);
     onChangeNoWood(data.isNoWood);
-    cells.init(Number(data.woodNum), data.civil);
+    cells.init(Number(data.woodNum), data.civil, data.isNoWood);
     data.roads.forEach((v: any) => {
       const { line, column } = v;
       cells.place(
@@ -543,6 +564,7 @@ const mapStateToProps = (state: any) => {
     civil: state.TopMenu.civil,
     isMapRotated: state.TopMenu.isMapRotated,
     copiedBuilding: state.Chessboard.copiedBuilding,
+    counter: state.Chessboard.counter,
     specials: state.Panel.specials,
   };
 };

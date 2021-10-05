@@ -35,15 +35,18 @@ export class Cells {
 
   civil!: CivilType;
 
+  isNoWood!: boolean;
+
   protection!: string[];
 
   constructor() {
-    this.init(3, CivilType.China);
+    this.init(5, CivilType.China, false);
   }
 
-  init(mapType: number, civil: CivilType) {
+  init(mapType: number, civil: CivilType, isNoWood: boolean) {
     this.mapType = mapType;
     this.civil = civil;
+    this.isNoWood = isNoWood;
     this.protection = CivilBuilding[civil]['防护'];
     this.data = Array.from(Array(LENGTH + 1), (_, i) =>
       Array.from(Array(LENGTH + 1), (_, j) => {

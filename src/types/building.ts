@@ -15,6 +15,19 @@ export const CivilBuilding: { [key in CivilType]: typeof BuildingChina } = {
   [CivilType.Custom]: undefined as any,
 };
 
+export enum BuildingType {
+  Residence = '住宅',
+  Agriculture = '农业',
+  Industry = '工业',
+  Commerce = '商业',
+  Municipal = '市政',
+  Culture = '文化',
+  Religion = '宗教',
+  Military = '军事',
+  Decoration = '美化',
+  Wonder = '奇迹',
+}
+
 export enum CatalogType {
   Road = '道路',
   Residence = '住宅',
