@@ -100,10 +100,10 @@ export const resetCounter = () => {
   return { type: ActionType.ResetCouter };
 };
 
-export const placeOrDeleteBuilding = (building: Building, diff: number) => {
+export const placeOrDeleteBuilding = (buildings: Building[], diff: number) => {
   return {
     type: ActionType.PlaceOrDeleteBuilding,
-    building,
+    buildings,
     diff,
   };
 };

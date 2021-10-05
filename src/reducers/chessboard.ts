@@ -22,23 +22,25 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
       };
     case ActionType.PlaceOrDeleteBuilding:
       let { counter } = state;
-      const { building, diff } = action;
-      if (building.IsRoad) counter.Road++;
-      if (!building.IsBarrier && !building.IsRoad) counter.Total += diff;
-      if (!building.IsBarrier && !building.IsRoad && building.IsFixed)
-        counter.Fixed += 1;
-      if (building.Catalog === CatalogType.Residence) {
-        if (building.Name === '普通住宅') counter.OridinaryHouse += diff;
-        else if (building.Name === '高级住宅') counter.HighEndHouse += diff;
-      }
-      if (building.Catalog === CatalogType.Municipal) {
-        if (building.Name === '粮仓') counter.Barn += diff;
-        else if (building.Name === '货栈') counter.Warehouse += diff;
-      }
-      if (building.Catalog === CatalogType.Agriculture)
-        counter.Agriculture += diff;
-      if (building.Catalog === CatalogType.Industry) counter.Industry += diff;
-      if (building.Catalog === CatalogType.General) counter.General += diff;
+      const { buildings, diff } = action;
+      buildings.forEach(building => {
+        if (building.IsRoad) counter.Road++;
+        if (!building.IsBarrier && !building.IsRoad) counter.Total += diff;
+        if (!building.IsBarrier && !building.IsRoad && building.IsFixed)
+          counter.Fixed += 1;
+        if (building.Catalog === CatalogType.Residence) {
+          if (building.Name === '普通住宅') counter.OridinaryHouse += diff;
+          else if (building.Name === '高级住宅') counter.HighEndHouse += diff;
+        }
+        if (building.Catalog === CatalogType.Municipal) {
+          if (building.Name === '粮仓') counter.Barn += diff;
+          else if (building.Name === '货栈') counter.Warehouse += diff;
+        }
+        if (building.Catalog === CatalogType.Agriculture)
+          counter.Agriculture += diff;
+        if (building.Catalog === CatalogType.Industry) counter.Industry += diff;
+        if (building.Catalog === CatalogType.General) counter.General += diff;
+      });
       return { ...state, counter: { ...counter } };
     case ActionType.SetCopiedBuilding:
       return {

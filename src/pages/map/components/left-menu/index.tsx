@@ -417,7 +417,6 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       message.error('该文件不是地图数据，导入失败！');
       return;
     }
-    console.log(data);
     onChangeIsLoading(true);
     onChangeIsImportingData(true);
     onChangeMapType(Number(data.woodNum));

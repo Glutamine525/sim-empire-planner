@@ -29,7 +29,7 @@ export function getPostfixName() {
 
 export function getScreenshotName() {
   const { civil, mapType, isNoWood } = store.getState().TopMenu;
-  return `${civil}-${mapType}木-${
+  return `模拟帝国-${civil}-${mapType}木-${
     isNoWood ? '无木' : '有木'
   }-${getPostfixName()}`;
 }

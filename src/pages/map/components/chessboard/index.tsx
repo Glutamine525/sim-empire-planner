@@ -31,7 +31,7 @@ import {
 } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import {
-  getBarrierImage,
+  getFullSizeImage,
   getBuildingImage,
   getMarkerImage,
   RATIO,
@@ -113,6 +113,7 @@ let barriers = {} as {
 };
 
 let roadBuffer = new Set<string>();
+let firstRoadInBuffer = '';
 
 let cancelNoWoodConfirmation = false;
 
@@ -145,7 +146,6 @@ const Chessboard = (props: ChessboardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
   const [moveConfig, setMoveConfig] = useState({ ...initMoveConfig });
-  const [updateRoad, setUpdateRoad] = useState(false); // 当按下鼠标，格子被占据时，需要实时更新道路边框
   const [showBoxButton, setShowBoxButton] = useState(false);
   const [showBuilding, setShowBuilding] = useState(false);
   const [showBox, setShowBox] = useState(false);
@@ -180,13 +180,6 @@ const Chessboard = (props: ChessboardProps) => {
     };
   }, [roadMarkerBuffer, protectionNum]);
   const roadImageBuffer = useMemo(() => getRoadImageBuffer(), []);
-  const building = useMemo(() => {
-    setShowBuilding(false);
-    if (operation === OperationType.Empty) return hoveredBuilding;
-    else if (operation === OperationType.Placing) return buildingConfig;
-    return {} as Building;
-  }, [operation, hoveredBuilding, buildingConfig]);
-  const hideMarker = useMemo(() => !showMarker(building), [building]);
   const civilBuildingBuffer = useMemo(() => {
     let result = {} as any;
     Object.values(BuildingType).forEach(v => {
@@ -220,6 +213,22 @@ const Chessboard = (props: ChessboardProps) => {
       ...specialBuildingBuffer,
     };
   }, [civilBuildingBuffer, generalBuildingBuffer, specialBuildingBuffer]);
+  const building = useMemo(() => {
+    setShowBuilding(false);
+    if (operation === OperationType.Empty) return hoveredBuilding;
+    else if (operation === OperationType.Placing) {
+      const { Catalog, Name } = buildingConfig;
+      if (
+        Catalog !== CatalogType.Road &&
+        buildingBuffer[Catalog][Name] === null
+      ) {
+        buildingBuffer[Catalog][Name] = getBuildingImage(buildingConfig);
+      }
+      return buildingConfig;
+    }
+    return {} as Building;
+  }, [operation, hoveredBuilding, buildingConfig]); // eslint-disable-line
+  const hideMarker = useMemo(() => !showMarker(building), [building]);
 
   useEffect(() => {
     const scroll = new PerfectScrollbar('#chessboard-wrapper-outer', {
@@ -268,7 +277,6 @@ const Chessboard = (props: ChessboardProps) => {
     document.addEventListener('import', async (event: any) => {
       const { cmd } = event;
       if (cmd === 'repaint') {
-        console.log(cells);
         onResetCounter();
         let canvas: any = buildingCanvasRef.current;
         let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -315,21 +323,27 @@ const Chessboard = (props: ChessboardProps) => {
           }
           const canvas: any = buildingCanvasRef.current;
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-          ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+          ctx.drawImage((await getFullSizeImage(barriers, 'barrier'))!, 0, 0);
           barriers = {};
         }
+        let buildings = [] as any[];
         for (let i = 1; i <= LENGTH; i++) {
-          let results = [] as Promise<void>[];
           for (let j = 0; j < LENGTH; j++) {
             const occupied = cells.getOccupied(i, j);
             if (!occupied) continue;
             if (!occupied.startsWith(`${i}-${j}`)) continue;
             const building = cells.getBuilding(i, j);
             if (building.IsBarrier) continue;
-            results.push(placeBuilding(building, i, j, { repaint: true }));
+            buildings.push({ ...building, line: i, column: j });
           }
-          await Promise.all(results);
         }
+        onPlaceOrDeleteBuilding(buildings, 1);
+        canvas = buildingCanvasRef.current;
+        ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        ctx.drawImage((await getFullSizeImage(buildings, 'building'))!, 0, 0);
+        canvas = markerCanvasRef.current;
+        ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        ctx.drawImage((await getFullSizeImage(buildings, 'marker'))!, 0, 0);
         onChangeIsLoading(false);
         onChangeIsImportingData(false);
         message.success('已成功导入地图数据！');
@@ -422,7 +436,7 @@ const Chessboard = (props: ChessboardProps) => {
           }
           const canvas: any = buildingCanvasRef.current;
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-          ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+          ctx.drawImage((await getFullSizeImage(barriers, 'barrier'))!, 0, 0);
           barriers = {};
           if (isImportingData) {
             console.timeEnd('useEffect [IsNoWood]');
@@ -498,6 +512,12 @@ const Chessboard = (props: ChessboardProps) => {
         setCopiedBuilding({});
         setHoveredBuilding({} as Building);
         setShowBuilding(false);
+        roadBuffer.forEach(key => {
+          if (firstRoadInBuffer === key) return;
+          const [line, column] = parseBuildingKey(key);
+          deleteBuilding(line, column, false, true);
+        });
+        roadBuffer.clear();
         break;
       case OperationType.Placing:
         setShowBuilding(false);
@@ -548,11 +568,13 @@ const Chessboard = (props: ChessboardProps) => {
         });
         break;
       case OperationType.Placing:
-        if (!showBuilding || cellOccupied) {
-          setUpdateRoad(true);
-          return;
-        }
         const { line, offsetLine, column, offsetColumn } = moveConfig;
+        // 点击空格取消操作时，当按下鼠标该位置已经被占据时，防止首个道路被删除
+        if ((!showBuilding || cellOccupied) && building.IsRoad) {
+          firstRoadInBuffer = `${line}-${column}`;
+        } else {
+          firstRoadInBuffer = '';
+        }
         const { Width, Height } = buildingConfig;
         const [canPlace] = cells.canPlace(
           line + offsetLine,
@@ -568,17 +590,15 @@ const Chessboard = (props: ChessboardProps) => {
         );
         if (!buildingConfig.IsGeneral && canReplace) {
           setCellOccupied(true);
-          setUpdateRoad(false);
           deleteBuilding(generalLine, generalColumn);
           placeBuilding(buildingConfig, generalLine, generalColumn, {});
         } else if (canPlace) {
           setCellOccupied(true);
-          setUpdateRoad(false);
           placeBuilding(
             buildingConfig,
             line + offsetLine,
             column + offsetColumn,
-            { updateRoad }
+            { updateRoad: false }
           );
         }
         if (buildingConfig.IsRoad) {
@@ -723,7 +743,7 @@ const Chessboard = (props: ChessboardProps) => {
             buildingConfig,
             line + offsetLine,
             column + offsetColumn,
-            { updateRoad }
+            { updateRoad: false }
           );
         }
         break;
@@ -758,9 +778,9 @@ const Chessboard = (props: ChessboardProps) => {
           let curLi = Math.floor(endY / 30);
           roadBuffer.forEach(key => {
             const [line, column] = parseBuildingKey(key);
-            deleteBuilding(line, column, true);
+            deleteBuilding(line, column, false, true);
           });
-          if (!updateRoad && initLi === curLi) {
+          if (initLi === curLi) {
             for (let i = initCo; i <= curCo; i++) {
               const occupied = cells.getOccupied(initLi + 1, i + 1);
               if (occupied) continue;
@@ -768,7 +788,7 @@ const Chessboard = (props: ChessboardProps) => {
                 updateRoad: true,
               });
             }
-          } else if (!updateRoad && initCo === curCo) {
+          } else if (initCo === curCo) {
             for (let i = initLi; i <= curLi; i++) {
               const occupied = cells.getOccupied(i + 1, initCo + 1);
               if (occupied) continue;
@@ -865,29 +885,16 @@ const Chessboard = (props: ChessboardProps) => {
     column: number,
     options: {
       updateRoad?: boolean;
-      repaint?: boolean;
     }
   ) => {
-    const { updateRoad, repaint } = options;
-    onPlaceOrDeleteBuilding(building, 1);
-    if (!repaint) {
-      const { records } = cells.place(building, line, column);
-      if (building.IsProtection) updateRecordMarker(records);
-      else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
-      if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
-    } else if (repaint && building.IsRoad) {
-      updateRoadDisplay([`${line}-${column}`]);
-      return;
-    }
+    const { updateRoad } = options;
+    onPlaceOrDeleteBuilding([building], 1);
+    const { records } = cells.place(building, line, column);
+    if (building.IsProtection) updateRecordMarker(records);
+    else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
+    if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    // if (operation === OperationType.Placing) {
-    //   ctx.drawImage(
-    //     await buildingBuffer,
-    //     (column - 1) * 30 * RATIO,
-    //     (line - 1) * 30 * RATIO
-    //   );
-    // } else
     if (building.IsRoad || building.IsFixed) {
       ctx.drawImage(
         await getBuildingImage(building),
@@ -933,7 +940,8 @@ const Chessboard = (props: ChessboardProps) => {
   const deleteBuilding = async (
     line: number,
     column: number,
-    force?: boolean
+    force?: boolean,
+    updateRoad?: boolean
   ) => {
     const occupied = cells.getOccupied(line, column);
     if (!occupied) return false;
@@ -943,8 +951,8 @@ const Chessboard = (props: ChessboardProps) => {
     if (target.IsFixed && !force) return false;
     const records = cells.delete(line, column, force);
     if (target.IsProtection) await updateRecordMarker(records);
-    else if (target.IsRoad && !force) await updateRoadDisplay(records);
-    onPlaceOrDeleteBuilding(target, -1);
+    else if (target.IsRoad && !updateRoad) await updateRoadDisplay(records);
+    onPlaceOrDeleteBuilding([target], -1);
     deleteMarker(originLine, originColumn);
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -1000,7 +1008,7 @@ const Chessboard = (props: ChessboardProps) => {
       });
     const canvas: any = buildingCanvasRef.current;
     const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-    ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
+    ctx.drawImage((await getFullSizeImage(barriers, 'barrier'))!, 0, 0);
     barriers = {};
   };
 
@@ -1459,8 +1467,8 @@ const mapDispatchToProps = (dispatch: any) => {
     onResetCounter: () => {
       dispatch(resetCounter());
     },
-    onPlaceOrDeleteBuilding: (building: Building, diff: number) => {
-      dispatch(placeOrDeleteBuilding(building, diff));
+    onPlaceOrDeleteBuilding: (buildings: Building[], diff: number) => {
+      dispatch(placeOrDeleteBuilding(buildings, diff));
     },
     setCopiedBuilding: (building: Building) => {
       dispatch(setCopiedBuilding(building));

@@ -1,6 +1,7 @@
-import { Building, MarkerColor } from '@/types/building';
+import { Building, CivilBuilding, MarkerColor } from '@/types/building';
+import { store } from '..';
 import { DEFAULT_SIZE } from './browser';
-import { parseBuildingKey } from './chessboard';
+import { parseBuildingKey, showMarker } from './chessboard';
 import { LENGTH } from './config';
 
 export const RATIO = 2;
@@ -8,15 +9,11 @@ export const RATIO = 2;
 const SVG_XMLNS = 'http://www.w3.org/2000/svg';
 const DIV_XMLNS = 'http://www.w3.org/1999/xhtml';
 
-export async function getBuildingImage(building: Building) {
-  if (!Object.keys(building).length) return new Image();
-  const { Width, Height } = building;
-  const { cellSize } = DEFAULT_SIZE;
-  const size = cellSize * RATIO;
+function getBuildingElement(building: Building) {
   let div = document.createElement('div');
   div.innerText = building.Text;
-  div.style.width = `${Width * 30}px`;
-  div.style.height = `${Height * 30}px`;
+  div.style.width = `${building.Width * 30}px`;
+  div.style.height = `${building.Height * 30}px`;
   div.style.color = building.Color;
   div.style.fontFamily = `'PingFang SC', 'Microsoft Yahei', monospace`;
   div.style.fontSize = `${building.FontSize * 10}px`;
@@ -40,38 +37,10 @@ export async function getBuildingImage(building: Building) {
     div.style.backgroundImage =
       'url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAIAAAC0Ujn1AAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAEXRFWHRTb2Z0d2FyZQBTbmlwYXN0ZV0Xzt0AAAE6SURBVEiJ7VVLEsIwCAWuUZe297+A9+g0LvUYLS4YkeHTVN24MJsyvPBCII/iPM8AME73tgxiwHNZzwcortulLQMiMrPFZF3biZnFjqgwVrEkH4136zzeKl51prwAQNd20k1ip3mJEe9kt3lqPXOc7sxsN2kFJXcX35ZBYm25LYrrdvEuxPN4i52Ruuv9XB1iVz21Pb/q20GUoFhV3xBxB7WGp9aT087A8y2lqHNSxKrOiEfQ+GZsrNjk0nSXcg9GUfdmYuxLjZYuzcXy6trX6qsgO51JeaGnVbJ5RdilnzorrZKembJr3yJ7V6uJGvV2rg77UzRqNVdj1bdv1Si1O6K3iFqtJmo8orcKtbFkZ7TO7q7eInuMJZ3ROn9la1dvDo2x/3+jp/7/G3/03/iWVint20G9RV4b+wB4s+9T4iL+igAAAABJRU5ErkJggg==)';
   }
-  document.documentElement.append(div);
-  const html = `
-    <svg width="${Width * size}" height="${Height * size}" xmlns="${SVG_XMLNS}">
-      <foreignObject width="100%" height="100%">
-        <div xmlns="${DIV_XMLNS}">
-          ${htmlToText(div)}
-        </div>
-      </foreignObject>
-    </svg>`;
-
-  // const svg = new Blob([html], {
-  //   type: 'image/svg+xml;charset=utf-8',
-  // });
-  // const url = window.URL.createObjectURL(svg);
-  // console.log(url);
-
-  let img = new Image();
-  img.src =
-    'data:image/svg+xml;base64,' +
-    window.btoa(unescape(encodeURIComponent(html)));
-  await new Promise<void>(resolve => {
-    img.onload = () => {
-      document.documentElement.removeChild(div);
-      resolve();
-    };
-  });
-  return img;
+  return div;
 }
 
-export async function getMarkerImage(marker: number, color: MarkerColor) {
-  const { cellSize } = DEFAULT_SIZE;
-  const size = cellSize * RATIO;
+function getMarkerElement(marker: number, color: MarkerColor) {
   let div = document.createElement('div');
   div.innerText = marker.toString();
   div.style.width = '30px';
@@ -87,12 +56,16 @@ export async function getMarkerImage(marker: number, color: MarkerColor) {
     'white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px';
   div.style.transform = `scale(${0.8 * RATIO})`;
   div.style.transformOrigin = 'top left';
-  document.documentElement.append(div);
+  return div;
+}
+
+async function getImage(width: number, height: number, el: HTMLElement) {
+  document.documentElement.append(el);
   const html = `
-    <svg width="${size}" height="${size}" xmlns="${SVG_XMLNS}">
+    <svg width="${width}" height="${height}" xmlns="${SVG_XMLNS}">
       <foreignObject width="100%" height="100%">
         <div xmlns="${DIV_XMLNS}">
-          ${htmlToText(div)}
+          ${htmlToText(el)}
         </div>
       </foreignObject>
     </svg>`;
@@ -109,70 +82,91 @@ export async function getMarkerImage(marker: number, color: MarkerColor) {
     window.btoa(unescape(encodeURIComponent(html)));
   await new Promise<void>(resolve => {
     img.onload = () => {
-      document.documentElement.removeChild(div);
+      document.documentElement.removeChild(el);
       resolve();
     };
   });
   return img;
 }
 
-export async function getBarrierImage(barriers: any) {
+export async function getBuildingImage(building: Building) {
+  if (!Object.keys(building).length) return new Image();
+  const { Width, Height } = building;
+  const { cellSize } = DEFAULT_SIZE;
+  const size = cellSize * RATIO;
+  const div = getBuildingElement(building);
+  return await getImage(Width * size, Height * size, div);
+}
+
+export async function getMarkerImage(marker: number, color: MarkerColor) {
+  const { cellSize } = DEFAULT_SIZE;
+  const size = cellSize * RATIO;
+  const div = getMarkerElement(marker, color);
+  return await getImage(size, size, div);
+}
+
+export async function getFullSizeImage(
+  data: any,
+  type: 'barrier' | 'building' | 'marker'
+) {
   const { cellSize } = DEFAULT_SIZE;
   const size = LENGTH * cellSize * RATIO;
-  let div = document.createElement('div');
-  div.style.position = 'absolute';
-  div.style.top = '0';
-  div.style.left = '0';
-  div.style.width = '3480px';
-  div.style.height = '3480px';
-  div.style.transform = `scale(${RATIO}00%)`;
-  div.style.transformOrigin = 'top left';
-  Object.keys(barriers).map(key => {
-    const [line, column] = parseBuildingKey(key);
-    let cell = document.createElement('div');
-    cell.style.position = 'absolute';
-    cell.style.boxSizing = 'border-box';
-    cell.style.width = '3rem';
-    cell.style.height = '3rem';
-    cell.style.border = '1px #000000';
-    cell.style.background = barriers[key].background;
-    cell.style.top = `${(line - 1) * 3}rem`;
-    cell.style.left = `${(column - 1) * 3}rem`;
-    cell.style.borderTopStyle = barriers[key].T ? 'solid' : 'none';
-    cell.style.borderRightStyle = barriers[key].R ? 'solid' : 'none';
-    cell.style.borderBottomStyle = barriers[key].B ? 'solid' : 'none';
-    cell.style.borderLeftStyle = barriers[key].L ? 'solid' : 'none';
-    div.append(cell);
-    return null;
-  });
-  document.documentElement.append(div);
-
-  const html = `
-    <svg width="${size}" height="${size}" xmlns="${SVG_XMLNS}">
-      <foreignObject width="100%" height="100%">
-        <div xmlns="${DIV_XMLNS}">
-          ${htmlToText(div)}
-        </div>
-      </foreignObject>
-    </svg>`;
-
-  // const svg = new Blob([html], {
-  //   type: 'image/svg+xml;charset=utf-8',
-  // });
-  // const url = window.URL.createObjectURL(svg);
-  // console.log(url);
-
-  let img = new Image();
-  img.src =
-    'data:image/svg+xml;base64,' +
-    window.btoa(unescape(encodeURIComponent(html)));
-  await new Promise<void>(resolve => {
-    img.onload = () => {
-      document.documentElement.removeChild(div);
-      resolve();
-    };
-  });
-  return img;
+  let container = document.createElement('div');
+  container.style.position = 'absolute';
+  container.style.top = '0';
+  container.style.left = '0';
+  container.style.width = '3480px';
+  container.style.height = '3480px';
+  container.style.transform = `scale(${RATIO}00%)`;
+  container.style.transformOrigin = 'top left';
+  if (type === 'barrier') {
+    Object.keys(data).map(key => {
+      const [line, column] = parseBuildingKey(key);
+      let div = document.createElement('div');
+      div.style.position = 'absolute';
+      div.style.boxSizing = 'border-box';
+      div.style.width = '3rem';
+      div.style.height = '3rem';
+      div.style.border = '1px #000000';
+      div.style.background = data[key].background;
+      div.style.top = `${(line - 1) * 3}rem`;
+      div.style.left = `${(column - 1) * 3}rem`;
+      div.style.borderTopStyle = data[key].T ? 'solid' : 'none';
+      div.style.borderRightStyle = data[key].R ? 'solid' : 'none';
+      div.style.borderBottomStyle = data[key].B ? 'solid' : 'none';
+      div.style.borderLeftStyle = data[key].L ? 'solid' : 'none';
+      container.append(div);
+      return null;
+    });
+  } else if (type === 'building') {
+    Object.values(data).map((v: any) => {
+      let div = getBuildingElement(v);
+      div.style.position = 'absolute';
+      div.style.top = `${(v.line - 1) * 3}rem`;
+      div.style.left = `${(v.column - 1) * 3}rem`;
+      div.style.transform = 'none';
+      container.append(div);
+      return null;
+    });
+  } else {
+    const { civil } = store.getState().TopMenu;
+    const protectionNum = CivilBuilding[civil]['防护'].length;
+    Object.values(data).map((v: any) => {
+      if (!showMarker(v) || v.IsFixed) return null;
+      if (v.IsRoad && !v.isRoadVertex) return null;
+      let color: MarkerColor =
+        v.Marker >= protectionNum ? MarkerColor.Safe : MarkerColor.Danger;
+      color = v.IsRoad ? MarkerColor.Normal : color;
+      let div = getMarkerElement(v.Marker, color);
+      div.style.position = 'absolute';
+      div.style.top = `${(v.line - 1) * 3}rem`;
+      div.style.left = `${(v.column - 1) * 3 + 0.3}rem`;
+      div.style.transform = 'scale(0.8)';
+      container.append(div);
+      return null;
+    });
+  }
+  return await getImage(size, size, container);
 }
 
 function htmlToText(node: Element | Text) {

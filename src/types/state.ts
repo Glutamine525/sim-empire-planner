@@ -55,7 +55,7 @@ export const InitLeftMenuState: LeftMenuAction = {
 
 export interface ChessboardAction {
   type: ActionType;
-  building: Building;
+  buildings: Building[];
   diff: number;
   copiedBuilding: Building;
   counter: Counter;
@@ -63,7 +63,7 @@ export interface ChessboardAction {
 
 export const InitChessboardState: ChessboardAction = {
   type: ActionType.Empty,
-  building: {} as Building,
+  buildings: [] as Building[],
   diff: 1,
   copiedBuilding: {} as Building,
   counter: {
