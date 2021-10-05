@@ -42,6 +42,7 @@ export interface LeftMenuAction {
   operation: OperationType;
   operationSub: string;
   buildingConfig: Building;
+  isImportingData: boolean;
 }
 
 export const InitLeftMenuState: LeftMenuAction = {
@@ -49,6 +50,7 @@ export const InitLeftMenuState: LeftMenuAction = {
   operation: OperationType.Empty,
   operationSub: '',
   buildingConfig: {} as Building,
+  isImportingData: false,
 };
 
 export interface ChessboardAction {

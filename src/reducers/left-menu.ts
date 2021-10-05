@@ -10,6 +10,11 @@ const LeftMenu = (state = InitLeftMenuState, action: LeftMenuAction) => {
         operationSub: action.operationSub,
         buildingConfig: action.buildingConfig,
       };
+    case ActionType.ChangeIsImportingData:
+      return {
+        ...state,
+        isImportingData: action.isImportingData,
+      };
     default:
       return state;
   }

@@ -19,6 +19,7 @@ export enum ActionType {
   ChangeCounter,
   PlaceOrDeleteBuilding,
   SetCopiedBuilding,
+  ChangeIsImportingData,
   InsertSpecialBuilding,
   DeleteSpecialBuilding,
   SwapSpecialBuilding,
@@ -111,6 +112,13 @@ export const setCopiedBuilding = (building: Building) => {
   return {
     type: ActionType.SetCopiedBuilding,
     copiedBuilding: building,
+  };
+};
+
+export const changeIsImportingData = (isImportingData: boolean) => {
+  return {
+    type: ActionType.ChangeIsImportingData,
+    isImportingData,
   };
 };
 

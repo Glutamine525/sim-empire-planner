@@ -34,6 +34,7 @@ import {
 } from '@/utils/screenshot';
 import Range from './components/range';
 import {
+  changeIsImportingData,
   changeIsLoading,
   changeNoWood,
   placeOrDeleteBuilding,
@@ -66,11 +67,13 @@ interface ChessboardProps {
   isMapRotated: boolean;
   operation: OperationType;
   buildingConfig: Building;
+  isImportingData: boolean;
   onChangeIsLoading: any;
   onChangeNoWood: any;
   onResetCounter: any;
   onPlaceOrDeleteBuilding: any;
   setCopiedBuilding: any;
+  onChangeIsImportingData: any;
 }
 
 const initDragConfig = {
@@ -110,9 +113,9 @@ let cancelNoWoodConfirmation = false;
 
 console.time('useEffect []');
 
-const Chessboard = (props: ChessboardProps) => {
-  const cells = Cells.getInstance();
+const cells = Cells.getInstance();
 
+const Chessboard = (props: ChessboardProps) => {
   const {
     mapType,
     civil,
@@ -122,11 +125,13 @@ const Chessboard = (props: ChessboardProps) => {
     isMapRotated,
     operation,
     buildingConfig,
+    isImportingData,
     onChangeIsLoading,
     onChangeNoWood,
     onResetCounter,
     onPlaceOrDeleteBuilding,
     setCopiedBuilding,
+    onChangeIsImportingData,
   } = props;
 
   const [isMouseDown, setIsMouseDown] = useState(false); // 全局标记鼠标是否按下
@@ -225,10 +230,44 @@ const Chessboard = (props: ChessboardProps) => {
     });
     document.body.removeChild(document.getElementById('init-loading')!);
     onChangeIsLoading(false);
+    document.addEventListener('import', async (event: any) => {
+      const { cmd } = event;
+      if (cmd === 'repaint') {
+        console.log(cells);
+        onResetCounter();
+        let canvas: any = buildingCanvasRef.current;
+        let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas = markerCanvasRef.current;
+        ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas = miniMapCanvasRef.current;
+        ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        placeBarrier(cells.mapType);
+        placeFixed(cells.mapType);
+        let results = [] as Promise<void>[];
+        for (let i = 1; i <= LENGTH; i++) {
+          for (let j = 0; j < LENGTH; j++) {
+            const occupied = cells.getOccupied(i, j);
+            if (!occupied) continue;
+            if (!occupied.startsWith(`${i}-${j}`)) continue;
+            const building = cells.getBuilding(i, j);
+            if (building.IsBarrier) continue;
+            results.push(placeBuilding(building, i, j, { repaint: true }));
+          }
+        }
+        await Promise.all(results);
+        onChangeIsLoading(false);
+        onChangeIsImportingData(false);
+        message.success('已成功导入地图数据！');
+      }
+    });
     console.timeEnd('useEffect []');
   }, []); // eslint-disable-line
 
   useEffect(() => {
+    if (isImportingData) return;
     console.time('useEffect [MapType, Civil]');
     setBuildingMarker(0);
     onResetCounter();
@@ -242,8 +281,8 @@ const Chessboard = (props: ChessboardProps) => {
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     cells.init(mapType, civil);
-    placeBarrier();
-    placeFixed();
+    placeBarrier(mapType);
+    placeFixed(mapType);
     onChangeIsLoading(false);
     console.timeEnd('useEffect [MapType, Civil]');
   }, [mapType, civil]); // eslint-disable-line
@@ -262,6 +301,10 @@ const Chessboard = (props: ChessboardProps) => {
         for (let key of keys) {
           const [line, column] = parseBuildingKey(key);
           deleteBuilding(line, column, true);
+        }
+        if (isImportingData) {
+          console.timeEnd('useEffect [IsNoWood]');
+          return;
         }
         onChangeIsLoading(false);
         console.timeEnd('useEffect [IsNoWood]');
@@ -309,6 +352,10 @@ const Chessboard = (props: ChessboardProps) => {
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
           ctx.drawImage((await getBarrierImage(barriers))!, 0, 0);
           barriers = {};
+          if (isImportingData) {
+            console.timeEnd('useEffect [IsNoWood]');
+            return;
+          }
           onChangeIsLoading(false);
           console.timeEnd('useEffect [IsNoWood]');
         };
@@ -451,7 +498,7 @@ const Chessboard = (props: ChessboardProps) => {
           setCellOccupied(true);
           setUpdateRoad(false);
           deleteBuilding(generalLine, generalColumn);
-          placeBuilding(buildingConfig, generalLine, generalColumn);
+          placeBuilding(buildingConfig, generalLine, generalColumn, {});
         } else if (canPlace) {
           setCellOccupied(true);
           setUpdateRoad(false);
@@ -459,7 +506,7 @@ const Chessboard = (props: ChessboardProps) => {
             buildingConfig,
             line + offsetLine,
             column + offsetColumn,
-            updateRoad
+            { updateRoad }
           );
         }
         if (buildingConfig.IsRoad) {
@@ -598,13 +645,13 @@ const Chessboard = (props: ChessboardProps) => {
         if (buildingConfig.IsRoad) roadBuffer.add(`${line}-${column}`);
         if (canReplace) {
           deleteBuilding(generalLine, generalColumn);
-          placeBuilding(buildingConfig, generalLine, generalColumn);
+          placeBuilding(buildingConfig, generalLine, generalColumn, {});
         } else {
           placeBuilding(
             buildingConfig,
             line + offsetLine,
             column + offsetColumn,
-            updateRoad
+            { updateRoad }
           );
         }
         break;
@@ -645,18 +692,22 @@ const Chessboard = (props: ChessboardProps) => {
             for (let i = initCo; i <= curCo; i++) {
               const occupied = cells.getOccupied(initLi + 1, i + 1);
               if (occupied) continue;
-              placeBuilding(buildingConfig, initLi + 1, i + 1, true);
+              placeBuilding(buildingConfig, initLi + 1, i + 1, {
+                updateRoad: true,
+              });
             }
           } else if (!updateRoad && initCo === curCo) {
             for (let i = initLi; i <= curLi; i++) {
               const occupied = cells.getOccupied(i + 1, initCo + 1);
               if (occupied) continue;
-              placeBuilding(buildingConfig, i + 1, initCo + 1, true);
+              placeBuilding(buildingConfig, i + 1, initCo + 1, {
+                updateRoad: true,
+              });
             }
           } else {
             roadBuffer.forEach(key => {
               const [line, column] = parseBuildingKey(key);
-              placeBuilding(buildingConfig, line, column, true);
+              placeBuilding(buildingConfig, line, column, { updateRoad: true });
             });
           }
           roadBuffer.clear();
@@ -740,13 +791,21 @@ const Chessboard = (props: ChessboardProps) => {
     building: Building,
     line: number,
     column: number,
-    updateRoad?: boolean
+    options: {
+      updateRoad?: boolean;
+      repaint?: boolean;
+    }
   ) => {
-    const { marker, records } = cells.place(building, line, column);
-    if (building.IsProtection) updateRecordMarker(records);
-    else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
+    const { updateRoad, repaint } = options;
+    if (!repaint) {
+      const { records } = cells.place(building, line, column);
+      if (building.IsProtection) updateRecordMarker(records);
+      else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
+      if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
+    } else if (repaint && building.IsRoad) {
+      updateRoadDisplay([`${line}-${column}`]);
+    }
     onPlaceOrDeleteBuilding(building, 1);
-    if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     if (operation === OperationType.Placing) {
@@ -772,7 +831,7 @@ const Chessboard = (props: ChessboardProps) => {
       MINI_MAP_RATIO * building.Height
     );
     if (showMarker(building)) {
-      await updateMarker(marker, line, column);
+      await updateMarker(cells.getBuilding(line, column).Marker, line, column);
     }
   };
 
@@ -822,7 +881,7 @@ const Chessboard = (props: ChessboardProps) => {
     return true;
   };
 
-  const placeBarrier = async () => {
+  const placeBarrier = async (mapType: number) => {
     Object.keys(BarrierType)
       .map(v => v.toLowerCase() as BarrierType)
       .map((v: BarrierType) => {
@@ -861,7 +920,7 @@ const Chessboard = (props: ChessboardProps) => {
     barriers = {};
   };
 
-  const placeFixed = async () => {
+  const placeFixed = async (mapType: number) => {
     Object.keys(FixedBuildingType)
       .map(v => v.toLowerCase() as FixedBuildingType)
       .map((v: FixedBuildingType) => {
@@ -896,7 +955,8 @@ const Chessboard = (props: ChessboardProps) => {
               BorderLStyle: BorderStyleType.Solid,
             },
             line,
-            column
+            column,
+            {}
           );
         }
         return null;
@@ -1014,7 +1074,9 @@ const Chessboard = (props: ChessboardProps) => {
     }
     for (let v of buildingBuffer) {
       const { building, line, column } = v;
-      await placeBuilding(building, line + dir[0], column + dir[1], true);
+      await placeBuilding(building, line + dir[0], column + dir[1], {
+        updateRoad: true,
+      });
     }
     let { initX, initY, curX, curY } = dragConfig;
     initX = initX + dir[1] * 30;
@@ -1297,6 +1359,7 @@ const mapStateToProps = (state: any) => {
     isMapRotated: state.TopMenu.isMapRotated,
     operation: state.LeftMenu.operation,
     buildingConfig: state.LeftMenu.buildingConfig,
+    isImportingData: state.LeftMenu.isImportingData,
   };
 };
 
@@ -1316,6 +1379,9 @@ const mapDispatchToProps = (dispatch: any) => {
     },
     setCopiedBuilding: (building: Building) => {
       dispatch(setCopiedBuilding(building));
+    },
+    onChangeIsImportingData: (isImportingData: boolean) => {
+      dispatch(changeIsImportingData(isImportingData));
     },
   };
 };

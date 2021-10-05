@@ -1,5 +1,6 @@
 import {
   changeCivil,
+  changeIsImportingData,
   changeIsLoading,
   changeMapType,
   changeNoWood,
@@ -42,6 +43,7 @@ interface LeftMenuProps {
   onChangeMapType: any;
   onChangeCivil: any;
   onChangeNoWood: any;
+  onChangeIsImportingData: any;
 }
 
 const cells = Cells.getInstance();
@@ -59,6 +61,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     onChangeMapType,
     onChangeCivil,
     onChangeNoWood,
+    onChangeIsImportingData,
   } = props;
 
   const isHamActiveRef = useRef<boolean>();
@@ -395,9 +398,11 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     }
     console.log(data);
     onChangeIsLoading(true);
+    onChangeIsImportingData(true);
     onChangeMapType(Number(data.woodNum));
     onChangeCivil(data.civil);
     onChangeNoWood(data.isNoWood);
+    cells.init(Number(data.woodNum), data.civil);
     data.roads.forEach((v: any) => {
       const { line, column } = v;
       cells.place(
@@ -430,11 +435,45 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
         column
       );
     });
-    let event: any = new Event('import');
-    event.cmd = 'repaint';
-    document.dispatchEvent(event);
+    data.buildings.forEach((v: any) => {
+      cells.place(
+        {
+          Name: v.name,
+          Text: v.text,
+          Range: v.range,
+          Catalog: v.catagory as CatalogType,
+          Marker: 0,
+          IsBarrier: false,
+          IsDecoration: v.isDecoration,
+          IsFixed: false,
+          IsGeneral: v.isGeneral,
+          IsProtection: v.isProtection,
+          IsRoad: false,
+          IsWonder:
+            v.isMiracle ||
+            (v.catagory === '市政' && ['皇宫', '宫殿'].includes(v.name)),
+          Width: v.width,
+          Height: v.height,
+          Color: v.color,
+          FontSize: 1.4,
+          Background: v.background,
+          BorderColor: '#000000',
+          BorderWidth: 0.1,
+          BorderTStyle: 'solid' as BorderStyleType,
+          BorderBStyle: 'solid' as BorderStyleType,
+          BorderRStyle: 'solid' as BorderStyleType,
+          BorderLStyle: 'solid' as BorderStyleType,
+        },
+        v.line,
+        v.column
+      );
+    });
     setShowUpload(false);
-    message.success('已成功导入地图数据！');
+    setTimeout(() => {
+      let event: any = new Event('import');
+      event.cmd = 'repaint';
+      document.dispatchEvent(event);
+    }, 10);
   };
 
   const onImportImageData = (_data: any) => {};
@@ -528,6 +567,9 @@ const mapDispatchToProps = (dispatch: any) => {
     },
     onChangeNoWood: (isNoWood: boolean) => {
       dispatch(changeNoWood(isNoWood));
+    },
+    onChangeIsImportingData: (isImportingData: boolean) => {
+      dispatch(changeIsImportingData(isImportingData));
     },
   };
 };
