@@ -691,7 +691,7 @@ const Chessboard = (props: ChessboardProps) => {
                 }
               }
               setBoxBuffer(record);
-            }
+            } else setBoxBuffer(new Set<string>());
           } else {
             setShowBuilding(false);
             setHoveredBuilding({} as Building);
@@ -802,6 +802,7 @@ const Chessboard = (props: ChessboardProps) => {
           let curCo = Math.floor(endX / 30);
           let curLi = Math.floor(endY / 30);
           roadBuffer.forEach(key => {
+            if (firstRoadInBuffer === key) return;
             const [line, column] = parseBuildingKey(key);
             deleteBuilding(line, column, { force: false, updateRoad: true });
           });
