@@ -1122,10 +1122,13 @@ const Chessboard = (props: ChessboardProps) => {
   };
 
   const onClickBoxDelete = async () => {
+    let buffer = [] as Building[];
     for (let v of boxBuffer) {
       const [line, column] = parseBuildingKey(v);
-      await deleteBuilding(line, column, {});
+      buffer.push(cells.getBuilding(line, column));
+      await deleteBuilding(line, column, { disableDispatch: true });
     }
+    onPlaceOrDeleteBuilding(buffer, -1);
     setShowBox(false);
     setShowBoxButton(false);
     setBoxBuffer(new Set<string>());

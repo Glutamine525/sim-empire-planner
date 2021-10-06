@@ -73,19 +73,7 @@ export function isInBuildingRange(
   if (li + co > range + diff + width + height - 2) return false;
   if (li < co - (range + diff + width - 1)) return false;
   if (li > co + (range + diff + height - 1)) return false;
-  if (li + range === 0 && range === 4) return 'single-top';
-  if (co + range === 0 && range === 4) return 'single-left';
-  if (co + 1 === range + width && range === 4) return 'single-right';
-  if (li + 1 === range + height && range === 4) return 'single-bottom';
-  if (li + co + range + diff === 0) return 'top-left';
-  if (li + co === range + diff + width + height - 2) return 'bottom-right';
-  if (li === co - (range + diff + width - 1)) return 'top-right';
-  if (li === co + (range + diff + height - 1)) return 'bottom-left';
-  if (li + range === 0) return 'top';
-  if (co + range === 0) return 'left';
-  if (co + 1 === range + width) return 'right';
-  if (li + 1 === range + height) return 'bottom';
-  return 'center';
+  return true;
 }
 
 export function getBuildingKey(
