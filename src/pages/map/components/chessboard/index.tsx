@@ -7,7 +7,7 @@ import {
   parseBuildingKey,
   showMarker,
 } from '@/utils/chessboard';
-import { EMAIL, GITHUB, LENGTH, VERSION, WEBSITE } from '@/utils/config';
+import { LENGTH } from '@/utils/config';
 import React, {
   MouseEventHandler,
   useEffect,
@@ -17,7 +17,7 @@ import React, {
 } from 'react';
 import { connect } from 'react-redux';
 import styles from './index.less';
-import { getScreenSize, getCoord, copyLink } from '@/utils/browser';
+import { getScreenSize, getCoord } from '@/utils/browser';
 import { OperationType } from '@/types/operation';
 import {
   BorderStyleType,
@@ -61,6 +61,7 @@ import { message, Modal } from 'antd';
 import { Cells } from '@/utils/cells';
 import MiniMap, { MINI_MAP_RATIO, MINI_MAP_SIZE } from './components/mini-map';
 import { usePrevState } from '@/utils/hook';
+import Copyright from './components/copyright';
 
 interface ChessboardProps {
   mapType: number;
@@ -1435,44 +1436,7 @@ const Chessboard = (props: ChessboardProps) => {
             })}
           </div>
         </div>
-        <div className={styles.copyright}>
-          <div>
-            <strong style={{ color: 'var(--ant-primary-color)' }}>
-              {civil}{' '}
-            </strong>
-            <strong style={{ color: 'var(--ant-error-color)' }}>
-              {mapType}木{' '}
-            </strong>
-            <strong style={{ color: 'var(--ant-success-color)' }}>
-              {isNoWood ? '无' : '有'}木{' '}
-            </strong>
-            <strong style={{ color: 'var(--text-regular)' }}>地图布局</strong>
-          </div>
-          <div>
-            <span>From the Map Editor </span>
-            <strong>V{VERSION}</strong>
-            <span> Implemented by </span>
-            <strong>Glutamine525</strong>
-          </div>
-          <div>
-            <span>网页链接: </span>
-            <strong className={styles.link} onClick={() => copyLink(WEBSITE)}>
-              {WEBSITE}
-            </strong>
-          </div>
-          <div>
-            <span>Github: </span>
-            <strong className={styles.link} onClick={() => copyLink(GITHUB)}>
-              {GITHUB}
-            </strong>
-          </div>
-          <div>
-            <span>Email: </span>
-            <strong className={styles.link} onClick={() => copyLink(EMAIL)}>
-              {EMAIL}
-            </strong>
-          </div>
-        </div>
+        <Copyright mapType={mapType} civil={civil} isNoWood={isNoWood} />
       </div>
       <MiniMap
         forwardedRef={miniMapCanvasRef}
