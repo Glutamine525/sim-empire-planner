@@ -145,6 +145,7 @@ const Chessboard = (props: ChessboardProps) => {
   const [isCtrlDown, setIsCtrlDown] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [dragConfig, setDragConfig] = useState({ ...initDragConfig });
+  const [boxConfig, setBoxConfig] = useState({ ...initDragConfig });
   const [moveConfig, setMoveConfig] = useState({ ...initMoveConfig });
   const [showBoxButton, setShowBoxButton] = useState(false);
   const [showBuilding, setShowBuilding] = useState(false);
@@ -604,7 +605,7 @@ const Chessboard = (props: ChessboardProps) => {
         if (buildingConfig.IsRoad) {
           roadBuffer.add(`${line}-${column}`);
           setShowBox(true);
-          setDragConfig({
+          setBoxConfig({
             initX: getScrollLeft() + clientX - 86,
             initY: getScrollTop() + clientY - 80,
             curX: getScrollLeft() + clientX - 86,
@@ -620,7 +621,7 @@ const Chessboard = (props: ChessboardProps) => {
         setBoxBuffer(new Set<string>());
         setShowBox(true);
         setShowBoxButton(false);
-        setDragConfig({
+        setBoxConfig({
           initX: getScrollLeft() + clientX - 86,
           initY: getScrollTop() + clientY - 80,
           curX: getScrollLeft() + clientX - 86,
@@ -727,7 +728,7 @@ const Chessboard = (props: ChessboardProps) => {
           setMoveConfig({ line, offsetLine, column, offsetColumn });
         }
         if (buildingConfig.IsRoad) {
-          setDragConfig(state => {
+          setBoxConfig(state => {
             const curX = getScrollLeft() + clientX - 86;
             const curY = getScrollTop() + clientY - 80;
             return { ...state, curX, curY };
@@ -753,7 +754,7 @@ const Chessboard = (props: ChessboardProps) => {
         if ((target as any).id) {
           break;
         }
-        setDragConfig(state => ({
+        setBoxConfig(state => ({
           ...state,
           curX: getScrollLeft() + clientX - 86,
           curY: getScrollTop() + clientY - 80,
@@ -766,10 +767,11 @@ const Chessboard = (props: ChessboardProps) => {
 
   const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = () => {
     setIsDragging(false);
+    if (isCtrlDown) return;
     switch (operation) {
       case OperationType.Placing:
         if (buildingConfig.IsRoad) {
-          const { initX, initY, curX, curY } = dragConfig;
+          const { initX, initY, curX, curY } = boxConfig;
           let [startX, endX] = initX < curX ? [initX, curX] : [curX, initX];
           let [startY, endY] = initY < curY ? [initY, curY] : [curY, initY];
           let initCo = Math.floor(startX / 30);
@@ -808,8 +810,11 @@ const Chessboard = (props: ChessboardProps) => {
         break;
       case OperationType.Select:
       case OperationType.Delete:
-        let { initX, initY, curX, curY } = dragConfig;
-        // if (initX === curX || initY === curY) setShowBox(false);
+        let { initX, initY, curX, curY } = boxConfig;
+        if (initX === curX && initY === curY) {
+          setShowBox(false);
+          return;
+        }
         setShowBoxButton(true);
         [initX, curX] = initX < curX ? [initX, curX] : [curX, initX];
         [initY, curY] = initY < curY ? [initY, curY] : [curY, initY];
@@ -830,7 +835,7 @@ const Chessboard = (props: ChessboardProps) => {
             setBoxBuffer(state => state.add(occupied));
           }
         }
-        setDragConfig({ initX, initY, curX, curY });
+        setBoxConfig({ initX, initY, curX, curY });
         break;
       default:
         break;
@@ -1180,7 +1185,7 @@ const Chessboard = (props: ChessboardProps) => {
           disableDispatch: true,
         });
       }
-      let { initX, initY, curX, curY } = dragConfig;
+      let { initX, initY, curX, curY } = boxConfig;
       initX = initX + dir[1] * 30;
       initY = initY + dir[0] * 30;
       curX = curX + dir[1] * 30;
@@ -1201,7 +1206,7 @@ const Chessboard = (props: ChessboardProps) => {
       }
       if (dir[0]) setScrollTop(getScrollTop() + dir[0] * 30);
       else setScrollLeft(getScrollLeft() + dir[1] * 30);
-      setDragConfig({ initX, initY, curX, curY });
+      setBoxConfig({ initX, initY, curX, curY });
       onChangeIsLoading(false);
     }, 0);
   };
@@ -1374,7 +1379,7 @@ const Chessboard = (props: ChessboardProps) => {
           ></Range>
           <Box
             show={showBox}
-            dragConfig={dragConfig}
+            dragConfig={boxConfig}
             operation={operation}
             showButton={showBoxButton}
             onClickMove={onClickBoxMove}
