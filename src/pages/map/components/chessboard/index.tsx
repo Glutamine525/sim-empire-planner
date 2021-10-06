@@ -565,6 +565,10 @@ const Chessboard = (props: ChessboardProps) => {
     console.timeEnd('useEffect [Operation]');
   }, [operation]); // eslint-disable-line
 
+  useEffect(() => {
+    setBoxBuffer(new Set<string>());
+  }, [isMapRotated]);
+
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
     const { target, clientX, clientY } = event;
     setIsDragging(true);
