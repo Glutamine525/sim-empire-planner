@@ -678,13 +678,28 @@ const Chessboard = (props: ChessboardProps) => {
             setCellOccupied(false);
             setHoveredBuilding(targetBuilding);
             setBuildingMarker(building.Marker);
+            if (showMarker(targetBuilding)) {
+              const { Width, Height } = targetBuilding;
+              let record = new Set<string>();
+              for (let i = li; i < li + Height; i++) {
+                for (let j = co; j < co + Width; j++) {
+                  const tmp = cells.getProtection(i, j);
+                  Object.values(tmp).forEach(arr =>
+                    arr.forEach(v => record.add(v))
+                  );
+                }
+              }
+              setBoxBuffer(record);
+            }
           } else {
             setShowBuilding(false);
             setHoveredBuilding({} as Building);
+            setBoxBuffer(new Set<string>());
           }
         } else {
           setShowBuilding(false);
           setHoveredBuilding({} as Building);
+          setBoxBuffer(new Set<string>());
         }
         if (!isDragging) return;
         const { initX, initY } = dragConfig;
@@ -1401,7 +1416,9 @@ const Chessboard = (props: ChessboardProps) => {
               const boxShadowColor =
                 operation === OperationType.Select
                   ? 'var(--ant-primary-color-hover)'
-                  : 'var(--ant-error-color-hover)';
+                  : operation === OperationType.Delete
+                  ? 'var(--ant-error-color-hover)'
+                  : 'var(--ant-success-color-hover)';
               return (
                 <div
                   key={`box-effect-${v}`}
