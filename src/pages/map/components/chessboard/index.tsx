@@ -62,6 +62,7 @@ import { Cells } from '@/utils/cells';
 import MiniMap, { MINI_MAP_RATIO, MINI_MAP_SIZE } from './components/mini-map';
 import { usePrevState } from '@/utils/hook';
 import Copyright from './components/copyright';
+import BoxEffect from './components/box-effect';
 
 interface ChessboardProps {
   mapType: number;
@@ -336,14 +337,23 @@ const Chessboard = (props: ChessboardProps) => {
           barriers = {};
         }
         let buildings = [] as any[];
+        canvas = miniMapCanvasRef.current;
+        ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
         for (let i = 1; i <= LENGTH; i++) {
-          for (let j = 0; j < LENGTH; j++) {
+          for (let j = 1; j < LENGTH; j++) {
             const occupied = cells.getOccupied(i, j);
             if (!occupied) continue;
             if (!occupied.startsWith(`${i}-${j}`)) continue;
             const building = cells.getBuilding(i, j);
             if (building.IsBarrier) continue;
             buildings.push({ ...building, line: i, column: j });
+            ctx.fillStyle = building.Background;
+            ctx.fillRect(
+              (j - 1) * MINI_MAP_RATIO,
+              (i - 1) * MINI_MAP_RATIO,
+              MINI_MAP_RATIO * building.Width,
+              MINI_MAP_RATIO * building.Height
+            );
           }
         }
         onPlaceOrDeleteBuilding(buildings, 1);
@@ -1412,7 +1422,7 @@ const Chessboard = (props: ChessboardProps) => {
             onClickMove={onClickBoxMove}
             onClickDelete={onClickBoxDelete}
           />
-          <div className={styles['box-effect']}>
+          {/* <div className={styles['box-effect']}>
             {Array.from(boxBuffer).map(v => {
               const [line, column, width, height] = parseBuildingKey(v);
               const boxShadowColor =
@@ -1435,7 +1445,8 @@ const Chessboard = (props: ChessboardProps) => {
                 ></div>
               );
             })}
-          </div>
+          </div> */}
+          <BoxEffect operation={operation} boxBuffer={boxBuffer} />
         </div>
         <Copyright mapType={mapType} civil={civil} isNoWood={isNoWood} />
       </div>
