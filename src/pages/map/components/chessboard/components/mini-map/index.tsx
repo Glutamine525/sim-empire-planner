@@ -98,6 +98,7 @@ export default function MiniMap(props: MiniMapProps) {
             className={styles.map}
           ></canvas>
           <canvas
+            id="mini-map"
             ref={forwardedRef}
             width={LENGTH * MINI_MAP_RATIO}
             height={LENGTH * MINI_MAP_RATIO}

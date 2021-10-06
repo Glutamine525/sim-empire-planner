@@ -507,17 +507,17 @@ const Chessboard = (props: ChessboardProps) => {
     console.time('useEffect [Operation]');
     setShowBox(false);
     setBoxBuffer(new Set<string>());
+    roadBuffer.forEach(key => {
+      if (firstRoadInBuffer === key) return;
+      const [line, column] = parseBuildingKey(key);
+      deleteBuilding(line, column, false, true);
+    });
+    roadBuffer.clear();
     switch (operation) {
       case OperationType.Empty:
         setCopiedBuilding({});
         setHoveredBuilding({} as Building);
         setShowBuilding(false);
-        roadBuffer.forEach(key => {
-          if (firstRoadInBuffer === key) return;
-          const [line, column] = parseBuildingKey(key);
-          deleteBuilding(line, column, false, true);
-        });
-        roadBuffer.clear();
         break;
       case OperationType.Placing:
         setShowBuilding(false);
@@ -1157,42 +1157,44 @@ const Chessboard = (props: ChessboardProps) => {
       return;
     }
     onChangeIsLoading(true);
-    let buildingBuffer = [] as any[];
-    for (let v of boxBuffer) {
-      const [line, column] = parseBuildingKey(v);
-      const building = cells.getBuilding(line, column);
-      buildingBuffer.push({ building, line, column });
-      await deleteBuilding(line, column);
-    }
-    for (let v of buildingBuffer) {
-      const { building, line, column } = v;
-      await placeBuilding(building, line + dir[0], column + dir[1], {
-        updateRoad: true,
-      });
-    }
-    let { initX, initY, curX, curY } = dragConfig;
-    initX = initX + dir[1] * 30;
-    initY = initY + dir[0] * 30;
-    curX = curX + dir[1] * 30;
-    curY = curY + dir[0] * 30;
-    const initCo = Math.floor(initX / 30);
-    const initLi = Math.floor(initY / 30);
-    const curCo = Math.ceil(curX / 30);
-    const curLi = Math.ceil(curY / 30);
-    setBoxBuffer(new Set<string>());
-    for (let i = initLi + 1; i <= curLi; i++) {
-      for (let j = initCo + 1; j <= curCo; j++) {
-        const occupied = cells.getOccupied(i, j);
-        if (!occupied) continue;
-        const building = cells.getBuilding(occupied);
-        if (building.IsFixed) continue;
-        setBoxBuffer(state => state.add(occupied));
+    setTimeout(async () => {
+      let buildingBuffer = [] as any[];
+      for await (let v of boxBuffer) {
+        const [line, column] = parseBuildingKey(v);
+        const building = cells.getBuilding(line, column);
+        buildingBuffer.push({ building, line, column });
+        await deleteBuilding(line, column);
       }
-    }
-    if (dir[0]) setScrollTop(getScrollTop() + dir[0] * 30);
-    else setScrollLeft(getScrollLeft() + dir[1] * 30);
-    setDragConfig({ initX, initY, curX, curY });
-    onChangeIsLoading(false);
+      for await (let v of buildingBuffer) {
+        const { building, line, column } = v;
+        placeBuilding(building, line + dir[0], column + dir[1], {
+          updateRoad: true,
+        });
+      }
+      let { initX, initY, curX, curY } = dragConfig;
+      initX = initX + dir[1] * 30;
+      initY = initY + dir[0] * 30;
+      curX = curX + dir[1] * 30;
+      curY = curY + dir[0] * 30;
+      const initCo = Math.floor(initX / 30);
+      const initLi = Math.floor(initY / 30);
+      const curCo = Math.ceil(curX / 30);
+      const curLi = Math.ceil(curY / 30);
+      setBoxBuffer(new Set<string>());
+      for (let i = initLi + 1; i <= curLi; i++) {
+        for (let j = initCo + 1; j <= curCo; j++) {
+          const occupied = cells.getOccupied(i, j);
+          if (!occupied) continue;
+          const building = cells.getBuilding(occupied);
+          if (building.IsFixed) continue;
+          setBoxBuffer(state => state.add(occupied));
+        }
+      }
+      if (dir[0]) setScrollTop(getScrollTop() + dir[0] * 30);
+      else setScrollLeft(getScrollLeft() + dir[1] * 30);
+      setDragConfig({ initX, initY, curX, curY });
+      onChangeIsLoading(false);
+    }, 0);
   };
 
   const updateMiniMapConfig = (resize?: boolean) => {
@@ -1231,8 +1233,12 @@ const Chessboard = (props: ChessboardProps) => {
     event: React.MouseEvent<HTMLDivElement, MouseEvent>
   ) => {
     const {
-      nativeEvent: { layerX, layerY },
+      nativeEvent: { pageX, pageY },
     } = event as any;
+    const { left, top } = document
+      .getElementById('mini-map')!
+      .getBoundingClientRect();
+    const [layerX, layerY] = [pageX - left, pageY - top];
     const { focusWidth, focusHeight } = miniMapConfig;
     const { clientWidth, clientHeight } = wrapperInnerRef.current!;
     setScrollTop(

@@ -393,107 +393,111 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   };
 
   const onImportTextData = (_data: any) => {
-    const data = JSON.parse(base64ToString(_data));
-    if (!data) {
-      message.error('该数据已被损坏，导入失败！');
-      return;
+    try {
+      const data = JSON.parse(base64ToString(_data));
+      if (!data) {
+        message.error('该数据已被损坏，导入失败！');
+        return;
+      }
+      if (uploadType === 'civil') {
+        return;
+      }
+      const dataMD5 = data.md5;
+      delete data.md5;
+      if (dataMD5 !== md5(JSON.stringify(data))) {
+        message.error('该数据已被损坏，导入失败！');
+        return;
+      }
+      if (
+        typeof data.woodNum === 'undefined' ||
+        typeof data.civil === 'undefined' ||
+        typeof data.isNoWood === 'undefined' ||
+        typeof data.roads === 'undefined' ||
+        typeof data.buildings === 'undefined'
+      ) {
+        message.error('该文件不是地图数据，导入失败！');
+        return;
+      }
+      onChangeIsLoading(true);
+      onChangeIsImportingData(true);
+      onChangeMapType(Number(data.woodNum));
+      onChangeCivil(data.civil);
+      onChangeNoWood(data.isNoWood);
+      cells.init(Number(data.woodNum), data.civil, data.isNoWood);
+      data.roads.forEach((v: any) => {
+        const { line, column } = v;
+        cells.place(
+          {
+            Name: '道路',
+            Text: '',
+            Range: 0,
+            Catalog: '道路' as CatalogType,
+            Marker: 0,
+            IsBarrier: false,
+            IsDecoration: false,
+            IsFixed: false,
+            IsGeneral: false,
+            IsProtection: false,
+            IsRoad: true,
+            IsWonder: false,
+            Width: 1,
+            Height: 1,
+            FontSize: 1.4,
+            Background: '#fdfebd',
+            BorderColor: '#000000',
+            BorderWidth: 0.1,
+            Color: '#000000',
+            BorderTStyle: 'solid' as BorderStyleType,
+            BorderBStyle: 'solid' as BorderStyleType,
+            BorderRStyle: 'solid' as BorderStyleType,
+            BorderLStyle: 'solid' as BorderStyleType,
+          },
+          line,
+          column
+        );
+      });
+      data.buildings.forEach((v: any) => {
+        cells.place(
+          {
+            Name: v.name,
+            Text: v.text,
+            Range: v.range,
+            Catalog: v.catagory as CatalogType,
+            Marker: 0,
+            IsBarrier: false,
+            IsDecoration: v.isDecoration,
+            IsFixed: false,
+            IsGeneral: v.isGeneral,
+            IsProtection: v.isProtection,
+            IsRoad: false,
+            IsWonder:
+              v.isMiracle ||
+              (v.catagory === '市政' && ['皇宫', '宫殿'].includes(v.name)),
+            Width: v.width,
+            Height: v.height,
+            Color: v.color,
+            FontSize: 1.4,
+            Background: v.background,
+            BorderColor: '#000000',
+            BorderWidth: 0.1,
+            BorderTStyle: 'solid' as BorderStyleType,
+            BorderBStyle: 'solid' as BorderStyleType,
+            BorderRStyle: 'solid' as BorderStyleType,
+            BorderLStyle: 'solid' as BorderStyleType,
+          },
+          v.line,
+          v.column
+        );
+      });
+      setShowUpload(false);
+      setTimeout(() => {
+        let event: any = new Event('import');
+        event.cmd = 'repaint';
+        document.dispatchEvent(event);
+      }, 10);
+    } catch (_) {
+      message.error('请上传存档文件！');
     }
-    if (uploadType === 'civil') {
-      return;
-    }
-    const dataMD5 = data.md5;
-    delete data.md5;
-    if (dataMD5 !== md5(JSON.stringify(data))) {
-      message.error('该数据已被损坏，导入失败！');
-      return;
-    }
-    if (
-      typeof data.woodNum === 'undefined' ||
-      typeof data.civil === 'undefined' ||
-      typeof data.isNoWood === 'undefined' ||
-      typeof data.roads === 'undefined' ||
-      typeof data.buildings === 'undefined'
-    ) {
-      message.error('该文件不是地图数据，导入失败！');
-      return;
-    }
-    onChangeIsLoading(true);
-    onChangeIsImportingData(true);
-    onChangeMapType(Number(data.woodNum));
-    onChangeCivil(data.civil);
-    onChangeNoWood(data.isNoWood);
-    cells.init(Number(data.woodNum), data.civil, data.isNoWood);
-    data.roads.forEach((v: any) => {
-      const { line, column } = v;
-      cells.place(
-        {
-          Name: '道路',
-          Text: '',
-          Range: 0,
-          Catalog: '道路' as CatalogType,
-          Marker: 0,
-          IsBarrier: false,
-          IsDecoration: false,
-          IsFixed: false,
-          IsGeneral: false,
-          IsProtection: false,
-          IsRoad: true,
-          IsWonder: false,
-          Width: 1,
-          Height: 1,
-          FontSize: 1.4,
-          Background: '#fdfebd',
-          BorderColor: '#000000',
-          BorderWidth: 0.1,
-          Color: '#000000',
-          BorderTStyle: 'solid' as BorderStyleType,
-          BorderBStyle: 'solid' as BorderStyleType,
-          BorderRStyle: 'solid' as BorderStyleType,
-          BorderLStyle: 'solid' as BorderStyleType,
-        },
-        line,
-        column
-      );
-    });
-    data.buildings.forEach((v: any) => {
-      cells.place(
-        {
-          Name: v.name,
-          Text: v.text,
-          Range: v.range,
-          Catalog: v.catagory as CatalogType,
-          Marker: 0,
-          IsBarrier: false,
-          IsDecoration: v.isDecoration,
-          IsFixed: false,
-          IsGeneral: v.isGeneral,
-          IsProtection: v.isProtection,
-          IsRoad: false,
-          IsWonder:
-            v.isMiracle ||
-            (v.catagory === '市政' && ['皇宫', '宫殿'].includes(v.name)),
-          Width: v.width,
-          Height: v.height,
-          Color: v.color,
-          FontSize: 1.4,
-          Background: v.background,
-          BorderColor: '#000000',
-          BorderWidth: 0.1,
-          BorderTStyle: 'solid' as BorderStyleType,
-          BorderBStyle: 'solid' as BorderStyleType,
-          BorderRStyle: 'solid' as BorderStyleType,
-          BorderLStyle: 'solid' as BorderStyleType,
-        },
-        v.line,
-        v.column
-      );
-    });
-    setShowUpload(false);
-    setTimeout(() => {
-      let event: any = new Event('import');
-      event.cmd = 'repaint';
-      document.dispatchEvent(event);
-    }, 10);
   };
 
   const onImportImageData = (_data: any) => {};
