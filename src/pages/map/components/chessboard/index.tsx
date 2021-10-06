@@ -262,7 +262,14 @@ const Chessboard = (props: ChessboardProps) => {
     wrapperOuter!.addEventListener('ps-scroll-y', () => updateMiniMapConfig());
     document.addEventListener('mousedown', () => setIsMouseDown(true));
     document.addEventListener('mouseup', () => setIsMouseDown(false));
-    document.addEventListener('mouseleave', () => setIsMouseDown(false));
+    document.addEventListener('mouseleave', () => {
+      setIsMouseDown(false);
+      setIsCtrlDown(false);
+    });
+    window.addEventListener('blur', () => {
+      setIsMouseDown(false);
+      setIsCtrlDown(false);
+    });
     document.addEventListener('keydown', event => {
       const { key } = event;
       if (key !== 'Control') return;
