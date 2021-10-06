@@ -109,10 +109,11 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
               }}
             >
               {text}
-              {!isDecoration && !isWonder ? (
+              {
                 <div
                   className={styles.marker}
                   style={{
+                    opacity: !isDecoration && !isWonder ? 1 : 0,
                     color: isFullProtection
                       ? 'var(--ant-success-color)'
                       : 'var(--ant-error-color)',
@@ -120,7 +121,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                 >
                   {isFullProtection ? CivilBuilding[civil]['防'].length : 0}
                 </div>
-              ) : null}
+              }
             </div>
           </div>
           <div>

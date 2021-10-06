@@ -54,7 +54,10 @@ export default function DragUpload(props: UploadMaskProps) {
   return createPortal(
     <div
       className={styles.container}
-      style={{ display: show ? 'flex' : 'none' }}
+      style={{
+        opacity: show ? '1' : '0',
+        visibility: show ? 'visible' : 'hidden',
+      }}
     >
       <div className={styles.mask} onClick={onClickMask}></div>
       <Dragger accept={accept} beforeUpload={beforeUpload}>
@@ -70,6 +73,7 @@ export default function DragUpload(props: UploadMaskProps) {
         <p className="ant-upload-hint">
           只能上传 <strong>{accept}</strong> 格式文件
         </p>
+        <p className="ant-upload-hint">点击其它区域即可关闭此界面</p>
       </Dragger>
     </div>,
     el

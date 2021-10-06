@@ -297,7 +297,7 @@ const Chessboard = (props: ChessboardProps) => {
             const occupied = cells.getOccupied(line, column);
             if (occupied) {
               const [oLi, oCo] = parseBuildingKey(occupied);
-              await deleteBuilding(oLi, oCo);
+              await deleteBuilding(oLi, oCo, {});
             }
             const top = `${line - 1}-${column}`;
             const bottom = `${line + 1}-${column}`;
@@ -386,7 +386,7 @@ const Chessboard = (props: ChessboardProps) => {
         }
         for (let key of keys) {
           const [line, column] = parseBuildingKey(key);
-          deleteBuilding(line, column, true);
+          deleteBuilding(line, column, { force: true });
         }
         if (isImportingData) {
           console.timeEnd('useEffect [IsNoWood]');
@@ -410,7 +410,7 @@ const Chessboard = (props: ChessboardProps) => {
             const occupied = cells.getOccupied(line, column);
             if (occupied) {
               const [oLi, oCo] = parseBuildingKey(occupied);
-              await deleteBuilding(oLi, oCo);
+              await deleteBuilding(oLi, oCo, {});
             }
             const top = `${line - 1}-${column}`;
             const bottom = `${line + 1}-${column}`;
@@ -510,7 +510,7 @@ const Chessboard = (props: ChessboardProps) => {
     roadBuffer.forEach(key => {
       if (firstRoadInBuffer === key) return;
       const [line, column] = parseBuildingKey(key);
-      deleteBuilding(line, column, false, true);
+      deleteBuilding(line, column, { force: false, updateRoad: true });
     });
     roadBuffer.clear();
     switch (operation) {
@@ -590,7 +590,7 @@ const Chessboard = (props: ChessboardProps) => {
         );
         if (!buildingConfig.IsGeneral && canReplace) {
           setCellOccupied(true);
-          deleteBuilding(generalLine, generalColumn);
+          deleteBuilding(generalLine, generalColumn, {});
           placeBuilding(buildingConfig, generalLine, generalColumn, {});
         } else if (canPlace) {
           setCellOccupied(true);
@@ -736,7 +736,7 @@ const Chessboard = (props: ChessboardProps) => {
         if (!isDragging || (!canPlace && !canReplace)) return;
         if (buildingConfig.IsRoad) roadBuffer.add(`${line}-${column}`);
         if (canReplace) {
-          deleteBuilding(generalLine, generalColumn);
+          deleteBuilding(generalLine, generalColumn, {});
           placeBuilding(buildingConfig, generalLine, generalColumn, {});
         } else {
           placeBuilding(
@@ -778,7 +778,7 @@ const Chessboard = (props: ChessboardProps) => {
           let curLi = Math.floor(endY / 30);
           roadBuffer.forEach(key => {
             const [line, column] = parseBuildingKey(key);
-            deleteBuilding(line, column, false, true);
+            deleteBuilding(line, column, { force: false, updateRoad: true });
           });
           if (initLi === curLi) {
             for (let i = initCo; i <= curCo; i++) {
@@ -853,9 +853,12 @@ const Chessboard = (props: ChessboardProps) => {
       pageY + getScrollTop() - 80,
     ];
     const { line, column } = getCoord(offsetX, offsetY);
-    if (!deleteBuilding(line, column)) return;
-    setShowBuilding(false);
-    setHoveredBuilding({} as Building);
+    (async () => {
+      const deleteResult = await deleteBuilding(line, column, {});
+      if (!deleteResult) return;
+      setShowBuilding(false);
+      setHoveredBuilding({} as Building);
+    })();
   };
 
   const placeMarker = async (
@@ -885,10 +888,11 @@ const Chessboard = (props: ChessboardProps) => {
     column: number,
     options: {
       updateRoad?: boolean;
+      disableDispatch?: boolean;
     }
   ) => {
-    const { updateRoad } = options;
-    onPlaceOrDeleteBuilding([building], 1);
+    const { updateRoad, disableDispatch } = options;
+    if (!disableDispatch) onPlaceOrDeleteBuilding([building], 1);
     const { records } = cells.place(building, line, column);
     if (building.IsProtection) updateRecordMarker(records);
     else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
@@ -940,9 +944,13 @@ const Chessboard = (props: ChessboardProps) => {
   const deleteBuilding = async (
     line: number,
     column: number,
-    force?: boolean,
-    updateRoad?: boolean
+    option: {
+      force?: boolean;
+      updateRoad?: boolean;
+      disableDispatch?: boolean;
+    }
   ) => {
+    const { force, updateRoad, disableDispatch } = option;
     const occupied = cells.getOccupied(line, column);
     if (!occupied) return false;
     const [originLine, originColumn, width, height] =
@@ -952,7 +960,7 @@ const Chessboard = (props: ChessboardProps) => {
     const records = cells.delete(line, column, force);
     if (target.IsProtection) await updateRecordMarker(records);
     else if (target.IsRoad && !updateRoad) await updateRoadDisplay(records);
-    onPlaceOrDeleteBuilding([target], -1);
+    if (!disableDispatch) onPlaceOrDeleteBuilding([target], -1);
     deleteMarker(originLine, originColumn);
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -1104,7 +1112,7 @@ const Chessboard = (props: ChessboardProps) => {
   const onClickBoxDelete = async () => {
     for (let v of boxBuffer) {
       const [line, column] = parseBuildingKey(v);
-      await deleteBuilding(line, column);
+      await deleteBuilding(line, column, {});
     }
     setShowBox(false);
     setShowBoxButton(false);
@@ -1159,16 +1167,17 @@ const Chessboard = (props: ChessboardProps) => {
     onChangeIsLoading(true);
     setTimeout(async () => {
       let buildingBuffer = [] as any[];
-      for await (let v of boxBuffer) {
+      for (let v of boxBuffer) {
         const [line, column] = parseBuildingKey(v);
         const building = cells.getBuilding(line, column);
         buildingBuffer.push({ building, line, column });
-        await deleteBuilding(line, column);
+        await deleteBuilding(line, column, { disableDispatch: true });
       }
-      for await (let v of buildingBuffer) {
+      for (let v of buildingBuffer) {
         const { building, line, column } = v;
-        placeBuilding(building, line + dir[0], column + dir[1], {
+        await placeBuilding(building, line + dir[0], column + dir[1], {
           updateRoad: true,
+          disableDispatch: true,
         });
       }
       let { initX, initY, curX, curY } = dragConfig;

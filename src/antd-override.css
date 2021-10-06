@@ -137,6 +137,7 @@ img + .ant-menu-title-content {
 
 .ant-upload.ant-upload-drag {
   border: none;
+  border-radius: 0.8rem;
   background: var(--background-base);
   box-shadow: var(--border-base) 0 0 0.4rem;
 }
