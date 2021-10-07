@@ -75,6 +75,10 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
       message.error('建筑名称不合法！');
       return;
     }
+    if (range > 0 && range < 4) {
+      message.error('建筑的影响范围只能等于0或者≥4！');
+      return;
+    }
     onInsertSpecialBuilding({
       name,
       text,
@@ -88,6 +92,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
       fontSize,
       background: rgbToHex(background),
     });
+    message.success('已成功添加该建筑！');
   };
 
   const onClickDelete = (name: string) => {
