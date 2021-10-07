@@ -5,6 +5,11 @@ const Panel = (state = InitPanelState, action: PanelAction) => {
   const { specials } = state;
 
   switch (action.type) {
+    case ActionType.ChangePanelTab:
+      return {
+        ...state,
+        tab: action.tab,
+      };
     case ActionType.InsertSpecialBuilding:
       return {
         ...state,

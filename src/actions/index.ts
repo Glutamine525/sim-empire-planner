@@ -23,6 +23,7 @@ export enum ActionType {
   InsertSpecialBuilding,
   DeleteSpecialBuilding,
   SwapSpecialBuilding,
+  ChangePanelTab,
 }
 
 export const changeIsLoading = (isLoading: boolean) => {
@@ -141,5 +142,12 @@ export const swapSpecialBuilding = (dragIndex: number, dropIndex: number) => {
     type: ActionType.SwapSpecialBuilding,
     dragIndex,
     dropIndex,
+  };
+};
+
+export const changePanelTab = (tab: string) => {
+  return {
+    type: ActionType.ChangePanelTab,
+    tab,
   };
 };

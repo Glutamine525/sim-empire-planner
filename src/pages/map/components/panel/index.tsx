@@ -1,5 +1,6 @@
+import { changePanelTab } from '@/actions';
 import { Tabs } from 'antd';
-import React, { useState } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import Archive from './components/archive';
 import SpecialBuildingEditter from './components/special-building-editter';
@@ -9,15 +10,15 @@ const { TabPane } = Tabs;
 
 interface PanelProps {
   isHamActive: boolean;
+  tab: string;
+  onChangePanelTab: any;
 }
 
 function Panel(props: PanelProps) {
-  const { isHamActive } = props;
-
-  const [activeKey, setActiveKey] = useState('tab-0');
+  const { isHamActive, tab, onChangePanelTab } = props;
 
   const onTabClick = (key: string) => {
-    setActiveKey(key);
+    onChangePanelTab(key);
   };
 
   return (
@@ -28,7 +29,7 @@ function Panel(props: PanelProps) {
         left: isHamActive ? 0 : '-100%',
       }}
     >
-      <Tabs activeKey={activeKey} onTabClick={onTabClick}>
+      <Tabs activeKey={tab} onTabClick={onTabClick}>
         <TabPane tab="自动存档" key="tab-0">
           <Archive />
         </TabPane>
@@ -46,11 +47,16 @@ function Panel(props: PanelProps) {
 const mapStateToProps = (state: any) => {
   return {
     isHamActive: state.TopMenu.isHamActive,
+    tab: state.Panel.tab,
   };
 };
 
 const mapDispatchToProps = (dispatch: any) => {
-  return {};
+  return {
+    onChangePanelTab: (tab: string) => {
+      dispatch(changePanelTab(tab));
+    },
+  };
 };
 
 const PanelContainer = connect(mapStateToProps, mapDispatchToProps)(Panel);

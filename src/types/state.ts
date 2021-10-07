@@ -82,6 +82,7 @@ export const InitChessboardState: ChessboardAction = {
 
 export interface PanelAction {
   type: ActionType;
+  tab: string;
   targetSpecial: SimpleBuilding;
   specials: SimpleBuilding[];
   dragIndex: number;
@@ -90,6 +91,7 @@ export interface PanelAction {
 
 export const InitPanelState: PanelAction = {
   type: ActionType.Empty,
+  tab: 'tab-0',
   targetSpecial: {} as SimpleBuilding,
   specials: [] as SimpleBuilding[],
   dragIndex: 0,

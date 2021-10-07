@@ -39,6 +39,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
   const [fontSize, setFontSize] = useState(1.4);
   const [range, setRange] = useState(0);
   const [color, setColor] = useState({ r: 245, g: 166, b: 35, a: 1 });
+  const [shadow, setShadow] = useState({ r: 215, g: 15, b: 15, a: 1 });
   const [background, setBackground] = useState({ r: 74, g: 200, b: 36, a: 1 });
   const [isDecoration, setIsDecoration] = useState(true);
   const [isWonder, setIsWonder] = useState(false);
@@ -47,6 +48,10 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
 
   const onChangeTextColor: ColorChangeHandler = color => {
     setColor(color.rgb as any);
+  };
+
+  const onChangeShadowColor: ColorChangeHandler = color => {
+    setShadow(color.rgb as any);
   };
 
   const onChangBgColor: ColorChangeHandler = color => {
@@ -66,6 +71,10 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
       message.error('建筑名称重复！');
       return;
     }
+    if (name.includes('打开编辑面板')) {
+      message.error('建筑名称不合法！');
+      return;
+    }
     onInsertSpecialBuilding({
       name,
       text,
@@ -75,6 +84,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
       width,
       height,
       color: rgbToHex(color),
+      shadow: rgbToHex(shadow),
       fontSize,
       background: rgbToHex(background),
     });
@@ -104,6 +114,17 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                 width: `${width * 30}px`,
                 height: `${height * 30}px`,
                 color: `rgb(${color.r} ${color.g} ${color.b})`,
+                textShadow: `${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
+                  shadow
+                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
+                  shadow
+                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
+                  shadow
+                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
+                  shadow
+                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
+                  shadow
+                )} 0 0 0.1rem`,
                 background: `rgb(${background.r} ${background.g} ${background.b})`,
                 fontSize: `${fontSize}rem`,
               }}
@@ -161,6 +182,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                 fontSize,
                 range,
                 color,
+                shadow,
                 background,
                 isDecoration,
                 isWonder,
@@ -215,8 +237,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                       borderColor: '#000000',
                       cursor: 'pointer',
                       margin: 0,
-                      textShadow:
-                        'white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px,white 0 0 1px',
+                      textShadow: `${shadow} 0 0 1px, ${shadow} 0 0 1px, ${shadow} 0 0 1px, ${shadow} 0 0 1px, ${shadow} 0 0 1px`,
                     }}
                   >
                     {name}
@@ -279,6 +300,14 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                 id="picker-text"
                 value={color}
                 handleChange={onChangeTextColor}
+              />
+            </div>
+            <div>
+              阴影颜色：
+              <ColorPicker
+                id="picker-shadow"
+                value={shadow}
+                handleChange={onChangeShadowColor}
               />
             </div>
             <div>

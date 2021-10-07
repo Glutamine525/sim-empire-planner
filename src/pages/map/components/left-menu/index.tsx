@@ -1,10 +1,12 @@
 import {
   changeCivil,
+  changeHamButton,
   changeIsImportingData,
   changeIsLoading,
   changeMapType,
   changeNoWood,
   changeOperation,
+  changePanelTab,
 } from '@/actions';
 import MenuIcon from '@/components/menu-icon';
 import DragUpload from '@/pages/map/components/left-menu/components/drag-upload';
@@ -40,12 +42,14 @@ interface LeftMenuProps {
   copiedBuilding: Building;
   counter: Counter;
   specials: SimpleBuilding[];
+  onChangeHamButton: any;
   onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
   onChangeIsLoading: any;
   onChangeMapType: any;
   onChangeCivil: any;
   onChangeNoWood: any;
   onChangeIsImportingData: any;
+  onChangePanelTab: any;
 }
 
 const cells = Cells.getInstance();
@@ -59,12 +63,14 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     copiedBuilding,
     counter,
     specials,
+    onChangeHamButton,
     onChangeOperation,
     onChangeIsLoading,
     onChangeMapType,
     onChangeCivil,
     onChangeNoWood,
     onChangeIsImportingData,
+    onChangePanelTab,
   } = props;
 
   const isHamActiveRef = useRef<boolean>();
@@ -133,9 +139,17 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [civil]);
 
   useEffect(() => {
-    const newCatalog = {
-      特殊建筑: { sub: specials },
-    };
+    let newCatalog: any;
+    if (specials.length) {
+      const newSubs = specials.concat({ name: '打开编辑面板' });
+      newCatalog = {
+        特殊建筑: { sub: newSubs },
+      };
+    } else {
+      newCatalog = {
+        特殊建筑: { sub: [] },
+      };
+    }
     setCatalog((catalog: any) => ({
       ...catalog,
       ...newCatalog,
@@ -155,8 +169,21 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       onChangeOperation(OperationType.Empty, '', {} as any);
       return;
     }
-    const { Catalog, Name, Text, Width, Height, Range, Background, IsRoad } =
-      copiedBuilding;
+    const {
+      Catalog,
+      Name,
+      Text,
+      Width,
+      Height,
+      Range,
+      Background,
+      IsRoad,
+      Color,
+      FontSize,
+      Shadow,
+      IsDecoration,
+      IsWonder,
+    } = copiedBuilding;
     let keyPath = IsRoad ? [Catalog] : [Catalog, Name];
     dispatchBuilding(keyPath, {
       name: Name,
@@ -164,8 +191,13 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       width: Width,
       height: Height,
       range: Range,
+      color: Color,
+      shadow: Shadow,
       background: Background,
+      fontSize: FontSize,
       isRoad: IsRoad,
+      isWonder: IsWonder,
+      isDecoration: IsDecoration,
     });
   }, [copiedBuilding]); // eslint-disable-line
 
@@ -183,8 +215,12 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (isHamActive) return;
       const { key, ctrlKey } = event;
+      if (key === 'Escape') {
+        onChangeHamButton(!isHamActive);
+        return;
+      }
+      if (isHamActive) return;
       if (isMapRotated && KEYS.includes(key)) {
         message.warning('旋转地图后无法进行编辑！');
         return;
@@ -285,7 +321,8 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       IsWonder:
         building.isWonder ||
         keyPath[0] === CatalogType.Wonder ||
-        typeof building.isPalace !== 'undefined',
+        building.isPalace ||
+        false,
       IsDecoration:
         building.isDecoration || keyPath[0] === CatalogType.Decoration,
       IsGeneral: keyPath[0] === CatalogType.General,
@@ -293,6 +330,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       Width: building.size || building.width || 1,
       Height: building.size || building.height || 1,
       Color: building.color || '#000000',
+      Shadow: building.shadow || '#ffffff',
       FontSize: building.fontSize || 1.4,
       Background: building.background || '#ffffff',
       BorderColor: '#000000',
@@ -332,6 +370,10 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
             isRoad: true,
           };
           break;
+        case '特殊建筑':
+          onChangeHamButton(true);
+          onChangePanelTab('tab-1');
+          return;
         case '取消操作':
           onChangeOperation(OperationType.Empty, '', {} as any);
           return;
@@ -375,6 +417,13 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
         default:
           return;
       }
+    } else if (
+      keyPath[0] === '特殊建筑' &&
+      keyPath[keyPath.length - 1] === '打开编辑面板'
+    ) {
+      onChangeHamButton(true);
+      onChangePanelTab('tab-1');
+      return;
     } else {
       building = catalog[keyPath[0] as CatalogType].sub.find(
         (v: { name: string }) => v.name === keyPath[1]
@@ -447,6 +496,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
             BorderColor: '#000000',
             BorderWidth: 0.1,
             Color: '#000000',
+            Shadow: '#ffffff',
             BorderTStyle: 'solid' as BorderStyleType,
             BorderBStyle: 'solid' as BorderStyleType,
             BorderRStyle: 'solid' as BorderStyleType,
@@ -476,6 +526,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
             Width: v.width,
             Height: v.height,
             Color: v.color,
+            Shadow: v.shadow || '#ffffff',
             FontSize: 1.4,
             Background: v.background,
             BorderColor: '#000000',
@@ -535,8 +586,16 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
                   {catalog[v as CatalogType].sub.map(
                     (w: any, index: number) => {
                       return (
-                        <Menu.Item key={`${v}@${w.name}`}>
-                          {`${index + 1}. ${w.name}`}
+                        <Menu.Item
+                          key={`${v}@${w.name}`}
+                          style={{ whiteSpace: 'pre' }}
+                        >
+                          {`${
+                            v === CatalogType.Special &&
+                            w.name === '打开编辑面板'
+                              ? '  '
+                              : index + 1 + '.'
+                          } ${w.name}`}
                         </Menu.Item>
                       );
                     }
@@ -574,6 +633,9 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
+    onChangeHamButton: (isHamActive: boolean) => {
+      dispatch(changeHamButton(isHamActive));
+    },
     onChangeOperation: (
       operation: OperationType,
       operationSub: string,
@@ -595,6 +657,9 @@ const mapDispatchToProps = (dispatch: any) => {
     },
     onChangeIsImportingData: (isImportingData: boolean) => {
       dispatch(changeIsImportingData(isImportingData));
+    },
+    onChangePanelTab: (tab: string) => {
+      dispatch(changePanelTab(tab));
     },
   };
 };

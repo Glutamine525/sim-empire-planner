@@ -63,6 +63,7 @@ export interface SimpleBuilding {
   height?: number;
   range?: number;
   color?: string;
+  shadow?: string;
   background?: string;
   fontSize?: number;
   isRoad?: boolean;
@@ -88,6 +89,7 @@ export interface Building {
   Width: number;
   Height: number;
   Color: string;
+  Shadow: string;
   FontSize: number;
   Background: string;
   BorderColor: string;

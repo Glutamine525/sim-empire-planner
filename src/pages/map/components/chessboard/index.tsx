@@ -1102,6 +1102,7 @@ const Chessboard = (props: ChessboardProps) => {
               Width: FixedBuildingSize[v],
               Height: FixedBuildingSize[v],
               Color: '#000000',
+              Shadow: '#ffffff',
               FontSize: 1.4,
               Background: FixedBuildingColor[v],
               BorderColor: '#000000',
@@ -1393,6 +1394,7 @@ const Chessboard = (props: ChessboardProps) => {
               borderRightStyle: building.BorderRStyle,
               borderBottomStyle: building.BorderBStyle,
               borderLeftStyle: building.BorderLStyle,
+              textShadow: `${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem`,
               transform: `translate(${
                 (moveConfig.column + moveConfig.offsetColumn - 1) * 3
               }rem,${(moveConfig.line + moveConfig.offsetLine - 1) * 3}rem) ${

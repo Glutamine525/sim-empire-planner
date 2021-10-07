@@ -149,3 +149,35 @@ img + .ant-menu-title-content {
 .ant-upload-hint {
   color: var(--text-secondary) !important;
 }
+
+.ant-input-affix-wrapper {
+  border-color: var(--border-base);
+  background: var(--background-lighter);
+}
+
+.ant-input {
+  color: var(--text-primary);
+  background: var(--background-lighter);
+}
+
+.ant-input-number {
+  border-color: var(--border-base);
+  color: var(--text-primary);
+  background: var(--background-lighter);
+}
+
+.ant-input-number-handler-wrap {
+  background: var(--background-lighter);
+}
+
+.ant-input-number-handler {
+  border-color: var(--border-base);
+}
+
+.ant-input-number-handler:active {
+  background: var(--background-base);
+}
+
+.ant-input-number svg {
+  fill: var(--text-primary);
+}

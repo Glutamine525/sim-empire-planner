@@ -28,9 +28,9 @@ function getBuildingElement(building: Building) {
   div.style.display = 'flex';
   div.style.justifyContent = 'center';
   div.style.alignItems = 'center';
+  div.style.textAlign = 'center';
   div.style.fontWeight = 'bold';
-  div.style.textShadow =
-    'white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px';
+  div.style.textShadow = `${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px`;
   div.style.transform = `scale(${RATIO}00%)`;
   div.style.transformOrigin = 'top left';
   if (building.IsRoad) {
