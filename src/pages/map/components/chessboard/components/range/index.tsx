@@ -74,7 +74,7 @@ export default function Range(props: RangeProps) {
                   key={`${i}-${j}`}
                   className={styles.cell}
                   style={{
-                    background: cell ? color + '6f' : 'transparent',
+                    background: cell ? color + 'bf' : 'transparent',
                     borderColor: color,
                     borderTopStyle: cell.t ? 'solid' : 'none',
                     borderRightStyle: cell.r ? 'solid' : 'none',

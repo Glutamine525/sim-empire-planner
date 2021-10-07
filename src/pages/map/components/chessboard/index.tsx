@@ -704,7 +704,7 @@ const Chessboard = (props: ChessboardProps) => {
             });
             setShowBuilding(true);
             setCellOccupied(false);
-            setHoveredBuilding(targetBuilding);
+            if (!isDragging) setHoveredBuilding(targetBuilding); // 防止画面卡顿
             setBuildingMarker(building.Marker);
             if (showMarker(targetBuilding)) {
               const { Width, Height } = targetBuilding;
@@ -730,6 +730,7 @@ const Chessboard = (props: ChessboardProps) => {
           setBoxBuffer(new Set<string>());
         }
         if (!isDragging) return;
+        setHoveredBuilding({} as Building); // 防止画面卡顿
         const { initX, initY } = dragConfig;
         setScrollLeft(initX - clientX);
         setScrollTop(initY - clientY);
@@ -1439,30 +1440,6 @@ const Chessboard = (props: ChessboardProps) => {
             onClickMove={onClickBoxMove}
             onClickDelete={onClickBoxDelete}
           />
-          {/* <div className={styles['box-effect']}>
-            {Array.from(boxBuffer).map(v => {
-              const [line, column, width, height] = parseBuildingKey(v);
-              const boxShadowColor =
-                operation === OperationType.Select
-                  ? 'var(--ant-primary-color-hover)'
-                  : operation === OperationType.Delete
-                  ? 'var(--ant-error-color-hover)'
-                  : 'var(--ant-success-color-hover)';
-              return (
-                <div
-                  key={`box-effect-${v}`}
-                  style={{
-                    position: 'absolute',
-                    top: `${(line - 1) * 3}rem`,
-                    left: `${(column - 1) * 3}rem`,
-                    width: `${width * 3}rem`,
-                    height: `${height * 3}rem`,
-                    boxShadow: `inset 0 0 1rem 0.5rem ${boxShadowColor}`,
-                  }}
-                ></div>
-              );
-            })}
-          </div> */}
           <BoxEffect operation={operation} boxBuffer={boxBuffer} />
         </div>
         <Copyright mapType={mapType} civil={civil} isNoWood={isNoWood} />
