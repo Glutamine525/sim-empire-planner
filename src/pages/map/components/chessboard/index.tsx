@@ -681,6 +681,7 @@ const Chessboard = (props: ChessboardProps) => {
         if (!occupied) return;
         const [li, co] = parseBuildingKey(occupied);
         const targetBuilding = cells.getBuilding(li, co);
+        setHoveredBuilding({} as Building);
         if (targetBuilding.IsBarrier || targetBuilding.IsRoad) return;
         setMoveConfig({
           line: li,
@@ -694,47 +695,8 @@ const Chessboard = (props: ChessboardProps) => {
     if (isMapRotated) return;
     switch (operation) {
       case OperationType.Empty:
-        const occupied = cells.getOccupied(line, column);
-        if (occupied) {
-          const [li, co] = parseBuildingKey(occupied);
-          const targetBuilding = cells.getBuilding(li, co);
-          if (!targetBuilding.IsBarrier && !targetBuilding.IsRoad) {
-            setMoveConfig({
-              line: li,
-              offsetLine: 0,
-              column: co,
-              offsetColumn: 0,
-            });
-            setShowBuilding(true);
-            setCellOccupied(false);
-            if (!isDragging) setHoveredBuilding(targetBuilding); // 防止画面卡顿
-            // setHoveredBuilding(targetBuilding);
-            setBuildingMarker(building.Marker);
-            if (showMarker(targetBuilding)) {
-              const { Width, Height } = targetBuilding;
-              let record = new Set<string>();
-              for (let i = li; i < li + Height; i++) {
-                for (let j = co; j < co + Width; j++) {
-                  const tmp = cells.getProtection(i, j);
-                  Object.values(tmp).forEach(arr =>
-                    arr.forEach(v => record.add(v))
-                  );
-                }
-              }
-              setBoxBuffer(record);
-            } else setBoxBuffer(new Set<string>());
-          } else {
-            setShowBuilding(false);
-            setHoveredBuilding({} as Building);
-            setBoxBuffer(new Set<string>());
-          }
-        } else {
-          setShowBuilding(false);
-          setHoveredBuilding({} as Building);
-          setBoxBuffer(new Set<string>());
-        }
+        updateHoveredBuilding(line, column, isDragging);
         if (!isDragging) return;
-        setHoveredBuilding({} as Building); // 防止画面卡顿
         const { initX, initY } = dragConfig;
         setScrollLeft(initX - clientX);
         setScrollTop(initY - clientY);
@@ -820,10 +782,22 @@ const Chessboard = (props: ChessboardProps) => {
     }
   };
 
-  const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = () => {
+  const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = event => {
     setIsDragging(false);
+    const { pageX, pageY } = event;
+    const [offsetX, offsetY] = [
+      pageX + getScrollLeft() - 86,
+      pageY + getScrollTop() - 80,
+    ];
+    const { line, column } = getCoord(offsetX, offsetY);
+    if (isCtrlDown && operation === OperationType.Empty && !isMapRotated) {
+      updateHoveredBuilding(line, column, false);
+    }
     if (isCtrlDown) return;
     switch (operation) {
+      case OperationType.Empty:
+        updateHoveredBuilding(line, column, false);
+        break;
       case OperationType.Placing:
         if (buildingConfig.IsRoad) {
           const { initX, initY, curX, curY } = boxConfig;
@@ -1168,6 +1142,52 @@ const Chessboard = (props: ChessboardProps) => {
         MINI_MAP_RATIO,
         MINI_MAP_RATIO
       );
+    }
+  };
+
+  const updateHoveredBuilding = (
+    line: number,
+    column: number,
+    isDragging: boolean
+  ) => {
+    const occupied = cells.getOccupied(line, column);
+    if (occupied) {
+      const [li, co] = parseBuildingKey(occupied);
+      const targetBuilding = cells.getBuilding(li, co);
+      if (!targetBuilding.IsBarrier && !targetBuilding.IsRoad) {
+        setMoveConfig({
+          line: li,
+          offsetLine: 0,
+          column: co,
+          offsetColumn: 0,
+        });
+        setShowBuilding(true);
+        setCellOccupied(false);
+        if (!isDragging) setHoveredBuilding(targetBuilding);
+        else setHoveredBuilding({} as Building);
+        setBuildingMarker(building.Marker);
+        if (showMarker(targetBuilding)) {
+          const { Width, Height } = targetBuilding;
+          let record = new Set<string>();
+          for (let i = li; i < li + Height; i++) {
+            for (let j = co; j < co + Width; j++) {
+              const tmp = cells.getProtection(i, j);
+              Object.values(tmp).forEach(arr =>
+                arr.forEach(v => record.add(v))
+              );
+            }
+          }
+          setBoxBuffer(record);
+        } else setBoxBuffer(new Set<string>());
+      } else {
+        setShowBuilding(false);
+        setHoveredBuilding({} as Building);
+        setBoxBuffer(new Set<string>());
+      }
+    } else {
+      setShowBuilding(false);
+      setHoveredBuilding({} as Building);
+      setBoxBuffer(new Set<string>());
     }
   };
 
