@@ -673,6 +673,19 @@ const Chessboard = (props: ChessboardProps) => {
       setScrollLeft(initX - clientX);
       setScrollTop(initY - clientY);
       updateMiniMapConfig();
+      if (operation === OperationType.Empty) {
+        const occupied = cells.getOccupied(line, column);
+        if (!occupied) return;
+        const [li, co] = parseBuildingKey(occupied);
+        const targetBuilding = cells.getBuilding(li, co);
+        if (targetBuilding.IsBarrier || targetBuilding.IsRoad) return;
+        setMoveConfig({
+          line: li,
+          offsetLine: 0,
+          column: co,
+          offsetColumn: 0,
+        });
+      }
       return;
     }
     if (isMapRotated) return;
