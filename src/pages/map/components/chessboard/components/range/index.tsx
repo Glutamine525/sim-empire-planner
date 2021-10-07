@@ -1,6 +1,6 @@
 import { OperationType } from '@/types/operation';
 import { isInBuildingRange } from '@/utils/chessboard';
-import React, { useEffect, useState } from 'react';
+import React, { useMemo } from 'react';
 import styles from './index.less';
 
 interface RangeProps {
@@ -17,9 +17,7 @@ interface RangeProps {
 export default function Range(props: RangeProps) {
   const { show, size, line, column, width, height, color, operation } = props;
 
-  const [cells, setCells] = useState([] as any);
-
-  useEffect(() => {
+  const cells = useMemo(() => {
     const realSize = size && size < 4 ? 4 : size;
     let result = [] as any;
     for (let i = 0; i < realSize * 2 + height; i++) {
@@ -48,7 +46,7 @@ export default function Range(props: RangeProps) {
         } else result[i][j] = false;
       }
     }
-    setCells(result);
+    return result;
   }, [size, width, height]);
 
   return (
@@ -71,7 +69,7 @@ export default function Range(props: RangeProps) {
             {row.map((cell: any, j: number) => {
               return (
                 <div
-                  key={`${i}-${j}`}
+                  key={`range-${i}-${j}`}
                   className={styles.cell}
                   style={{
                     background: cell ? color + 'bf' : 'transparent',

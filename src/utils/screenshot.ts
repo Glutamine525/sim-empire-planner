@@ -30,7 +30,7 @@ function getBuildingElement(building: Building) {
   div.style.alignItems = 'center';
   div.style.textAlign = 'center';
   div.style.fontWeight = 'bold';
-  div.style.textShadow = `${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px, ${building.Shadow} 0 0 1px`;
+  div.style.textShadow = Array(10).fill(`${building.Shadow} 0 0 1px`).join(',');
   div.style.transform = `scale(${RATIO}00%)`;
   div.style.transformOrigin = 'top left';
   if (building.IsRoad) {
@@ -52,8 +52,7 @@ function getMarkerElement(marker: number, color: MarkerColor) {
   div.style.top = '0px';
   div.style.left = '6px';
   div.style.fontWeight = 'bold';
-  div.style.textShadow =
-    'white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px, white 0 0 1px';
+  div.style.textShadow = Array(10).fill('white 0 0 1px').join(',');
   div.style.transform = `scale(${0.8 * RATIO})`;
   div.style.transformOrigin = 'top left';
   return div;

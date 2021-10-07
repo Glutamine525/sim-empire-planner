@@ -572,7 +572,7 @@ const Chessboard = (props: ChessboardProps) => {
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
     const { target, clientX, clientY } = event;
     setIsDragging(true);
-    if (isCtrlDown || isMapRotated) {
+    if (isCtrlDown || (isMapRotated && operation !== OperationType.Watermark)) {
       setDragConfig({
         initX: getScrollLeft() + clientX,
         initY: getScrollTop() + clientY,
@@ -668,7 +668,10 @@ const Chessboard = (props: ChessboardProps) => {
       column,
       offsetColumn: 0,
     });
-    if (isDragging && (isCtrlDown || isMapRotated)) {
+    if (
+      isDragging &&
+      (isCtrlDown || (isMapRotated && operation !== OperationType.Watermark))
+    ) {
       const { initX, initY } = dragConfig;
       setScrollLeft(initX - clientX);
       setScrollTop(initY - clientY);
@@ -705,6 +708,7 @@ const Chessboard = (props: ChessboardProps) => {
             setShowBuilding(true);
             setCellOccupied(false);
             if (!isDragging) setHoveredBuilding(targetBuilding); // 防止画面卡顿
+            // setHoveredBuilding(targetBuilding);
             setBuildingMarker(building.Marker);
             if (showMarker(targetBuilding)) {
               const { Width, Height } = targetBuilding;
@@ -1394,7 +1398,9 @@ const Chessboard = (props: ChessboardProps) => {
               borderRightStyle: building.BorderRStyle,
               borderBottomStyle: building.BorderBStyle,
               borderLeftStyle: building.BorderLStyle,
-              textShadow: `${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem, ${building.Shadow} 0 0 0.1rem`,
+              textShadow: Array(10)
+                .fill(`${building.Shadow} 0 0 0.1rem`)
+                .join(','),
               transform: `translate(${
                 (moveConfig.column + moveConfig.offsetColumn - 1) * 3
               }rem,${(moveConfig.line + moveConfig.offsetLine - 1) * 3}rem) ${

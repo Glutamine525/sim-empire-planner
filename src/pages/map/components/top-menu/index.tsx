@@ -209,7 +209,9 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
           'backdrop-filter' in document.documentElement.style
             ? {
                 backdropFilter: 'blur(1.5rem)',
-                textShadow: `var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem, var(--border-base) 0 0 0.1rem`,
+                textShadow: Array(10)
+                  .fill('var(--border-base) 0 0 0.1rem')
+                  .join(','),
               }
             : { background: 'var(--border-lighter)' }
         }

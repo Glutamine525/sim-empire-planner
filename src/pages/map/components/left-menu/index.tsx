@@ -39,6 +39,7 @@ interface LeftMenuProps {
   mapType: number;
   civil: CivilType;
   isMapRotated: boolean;
+  operation: OperationType;
   copiedBuilding: Building;
   counter: Counter;
   specials: SimpleBuilding[];
@@ -60,6 +61,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     mapType,
     civil,
     isMapRotated,
+    operation,
     copiedBuilding,
     counter,
     specials,
@@ -161,7 +163,8 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [mapType, civil]); // eslint-disable-line
 
   useEffect(() => {
-    if (isMapRotated) onChangeOperation(OperationType.Empty, '', {} as any);
+    if (operation === OperationType.Watermark || !isMapRotated) return;
+    onChangeOperation(OperationType.Empty, '', {} as any);
   }, [isMapRotated]); // eslint-disable-line
 
   useEffect(() => {
@@ -625,6 +628,7 @@ const mapStateToProps = (state: any) => {
     mapType: state.TopMenu.mapType,
     civil: state.TopMenu.civil,
     isMapRotated: state.TopMenu.isMapRotated,
+    operation: state.LeftMenu.operation,
     copiedBuilding: state.Chessboard.copiedBuilding,
     counter: state.Chessboard.counter,
     specials: state.Panel.specials,

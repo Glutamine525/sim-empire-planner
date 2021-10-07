@@ -114,17 +114,9 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                 width: `${width * 30}px`,
                 height: `${height * 30}px`,
                 color: `rgb(${color.r} ${color.g} ${color.b})`,
-                textShadow: `${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
-                  shadow
-                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
-                  shadow
-                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
-                  shadow
-                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
-                  shadow
-                )} 0 0 0.1rem, ${rgbToHex(shadow)} 0 0 0.1rem, ${rgbToHex(
-                  shadow
-                )} 0 0 0.1rem`,
+                textShadow: Array(10)
+                  .fill(`${rgbToHex(shadow)} 0 0 0.1rem`)
+                  .join(','),
                 background: `rgb(${background.r} ${background.g} ${background.b})`,
                 fontSize: `${fontSize}rem`,
               }}
@@ -237,7 +229,9 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
                       borderColor: '#000000',
                       cursor: 'pointer',
                       margin: 0,
-                      textShadow: `${shadow} 0 0 1px, ${shadow} 0 0 1px, ${shadow} 0 0 1px, ${shadow} 0 0 1px, ${shadow} 0 0 1px`,
+                      textShadow: Array(10)
+                        .fill(`${shadow} 0 0 0.1rem`)
+                        .join(','),
                     }}
                   >
                     {name}
