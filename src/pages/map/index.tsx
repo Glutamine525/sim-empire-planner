@@ -18,13 +18,6 @@ const Map: FC<MapProps> = (props: MapProps) => {
   const { isLoading, isHamActive, onChangeHamButton } = props;
 
   const onClickHamButton = () => {
-    let chessboard = document.getElementById('chessboard-wrapper-outer');
-    if (isHamActive) chessboard!.style.display = 'block';
-    else {
-      setTimeout(() => {
-        chessboard!.style.display = 'none';
-      }, 300);
-    }
     onChangeHamButton(!isHamActive);
   };
 
