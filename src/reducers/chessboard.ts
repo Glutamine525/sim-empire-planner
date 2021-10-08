@@ -18,13 +18,14 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
           Fixed: 0,
           Total: 0,
           Road: 0,
+          OccupiedCells: 0,
         },
       };
     case ActionType.PlaceOrDeleteBuilding:
       let { counter } = state;
       const { buildings, diff } = action;
       buildings.forEach(building => {
-        if (building.IsRoad) counter.Road++;
+        if (building.IsRoad) counter.Road += diff;
         if (!building.IsBarrier && !building.IsRoad) counter.Total += diff;
         if (!building.IsBarrier && !building.IsRoad && building.IsFixed)
           counter.Fixed += 1;
@@ -40,6 +41,8 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
           counter.Agriculture += diff;
         if (building.Catalog === CatalogType.Industry) counter.Industry += diff;
         if (building.Catalog === CatalogType.General) counter.General += diff;
+        if (!building.IsBarrier)
+          counter.OccupiedCells += diff * building.Width * building.Height;
       });
       return { ...state, counter: { ...counter } };
     case ActionType.SetCopiedBuilding:

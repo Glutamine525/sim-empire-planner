@@ -16,8 +16,9 @@ import {
 } from '@/actions';
 import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu, Modal, Tooltip } from 'antd';
-import { EMAIL, MINOR_PATCH, VERSION } from '@/utils/config';
+import { EMAIL, LENGTH, MINOR_PATCH, VERSION } from '@/utils/config';
 import { copyLink } from '@/utils/browser';
+import { BuildingFixed } from '@/types/building-fixed';
 
 interface TopMenuProps {
   mapType: number;
@@ -58,23 +59,18 @@ const helper = () => {
       <div style={{ textAlign: 'center' }}>
         <strong>其它操作</strong>
       </div>
-      <div>- 右键点击住宅建筑可以查询需求结果</div>
+      <div>- 左键双击住宅建筑可以查询需求结果</div>
       <div>- 查询需求结果里的建筑可以选中</div>
-      <div>- 双击建筑可以删除建筑</div>
-      <div>- 按住Ctrl键可以在选中操作时拖动地图</div>
+      <div>- 右键双击建筑可以删除建筑</div>
       <div>- 使用相同大小的建筑可以覆盖通用建筑</div>
-      <div>- 鼠标悬停在建筑上，按Ctrl+C可以复制建筑</div>
-      <div>- 如果无法放置建筑，尝试按一次Ctrl</div>
+      <div>- 按住Ctrl键可以在任何时候拖动地图</div>
+      <div>- 鼠标悬停在建筑上，Ctrl+C可以复制建筑</div>
       <div className={styles['helper-splitter']}></div>
       <div style={{ textAlign: 'center' }}>
         <strong>注意事项</strong>
       </div>
-      <div>- 特殊建筑的数据会被导入导出</div>
-      <div>- 编辑者自定义的水印会被导入导出</div>
-      <div>- 自动保存不会保存特殊建筑和编辑者水印</div>
-      <div>- 在「水印模式」里截图才会添加编辑者水印</div>
-      <div>- 版权水印总是会生成</div>
-      <div>- 旋转地图开启后，无法编辑，只能截图</div>
+      <div>- 在「水印模式」下截图才会添加编辑者水印</div>
+      <div>- 旋转地图开启后，只能添加水印或截图</div>
       <div className={styles['helper-splitter']}></div>
       <div style={{ textAlign: 'center' }}>
         模拟帝国地图编辑器 <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
@@ -324,6 +320,29 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
               <span> 总计：</span>
               <strong>{counter.Total}</strong>
               <span>个 </span>
+            </div>
+          </div>
+          <div>
+            <div>
+              <span> 道路：</span>
+              <strong>{counter.Road}</strong>
+              <span>个 </span>
+            </div>
+            <div>
+              <span> 覆盖率：</span>
+              <strong>
+                {
+                  'TODO'
+                  // Math.round(
+                  //   (counter.OccupiedCells * 100) /
+                  //     (2 * (LENGTH / 2 + 1) ** 2 -
+                  //       BuildingFixed.water[mapType - 3].length -
+                  //       BuildingFixed.mountain[mapType - 3].length -
+                  //       (isNoWood ? 0 : BuildingFixed.tree[mapType - 3].length))
+                  // )
+                }
+              </strong>
+              <span>% </span>
             </div>
           </div>
         </div>

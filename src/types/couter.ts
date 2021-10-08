@@ -9,4 +9,5 @@ export interface Counter {
   Fixed: number;
   Total: number;
   Road: number;
+  OccupiedCells: number;
 }

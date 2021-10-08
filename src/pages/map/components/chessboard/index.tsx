@@ -365,6 +365,7 @@ const Chessboard = (props: ChessboardProps) => {
         ctx.drawImage((await getFullSizeImage(buildings, 'marker'))!, 0, 0);
         onChangeIsLoading(false);
         onChangeIsImportingData(false);
+        onPlaceOrDeleteBuilding([{ IsRoad: true, Width: 1, Height: 1 }], -1); // 删除每个地图唯一一个固定道路的计数
         message.success('已成功导入地图数据！');
       }
     });
@@ -453,6 +454,15 @@ const Chessboard = (props: ChessboardProps) => {
               MINI_MAP_RATIO
             );
           }
+          onPlaceOrDeleteBuilding(
+            Array(keys.length).fill({
+              IsBarrier: true,
+              IsFixed: true,
+              Width: 1,
+              Height: 1,
+            }),
+            1
+          );
           const canvas: any = buildingCanvasRef.current;
           const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
           ctx.drawImage((await getFullSizeImage(barriers, 'barrier'))!, 0, 0);
@@ -570,6 +580,11 @@ const Chessboard = (props: ChessboardProps) => {
   }, [isMapRotated]);
 
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
+    const { button, detail } = event.nativeEvent;
+    if (button === 2 && detail > 1) {
+      onWrapperDoubleRightClick(event);
+      return;
+    }
     const { target, clientX, clientY } = event;
     setIsDragging(true);
     if (isCtrlDown || (isMapRotated && operation !== OperationType.Watermark)) {
@@ -879,22 +894,23 @@ const Chessboard = (props: ChessboardProps) => {
     setHoveredBuilding({} as Building);
   };
 
-  const onWrapperDoubleClick: MouseEventHandler<HTMLDivElement> = event => {
-    if (operation === OperationType.Placing && cellOccupied) return;
-    if (operation === OperationType.Select) return;
-    const { pageX, pageY } = event;
-    const [offsetX, offsetY] = [
-      pageX + getScrollLeft() - 86,
-      pageY + getScrollTop() - 80,
-    ];
-    const { line, column } = getCoord(offsetX, offsetY);
-    (async () => {
-      const deleteResult = await deleteBuilding(line, column, {});
-      if (!deleteResult) return;
-      setShowBuilding(false);
-      setHoveredBuilding({} as Building);
-    })();
-  };
+  const onWrapperDoubleRightClick: MouseEventHandler<HTMLDivElement> =
+    event => {
+      if (operation === OperationType.Placing && cellOccupied) return;
+      if (operation === OperationType.Select) return;
+      const { pageX, pageY } = event;
+      const [offsetX, offsetY] = [
+        pageX + getScrollLeft() - 86,
+        pageY + getScrollTop() - 80,
+      ];
+      const { line, column } = getCoord(offsetX, offsetY);
+      (async () => {
+        const deleteResult = await deleteBuilding(line, column, {});
+        if (!deleteResult) return;
+        setShowBuilding(false);
+        setHoveredBuilding({} as Building);
+      })();
+    };
 
   const placeMarker = async (
     value: number,
@@ -927,10 +943,10 @@ const Chessboard = (props: ChessboardProps) => {
     }
   ) => {
     const { updateRoad, disableDispatch } = options;
-    if (!disableDispatch) onPlaceOrDeleteBuilding([building], 1);
     const { records } = cells.place(building, line, column);
     if (building.IsProtection) updateRecordMarker(records);
     else if (building.IsRoad && updateRoad) updateRoadDisplay(records);
+    if (!disableDispatch) onPlaceOrDeleteBuilding([building], 1);
     if (building.IsRoad && updateRoad) return; // 禁止道路图片重绘
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -991,11 +1007,11 @@ const Chessboard = (props: ChessboardProps) => {
     const [originLine, originColumn, width, height] =
       parseBuildingKey(occupied);
     const target = cells.getBuilding(originLine, originColumn);
+    if (!disableDispatch) onPlaceOrDeleteBuilding([target], -1);
     if (target.IsFixed && !force) return false;
     const records = cells.delete(line, column, force);
     if (target.IsProtection) await updateRecordMarker(records);
     else if (target.IsRoad && !updateRoad) await updateRoadDisplay(records);
-    if (!disableDispatch) onPlaceOrDeleteBuilding([target], -1);
     deleteMarker(originLine, originColumn);
     let canvas: any = buildingCanvasRef.current;
     let ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -1374,7 +1390,6 @@ const Chessboard = (props: ChessboardProps) => {
         onMouseMoveCapture={onWrapperMouseMove}
         onMouseUpCapture={onWrapperMouseUp}
         onMouseLeave={onWrapperMouseLeave}
-        onDoubleClickCapture={onWrapperDoubleClick}
       >
         <div
           className={styles.container}

@@ -39,6 +39,7 @@ const App: FC<AppProps> = (props: AppProps) => {
       duration: 2,
       maxCount: 3,
     });
+    document.addEventListener('contextmenu', event => event.preventDefault());
   }, []); // eslint-disable-line
 
   useEffect(() => {

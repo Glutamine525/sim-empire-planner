@@ -77,6 +77,7 @@ export const InitChessboardState: ChessboardAction = {
     Fixed: 0,
     Total: 0,
     Road: 0,
+    OccupiedCells: 0,
   },
 };
 

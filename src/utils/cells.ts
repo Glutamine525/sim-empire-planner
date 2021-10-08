@@ -203,6 +203,8 @@ export class Cells {
     this.data[line][column].building = {
       IsFixed: true,
       IsBarrier: true,
+      Width: 1,
+      Height: 1,
     } as BuildingInCell;
   }
 
