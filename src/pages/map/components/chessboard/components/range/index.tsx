@@ -14,7 +14,7 @@ interface RangeProps {
   operation: OperationType;
 }
 
-export default function Range(props: RangeProps) {
+function Range(props: RangeProps) {
   const { show, size, line, column, width, height, color, operation } = props;
 
   const [realSize, setRealSize] = useState(0);
@@ -93,3 +93,5 @@ export default function Range(props: RangeProps) {
     </div>
   );
 }
+
+export default React.memo(Range);

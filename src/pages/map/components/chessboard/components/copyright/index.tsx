@@ -10,7 +10,7 @@ interface CopyrightProps {
   isNoWood: boolean;
 }
 
-export default function Copyright(props: CopyrightProps) {
+function Copyright(props: CopyrightProps) {
   const { civil, mapType, isNoWood } = props;
 
   return (
@@ -52,3 +52,5 @@ export default function Copyright(props: CopyrightProps) {
     </div>
   );
 }
+
+export default React.memo(Copyright);

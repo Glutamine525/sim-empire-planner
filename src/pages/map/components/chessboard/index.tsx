@@ -1008,10 +1008,10 @@ const Chessboard = (props: ChessboardProps) => {
     canvas = miniMapCanvasRef.current;
     ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
     ctx.clearRect(
-      (column - 1) * MINI_MAP_RATIO,
-      (line - 1) * MINI_MAP_RATIO,
-      MINI_MAP_RATIO * target.Width,
-      MINI_MAP_RATIO * target.Height
+      (originColumn - 1) * MINI_MAP_RATIO,
+      (originLine - 1) * MINI_MAP_RATIO,
+      MINI_MAP_RATIO * (target.Width || 1),
+      MINI_MAP_RATIO * (target.Height || 1)
     );
     return true;
   };
@@ -1163,8 +1163,7 @@ const Chessboard = (props: ChessboardProps) => {
         });
         setShowBuilding(true);
         setCellOccupied(false);
-        if (!isDragging) setHoveredBuilding(targetBuilding);
-        else setHoveredBuilding({} as Building);
+        setHoveredBuilding(targetBuilding);
         setBuildingMarker(building.Marker);
         if (showMarker(targetBuilding)) {
           const { Width, Height } = targetBuilding;

@@ -151,7 +151,7 @@ export async function getFullSizeImage(
     const { civil } = store.getState().TopMenu;
     const protectionNum = CivilBuilding[civil]['防护'].length;
     Object.values(data).map((v: any) => {
-      if (!showMarker(v) || v.IsFixed) return null;
+      if ((!showMarker(v) || v.IsFixed) && !v.IsRoad) return null;
       if (v.IsRoad && !v.isRoadVertex) return null;
       let color: MarkerColor =
         v.Marker >= protectionNum ? MarkerColor.Safe : MarkerColor.Danger;
