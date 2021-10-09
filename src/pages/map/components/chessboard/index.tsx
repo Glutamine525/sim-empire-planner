@@ -63,6 +63,7 @@ import MiniMap, { MINI_MAP_RATIO, MINI_MAP_SIZE } from './components/mini-map';
 import { usePrevState } from '@/utils/hook';
 import Copyright from './components/copyright';
 import BoxEffect from './components/box-effect';
+import Footer from './components/footer';
 
 interface ChessboardProps {
   mapType: number;
@@ -158,6 +159,7 @@ const Chessboard = (props: ChessboardProps) => {
   const [boxBuffer, setBoxBuffer] = useState(new Set<string>());
   const [miniMapConfig, setMiniMapConfig] = useState({ ...initMiniMapConfig });
   const [isDraggingMiniMapFocus, setIsDraggingMiniMapFocus] = useState(false);
+  const [showFooter, setShowFooter] = useState(false);
 
   const prevBuildingConfig: any = usePrevState(buildingConfig);
 
@@ -261,7 +263,13 @@ const Chessboard = (props: ChessboardProps) => {
     });
     const wrapperOuter = document.getElementById('chessboard-wrapper-outer');
     wrapperOuter!.addEventListener('ps-scroll-x', () => updateMiniMapConfig());
-    wrapperOuter!.addEventListener('ps-scroll-y', () => updateMiniMapConfig());
+    wrapperOuter!.addEventListener('ps-scroll-y', () => {
+      updateMiniMapConfig();
+      const [, height] = getWrapperSize();
+      const [, scrollHeight] = getScreenSize();
+      const top = getScrollTop();
+      setShowFooter((top + scrollHeight) / height > 0.99);
+    });
     document.addEventListener('mousedown', () => setIsMouseDown(true));
     document.addEventListener('mouseup', () => setIsMouseDown(false));
     document.addEventListener('mouseleave', () => {
@@ -365,7 +373,22 @@ const Chessboard = (props: ChessboardProps) => {
         ctx.drawImage((await getFullSizeImage(buildings, 'marker'))!, 0, 0);
         onChangeIsLoading(false);
         onChangeIsImportingData(false);
-        onPlaceOrDeleteBuilding([{ IsRoad: true, Width: 1, Height: 1 }], -1); // 删除每个地图唯一一个固定道路的计数
+        let fixedBuilding: any = [];
+        Object.keys(FixedBuildingType)
+          .map(v => v.toLowerCase() as FixedBuildingType)
+          .map((v: FixedBuildingType) => {
+            const keys = BuildingFixed[v][cells.mapType - 3];
+            keys.forEach(() => {
+              fixedBuilding.push({
+                IsRoad: v === FixedBuildingType.Road,
+                Width: FixedBuildingSize[v],
+                Height: FixedBuildingSize[v],
+                IsFixed: true,
+              });
+            });
+            return null;
+          });
+        onPlaceOrDeleteBuilding(fixedBuilding, -1); // 删除每个地图唯一一个固定道路的计数
         message.success('已成功导入地图数据！');
       }
     });
@@ -607,8 +630,13 @@ const Chessboard = (props: ChessboardProps) => {
         break;
       case OperationType.Placing:
         const { line, offsetLine, column, offsetColumn } = moveConfig;
+        if (!isInRange(line, column)) return;
         // 点击空格取消操作时，当按下鼠标该位置已经被占据时，防止首个道路被删除
-        if ((!showBuilding || cellOccupied) && building.IsRoad) {
+        if (
+          (!showBuilding || cellOccupied) &&
+          building.IsRoad &&
+          isInRange(line, column)
+        ) {
           firstRoadInBuffer = `${line}-${column}`;
         } else {
           firstRoadInBuffer = '';
@@ -697,6 +725,7 @@ const Chessboard = (props: ChessboardProps) => {
         const [li, co] = parseBuildingKey(occupied);
         const targetBuilding = cells.getBuilding(li, co);
         setHoveredBuilding({} as Building);
+        // setBoxBuffer(new Set<string>());
         if (targetBuilding.IsBarrier || targetBuilding.IsRoad) return;
         setMoveConfig({
           line: li,
@@ -799,6 +828,7 @@ const Chessboard = (props: ChessboardProps) => {
 
   const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = event => {
     setIsDragging(false);
+    if (isMapRotated) return;
     const { pageX, pageY } = event;
     const [offsetX, offsetY] = [
       pageX + getScrollLeft() - 86,
@@ -829,6 +859,7 @@ const Chessboard = (props: ChessboardProps) => {
           });
           if (initLi === curLi) {
             for (let i = initCo; i <= curCo; i++) {
+              if (!isInRange(initLi + 1, i + 1)) continue;
               const occupied = cells.getOccupied(initLi + 1, i + 1);
               if (occupied) continue;
               placeBuilding(buildingConfig, initLi + 1, i + 1, {
@@ -837,6 +868,7 @@ const Chessboard = (props: ChessboardProps) => {
             }
           } else if (initCo === curCo) {
             for (let i = initLi; i <= curLi; i++) {
+              if (!isInRange(i + 1, initCo + 1)) continue;
               const occupied = cells.getOccupied(i + 1, initCo + 1);
               if (occupied) continue;
               placeBuilding(buildingConfig, i + 1, initCo + 1, {
@@ -846,6 +878,7 @@ const Chessboard = (props: ChessboardProps) => {
           } else {
             roadBuffer.forEach(key => {
               const [line, column] = parseBuildingKey(key);
+              if (!isInRange(line, column)) return;
               placeBuilding(buildingConfig, line, column, { updateRoad: true });
             });
           }
@@ -1007,8 +1040,8 @@ const Chessboard = (props: ChessboardProps) => {
     const [originLine, originColumn, width, height] =
       parseBuildingKey(occupied);
     const target = cells.getBuilding(originLine, originColumn);
-    if (!disableDispatch) onPlaceOrDeleteBuilding([target], -1);
     if (target.IsFixed && !force) return false;
+    if (!disableDispatch) onPlaceOrDeleteBuilding([target], -1);
     const records = cells.delete(line, column, force);
     if (target.IsProtection) await updateRecordMarker(records);
     else if (target.IsRoad && !updateRoad) await updateRoadDisplay(records);
@@ -1363,7 +1396,10 @@ const Chessboard = (props: ChessboardProps) => {
 
   const getScrollLeft = () => (wrapperOuterRef.current as any).scrollLeft;
 
-  const getScrollTop = () => (wrapperOuterRef.current as any).scrollTop;
+  const getScrollTop = () => {
+    if (!wrapperOuterRef.current) return 1;
+    return (wrapperOuterRef.current as any).scrollTop;
+  };
 
   const setScrollLeft = (val: number) =>
     ((wrapperOuterRef.current as any).scrollLeft = val);
@@ -1372,6 +1408,7 @@ const Chessboard = (props: ChessboardProps) => {
     ((wrapperOuterRef.current as any).scrollTop = val);
 
   const getWrapperSize = () => {
+    if (!wrapperInnerRef.current) return [1, 1];
     const { clientWidth, clientHeight } = wrapperInnerRef.current as any;
     return [clientWidth, clientHeight];
   };
@@ -1496,6 +1533,7 @@ const Chessboard = (props: ChessboardProps) => {
         onMouseMove={onMiniMapMouseMove}
         onMouseUp={onMiniMapMouseUp}
       />
+      <Footer show={showFooter} />
     </div>
   );
 };

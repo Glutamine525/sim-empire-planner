@@ -39,21 +39,26 @@ export function getRoadImageBuffer(): {
   return styles;
 }
 
-export function isInRange(li: number, co: number) {
+export function isInRange(line: number, column: number) {
   const halfLength = LENGTH / 2;
-  if (li + co <= halfLength + 2) return false;
-  if (li + co >= halfLength * 3) return false;
-  if (li <= co - halfLength) return false;
-  if (li >= co + halfLength) return false;
+  if (line + column <= halfLength + 2) return false;
+  if (line + column >= halfLength * 3) return false;
+  if (line <= column - halfLength) return false;
+  if (line >= column + halfLength) return false;
   return true;
 }
 
-export function isAllInRange(li: number, co: number, w: number, h: number) {
+export function isAllInRange(
+  line: number,
+  column: number,
+  width: number,
+  height: number
+) {
   return (
-    isInRange(li, co) &&
-    isInRange(li + h, co) &&
-    isInRange(li, co + w) &&
-    isInRange(li + h, co + w)
+    isInRange(line, column) &&
+    isInRange(line + height, column) &&
+    isInRange(line, column + width) &&
+    isInRange(line + height, column + width)
   );
 }
 

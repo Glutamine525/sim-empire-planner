@@ -71,7 +71,7 @@ export class Cells {
     let records: string[] = [];
     for (let i = line; i < line + height; i++) {
       for (let j = column; j < column + width; j++) {
-        if (this.getOccupied(i, j)) isOccupied = true;
+        if (this.getOccupied(i, j) || !isInRange(i, j)) isOccupied = true;
         for (let v of this.protection) {
           if (this.getProtection(i, j)[v]?.length && !records.includes(v)) {
             records.push(v);

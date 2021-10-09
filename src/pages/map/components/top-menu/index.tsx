@@ -331,16 +331,13 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
             <div>
               <span> 覆盖率：</span>
               <strong>
-                {
-                  'TODO'
-                  // Math.round(
-                  //   (counter.OccupiedCells * 100) /
-                  //     (2 * (LENGTH / 2 + 1) ** 2 -
-                  //       BuildingFixed.water[mapType - 3].length -
-                  //       BuildingFixed.mountain[mapType - 3].length -
-                  //       (isNoWood ? 0 : BuildingFixed.tree[mapType - 3].length))
-                  // )
-                }
+                {Math.round(
+                  (counter.OccupiedCells * 100) /
+                    (2 * (LENGTH / 2 - 1) ** 2 -
+                      BuildingFixed.water[mapType - 3].length -
+                      BuildingFixed.mountain[mapType - 3].length -
+                      (isNoWood ? 0 : BuildingFixed.tree[mapType - 3].length))
+                )}
               </strong>
               <span>% </span>
             </div>

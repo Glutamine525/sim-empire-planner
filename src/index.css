@@ -18,18 +18,18 @@
 
 body {
   font-size: 1.4rem;
-  line-height: 2rem;
   font-family:
     'PingFang SC',
     'DFPKingGothicGB-Regular',
     'Microsoft Yahei',
     monospace;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  user-select: none;
   color: var(--text-regular);
   background: var(--background-base);
   transition: color 0.3s ease-in-out, background 0.3s ease-in-out;
+  line-height: 2rem;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  user-select: none;
 }
 
 body,
