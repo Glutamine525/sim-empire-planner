@@ -72,6 +72,7 @@ const App: FC<AppProps> = (props: AppProps) => {
     <>
       <Router>
         <Route exact path="/" component={Map} />
+        <Route path="/map" component={Map} />
       </Router>
       <Loading isLoading={isLoading} />
     </>
