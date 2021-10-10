@@ -226,21 +226,72 @@ function Chessboard() {
     console.timeEnd('useEffect [Theme]');
   }, [theme]); // eslint-disable-line
 
+  useEffect(() => {
+    resetState();
+  }, [operation]);
+
+  const resetState = () => {
+    setShowBuilding(false);
+    setCellOccupied(false);
+    setBuildingMarker(0);
+    setHoveredBuilding({} as Building);
+    setShowBox(false);
+    setShowBoxButton(false);
+    setBoxBuffer(new Set<string>());
+  };
+
   const dragMap = (type: string, offsetX: number, offsetY: number) => {
-    switch (type) {
-      case 'down':
-        setOrigin({
-          x: getScrollLeft() + offsetX,
-          y: getScrollTop() + offsetY,
-        });
-        break;
-      case 'move':
-        const { x, y } = origin;
-        setScrollLeft(x - offsetX);
-        setScrollTop(y - offsetY);
-        break;
-      default:
-        break;
+    if (type === 'down') {
+      setOrigin({
+        x: getScrollLeft() + offsetX,
+        y: getScrollTop() + offsetY,
+      });
+    } else if (type === 'move') {
+      const { x, y } = origin;
+      setScrollLeft(x - offsetX);
+      setScrollTop(y - offsetY);
+    }
+  };
+
+  const updateBoxRect = (type: string, offsetX?: number, offsetY?: number) => {
+    if (type === 'down') {
+      setBoxBuffer(new Set<string>());
+      setShowBox(true);
+      setShowBoxButton(false);
+      setBoxRect({
+        x: getScrollLeft() + offsetX! - 86,
+        y: getScrollTop() + offsetY! - 80,
+        w: 0,
+        h: 0,
+      });
+    } else if (type === 'move') {
+      const { x, y } = boxRect;
+      setBoxRect(state => ({
+        ...state,
+        w: getScrollLeft() + offsetX! - 86 - x,
+        h: getScrollTop() + offsetY! - 80 - y,
+      }));
+    } else if (type === 'up') {
+      if (building.IsRoad) {
+        setShowBox(false);
+        return;
+      }
+      let { x, y, w, h } = mapRectToCell(boxRect);
+      if (!w && !h) {
+        setShowBox(false);
+        return;
+      }
+      setShowBoxButton(true);
+      setBoxRect({ x, y, w, h });
+      for (let i = y / 30 + 1; i <= y / 30 + 1 + h / 30; i++) {
+        for (let j = x / 30 + 1; j <= x / 30 + 1 + w / 30; j++) {
+          const occupied = cells.getOccupied(i, j);
+          if (!occupied) continue;
+          const building = cells.getBuilding(occupied);
+          if (building.IsFixed) continue;
+          setBoxBuffer(state => state.add(occupied));
+        }
+      }
     }
   };
 
@@ -256,20 +307,12 @@ function Chessboard() {
         dragMap('down', clientX, clientY);
         break;
       case OperationType.Placing:
+        if (building.IsRoad) updateBoxRect('down', clientX, clientY);
+        break;
       case OperationType.Select:
       case OperationType.Delete:
-        if ((target as any).id?.startsWith('box-')) {
-          break;
-        }
-        setBoxBuffer(new Set<string>());
-        setShowBox(true);
-        setShowBoxButton(false);
-        setBoxRect({
-          x: getScrollLeft() + clientX - 86,
-          y: getScrollTop() + clientY - 80,
-          w: 0,
-          h: 0,
-        });
+        if ((target as any).id?.startsWith('box-')) return;
+        updateBoxRect('down', clientX, clientY);
         break;
       default:
         break;
@@ -288,18 +331,15 @@ function Chessboard() {
         dragMap('move', clientX, clientY);
         break;
       case OperationType.Placing:
+        if (isDragging && building.IsRoad) {
+          updateBoxRect('move', clientX, clientY);
+        }
+        break;
       case OperationType.Select:
       case OperationType.Delete:
         if (!isDragging) return;
-        if ((target as any).id) {
-          break;
-        }
-        const { x, y } = boxRect;
-        setBoxRect(state => ({
-          ...state,
-          w: getScrollLeft() + clientX - 86 - x,
-          h: getScrollTop() + clientY - 80 - y,
-        }));
+        if ((target as any).id) return;
+        updateBoxRect('move', clientX, clientY);
         break;
       default:
         break;
@@ -314,28 +354,20 @@ function Chessboard() {
     }
     switch (operation) {
       case OperationType.Placing:
+        if (building.IsRoad) updateBoxRect('up');
+        break;
       case OperationType.Select:
       case OperationType.Delete:
-        let { x, y, w, h } = mapRectToCell(boxRect);
-        if (!w && !h) {
-          setShowBox(false);
-          return;
-        }
-        setShowBoxButton(true);
-        setBoxRect({ x, y, w, h });
-        for (let i = y / 30 + 1; i <= y / 30 + 1 + h / 30; i++) {
-          for (let j = x / 30 + 1; j <= x / 30 + 1 + w / 30; j++) {
-            const occupied = cells.getOccupied(i, j);
-            if (!occupied) continue;
-            const building = cells.getBuilding(occupied);
-            if (building.IsFixed) continue;
-            setBoxBuffer(state => state.add(occupied));
-          }
-        }
+        updateBoxRect('up');
         break;
       default:
         break;
     }
+  };
+
+  const onWrapperMouseLeave: MouseEventHandler<HTMLDivElement> = () => {
+    setIsDragging(false);
+    resetState();
   };
 
   const onMiniMapMouseDown: MouseEventHandler<HTMLDivElement> = event => {
@@ -413,6 +445,7 @@ function Chessboard() {
         onMouseDownCapture={onWrapperMouseDown}
         onMouseMoveCapture={onWrapperMouseMove}
         onMouseUpCapture={onWrapperMouseUp}
+        onMouseLeave={onWrapperMouseLeave}
       >
         <Canvases
           isMapRotated={isMapRotated}

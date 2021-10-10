@@ -52,7 +52,7 @@ export default function Box(props: BoxProps) {
     switch (operation) {
       case OperationType.Placing:
         setStyle({
-          background: 'var(--ant-primary-color-outline)',
+          background: 'var(--ant-success-color-outline)',
           borderStyle: 'none',
           borderColor: 'none',
         });
