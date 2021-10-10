@@ -1,4 +1,4 @@
-import { ActionType } from '@/state/action-creators';
+import { ActionType } from '@/state/actions';
 import { Building } from '@/types/building';
 import { OperationType } from '@/types/operation';
 

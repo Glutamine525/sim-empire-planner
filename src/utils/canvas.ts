@@ -1,10 +1,9 @@
+import { MINI_MAP_RATIO } from '@/pages/map/components/chessboard/components/mini-map';
 import { Building } from '@/types/building';
 import { CivilType } from '@/types/civil';
 import { RefObject } from 'react';
 import { showMarker } from './chessboard';
 import { RATIO } from './screenshot';
-
-const MINI_MAP_RATIO = 4;
 
 export function getContext(canvasRef: RefObject<HTMLCanvasElement>) {
   const canvas = canvasRef.current!;

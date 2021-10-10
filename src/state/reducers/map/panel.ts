@@ -1,4 +1,4 @@
-import { ActionType } from '@/state/action-creators';
+import { ActionType } from '@/state/actions';
 import { SimpleBuilding } from '@/types/building';
 
 export interface PanelAction {

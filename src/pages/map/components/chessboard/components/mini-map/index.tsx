@@ -13,10 +13,10 @@ interface MiniMapProps {
   show: boolean;
   theme: ThemeType;
   rotated: boolean;
-  focusWidth: number;
-  focusHeight: number;
-  focusTop: number;
-  focusLeft: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
   onMouseDown: MouseEventHandler<HTMLDivElement>;
   onMouseMove: MouseEventHandler<HTMLDivElement>;
   onMouseUp: MouseEventHandler<HTMLDivElement>;
@@ -28,10 +28,10 @@ export default function MiniMap(props: MiniMapProps) {
     show,
     theme,
     rotated,
-    focusWidth,
-    focusHeight,
-    focusTop,
-    focusLeft,
+    x,
+    y,
+    w,
+    h,
     onMouseDown,
     onMouseMove,
     onMouseUp,
@@ -108,10 +108,10 @@ export default function MiniMap(props: MiniMapProps) {
         <div
           className={styles.focus}
           style={{
-            width: focusWidth * MINI_MAP_SIZE,
-            height: focusHeight * MINI_MAP_SIZE,
-            transform: `translate(${focusLeft * MINI_MAP_SIZE}px,${
-              focusTop * MINI_MAP_SIZE
+            width: w * MINI_MAP_SIZE,
+            height: h * MINI_MAP_SIZE,
+            transform: `translate(${x * MINI_MAP_SIZE}px,${
+              y * MINI_MAP_SIZE
             }px)`,
           }}
         ></div>

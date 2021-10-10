@@ -1,5 +1,5 @@
 import { State } from '@/state';
-import { AppActionCreators, MapActionCreators } from '@/state/action-creators';
+import { AppActionCreators, MapActionCreators } from '@/state/actions';
 import { useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { bindActionCreators } from 'redux';

@@ -1,4 +1,4 @@
-import { ActionType } from '@/state/action-creators';
+import { ActionType } from '@/state/actions';
 import { CivilType } from '@/types/civil';
 import { ThemeType } from '@/types/theme';
 import { setMiniMapInStorage, setThemeInStorage } from '@/utils/storage';
@@ -30,7 +30,7 @@ const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
     case ActionType.ChangeIsPanelActive:
       console.log(state, action.isPanelActive);
 
-      let chessboard = document.getElementById('chessboard-wrapper-outer');
+      let chessboard = document.getElementById('chessboard-wrapper');
       if (!action.isPanelActive) {
         chessboard!.style.display = 'block';
       } else {

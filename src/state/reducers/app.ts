@@ -1,4 +1,4 @@
-import { ActionType } from '../action-creators';
+import { ActionType } from '../actions';
 
 export interface AppAction {
   type: ActionType;

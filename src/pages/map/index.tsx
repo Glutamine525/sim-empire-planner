@@ -1,5 +1,6 @@
 import HamButton from '@/components/ham-button';
 import { MapAction } from '@/state';
+import { AppAction } from '@/state/reducers/app';
 import { useMapCreators, useValue } from '@/utils/hook';
 import React from 'react';
 import Chessboard from './components/chessboard';
@@ -9,7 +10,7 @@ import TopMenu from './components/top-menu';
 import styles from './index.less';
 
 export default function Map() {
-  const isLoading = useValue<boolean>(state => state.app.isLoading);
+  const { isLoading } = useValue<AppAction>(state => state.app);
   const { isPanelActive } = useValue<MapAction>(state => state.map);
   const { changeIsPanelActive } = useMapCreators();
 
