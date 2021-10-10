@@ -1,9 +1,10 @@
 import { OperationType } from '@/types/operation';
+import { formatRect, mapRectToCell } from '@/utils/chessboard';
 import React, { useEffect, useState } from 'react';
 import styles from './index.less';
 
 interface BoxProps {
-  dragConfig: { initX: number; initY: number; curX: number; curY: number };
+  boxRect: { x: number; y: number; w: number; h: number };
   show: boolean;
   operation: OperationType;
   showButton: boolean;
@@ -13,7 +14,7 @@ interface BoxProps {
 
 export default function Box(props: BoxProps) {
   const {
-    dragConfig: { initX, initY, curX, curY },
+    boxRect: { x, y, w, h },
     show,
     operation,
     showButton,
@@ -22,12 +23,7 @@ export default function Box(props: BoxProps) {
   } = props;
 
   const [showRoadHelper, setShowRoadHelper] = useState(false);
-  const [config, setConfig] = useState({
-    x: 0,
-    y: 0,
-    width: 0,
-    height: 0,
-  });
+  const [config, setConfig] = useState({ x: 0, y: 0, w: 0, h: 0 });
   const [style, setStyle] = useState({
     background: 'black',
     borderStyle: 'none',
@@ -35,35 +31,22 @@ export default function Box(props: BoxProps) {
   });
 
   useEffect(() => {
-    let x = initX < curX ? initX : curX;
-    let y = initY < curY ? initY : curY;
-    let width = Math.abs(initX - curX);
-    let height = Math.abs(initY - curY);
+    let { x: realX, y: realY, w: realW, h: realH } = formatRect({ x, y, w, h });
     if (operation === OperationType.Placing) {
-      let [startX, endX] = initX < curX ? [initX, curX] : [curX, initX];
-      let [startY, endY] = initY < curY ? [initY, curY] : [curY, initY];
-      startX = Math.floor(startX / 30) * 30;
-      startY = Math.floor(startY / 30) * 30;
-      endX = Math.floor(endX / 30) * 30;
-      endY = Math.floor(endY / 30) * 30;
-      [x, y] = [startX, startY];
-      if (startX === endX) {
-        width = 30;
-        height = endY - startY + 30;
-        setShowRoadHelper(true);
-      } else if (startY === endY) {
-        height = 30;
-        width = endX - startX + 30;
-        setShowRoadHelper(true);
-      } else {
-        x = Math.floor(initX / 30) * 30;
-        y = Math.floor(initY / 30) * 30;
-        [width, height] = [30, 30];
-        setShowRoadHelper(true);
+      const data = mapRectToCell({ x, y, w, h });
+      [realX, realY, realW, realH] = [data.x, data.y, data.w, data.h];
+      if (realW > 30 && realH > 30) {
+        [realX, realY, realW, realH] = [
+          Math.floor(x / 30) * 30,
+          Math.floor(y / 30) * 30,
+          30,
+          30,
+        ];
       }
+      setShowRoadHelper(true);
     }
-    setConfig({ x, y, width, height });
-  }, [initX, initY, curX, curY]); // eslint-disable-line
+    setConfig({ x: realX, y: realY, w: realW, h: realH });
+  }, [x, y, w, h]); // eslint-disable-line
 
   useEffect(() => {
     switch (operation) {
@@ -99,13 +82,14 @@ export default function Box(props: BoxProps) {
       style={{
         ...style,
         display:
-          (show && operation !== OperationType.Placing) ||
-          (show && showRoadHelper && operation === OperationType.Placing)
+          show &&
+          (operation !== OperationType.Placing ||
+            (showRoadHelper && operation === OperationType.Placing))
             ? 'block'
             : 'none',
         transform: `translate(${config.x}px, ${config.y}px)`,
-        width: config.width,
-        height: config.height,
+        width: config.w,
+        height: config.h,
       }}
     >
       <div
@@ -115,7 +99,7 @@ export default function Box(props: BoxProps) {
           display:
             showButton && operation === OperationType.Delete ? 'block' : 'none',
           top: '-4.8rem',
-          left: Math.abs(initX - curX) / 2 - 21,
+          left: Math.abs(w) / 2 - 21,
         }}
         onClick={onClickDelete}
       >
@@ -131,7 +115,7 @@ export default function Box(props: BoxProps) {
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
           bottom: '-4.8rem',
-          left: Math.abs(initX - curX) / 2 - 21,
+          left: Math.abs(w) / 2 - 21,
         }}
       >
         <span id="box-select-down-text" className={styles['icon-font']}>
@@ -146,7 +130,7 @@ export default function Box(props: BoxProps) {
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
           top: '-4.8rem',
-          left: Math.abs(initX - curX) / 2 - 21,
+          left: Math.abs(w) / 2 - 21,
         }}
       >
         <span id="box-select-up-text" className={styles['icon-font']}>
@@ -160,7 +144,7 @@ export default function Box(props: BoxProps) {
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
-          top: Math.abs(initY - curY) / 2 - 21,
+          top: Math.abs(h) / 2 - 21,
           left: '-4.8rem',
         }}
       >
@@ -175,7 +159,7 @@ export default function Box(props: BoxProps) {
         style={{
           display:
             showButton && operation === OperationType.Select ? 'block' : 'none',
-          top: Math.abs(initY - curY) / 2 - 21,
+          top: Math.abs(h) / 2 - 21,
           right: '-4.8rem',
         }}
       >

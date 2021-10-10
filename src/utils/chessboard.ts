@@ -105,3 +105,40 @@ export function showMarker(building: Building) {
     building.IsDecoration
   );
 }
+
+export function formatRect(rect: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}) {
+  const { x, y, w, h } = rect;
+  let [realX, realY, realW, realH] = [x, y, w, h];
+  if (w < 0) {
+    realX += w;
+    realW = -w;
+  }
+  if (h < 0) {
+    realY += h;
+    realH = -h;
+  }
+  return { x: realX, y: realY, w: realW, h: realH };
+}
+
+export function mapRectToCell(rect: {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}) {
+  let { x, y, w, h } = formatRect(rect);
+  const initCo = Math.floor(x / 30);
+  const initLi = Math.floor(y / 30);
+  const curCo = Math.ceil((x + w) / 30);
+  const curLi = Math.ceil((y + h) / 30);
+  x = initCo * 30;
+  y = initLi * 30;
+  w = (curCo - initCo) * 30;
+  h = (curLi - initLi) * 30;
+  return { x, y, w, h };
+}

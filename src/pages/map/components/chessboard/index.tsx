@@ -16,6 +16,7 @@ import { ThemeColor } from '@/types/theme';
 import {
   getRoadImageBuffer,
   isInRange,
+  mapRectToCell,
   showMarker as showBuildingMarker,
 } from '@/utils/chessboard';
 import Copyright from './components/copyright';
@@ -32,6 +33,10 @@ import {
 import { OperationType } from '@/types/operation';
 import MiniMap, { MINI_MAP_SIZE } from './components/mini-map';
 import Canvases from './components/canvases';
+import Box from './components/box';
+import BoxEffect from './components/box-effect';
+import Range from './components/range';
+import { Cells } from '@/utils/cells';
 
 const initBuildingPos = { l: -1, oL: -1, c: -1, oC: -1 };
 const initRect = { x: -1, y: -1, w: -1, h: -1 };
@@ -40,6 +45,8 @@ export const cellCanvasRef = createRef<HTMLCanvasElement>();
 export const buildingCanvasRef = createRef<HTMLCanvasElement>();
 export const markerCanvasRef = createRef<HTMLCanvasElement>();
 export const miniMapCanvasRef = createRef<HTMLCanvasElement>();
+
+const cells = Cells.getInstance();
 
 function Chessboard() {
   const {
@@ -239,22 +246,64 @@ function Chessboard() {
 
   const onWrapperMouseDown: MouseEventHandler<HTMLDivElement> = event => {
     setIsDragging(true);
-    const { ctrlKey, clientX, clientY } = event;
+    const { ctrlKey, clientX, clientY, target } = event;
     if (ctrlKey) {
       dragMap('down', clientX, clientY);
       return;
     }
-    dragMap('down', clientX, clientY);
+    switch (operation) {
+      case OperationType.Empty:
+        dragMap('down', clientX, clientY);
+        break;
+      case OperationType.Placing:
+      case OperationType.Select:
+      case OperationType.Delete:
+        if ((target as any).id?.startsWith('box-')) {
+          break;
+        }
+        setBoxBuffer(new Set<string>());
+        setShowBox(true);
+        setShowBoxButton(false);
+        setBoxRect({
+          x: getScrollLeft() + clientX - 86,
+          y: getScrollTop() + clientY - 80,
+          w: 0,
+          h: 0,
+        });
+        break;
+      default:
+        break;
+    }
   };
 
   const onWrapperMouseMove: MouseEventHandler<HTMLDivElement> = event => {
     if (!isDragging) return;
-    const { ctrlKey, clientX, clientY } = event;
+    const { ctrlKey, clientX, clientY, target } = event;
     if (ctrlKey) {
       dragMap('move', clientX, clientY);
       return;
     }
-    dragMap('move', clientX, clientY);
+    switch (operation) {
+      case OperationType.Empty:
+        dragMap('move', clientX, clientY);
+        break;
+      case OperationType.Placing:
+      case OperationType.Select:
+      case OperationType.Delete:
+        if (!isDragging) return;
+        if ((target as any).id) {
+          break;
+        }
+        const { x, y } = boxRect;
+        setBoxRect(state => ({
+          ...state,
+          w: getScrollLeft() + clientX - 86 - x,
+          h: getScrollTop() + clientY - 80 - y,
+        }));
+        break;
+      default:
+        break;
+    }
   };
 
   const onWrapperMouseUp: MouseEventHandler<HTMLDivElement> = event => {
@@ -262,6 +311,30 @@ function Chessboard() {
     const { ctrlKey } = event;
     if (ctrlKey) {
       return;
+    }
+    switch (operation) {
+      case OperationType.Placing:
+      case OperationType.Select:
+      case OperationType.Delete:
+        let { x, y, w, h } = mapRectToCell(boxRect);
+        if (!w && !h) {
+          setShowBox(false);
+          return;
+        }
+        setShowBoxButton(true);
+        setBoxRect({ x, y, w, h });
+        for (let i = y / 30 + 1; i <= y / 30 + 1 + h / 30; i++) {
+          for (let j = x / 30 + 1; j <= x / 30 + 1 + w / 30; j++) {
+            const occupied = cells.getOccupied(i, j);
+            if (!occupied) continue;
+            const building = cells.getBuilding(occupied);
+            if (building.IsFixed) continue;
+            setBoxBuffer(state => state.add(occupied));
+          }
+        }
+        break;
+      default:
+        break;
     }
   };
 
@@ -315,6 +388,10 @@ function Chessboard() {
     updateMiniRect();
   };
 
+  const onClickBoxDelete = async () => {};
+
+  const onClickBoxMove = async () => {};
+
   const getScrollLeft = () => wrapperRef.current!.scrollLeft;
 
   const getScrollTop = () => wrapperRef.current!.scrollTop;
@@ -343,6 +420,27 @@ function Chessboard() {
           buildingCanvasRef={buildingCanvasRef}
           markerCanvasRef={markerCanvasRef}
         />
+        <div className={styles.function}>
+          <Range
+            show={showBuilding}
+            size={building.Range || 0}
+            line={buildingPos.l + buildingPos.oL}
+            column={buildingPos.c + buildingPos.oC}
+            width={building.Width || 0}
+            height={building.Height || 0}
+            color={building.Background}
+            operation={operation}
+          />
+          <Box
+            show={showBox}
+            boxRect={boxRect}
+            operation={operation}
+            showButton={showBoxButton}
+            onClickMove={onClickBoxMove}
+            onClickDelete={onClickBoxDelete}
+          />
+          <BoxEffect operation={operation} boxBuffer={boxBuffer} />
+        </div>
         <Copyright mapType={mapType} civil={civil} isNoWood={isNoWood} />
       </div>
       <MiniMap
