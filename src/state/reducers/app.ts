@@ -1,5 +1,14 @@
-import { ActionType } from '@/actions';
-import { InitAppState, AppAction } from '@/types/state';
+import { ActionType } from '../action-creators';
+
+export interface AppAction {
+  type: ActionType;
+  isLoading: boolean;
+}
+
+export const InitAppState: AppAction = {
+  type: ActionType.Empty,
+  isLoading: true,
+};
 
 const App = (state = InitAppState, action: AppAction) => {
   switch (action.type) {

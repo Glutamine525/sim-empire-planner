@@ -1,25 +1,19 @@
-import { changeHamButton } from '@/actions';
 import HamButton from '@/components/ham-button';
-import React, { FC } from 'react';
-import { connect } from 'react-redux';
+import { MapAction } from '@/state';
+import { useMapCreators, useValue } from '@/utils/hook';
+import React from 'react';
 import Chessboard from './components/chessboard';
 import LeftMenu from './components/left-menu';
 import Panel from './components/panel';
-import TopMenuContainer from './components/top-menu';
+import TopMenu from './components/top-menu';
 import styles from './index.less';
 
-interface MapProps {
-  isLoading: boolean;
-  isHamActive: boolean;
-  onChangeHamButton: any;
-}
+export default function Map() {
+  const isLoading = useValue<boolean>(state => state.app.isLoading);
+  const { isPanelActive } = useValue<MapAction>(state => state.map);
+  const { changeIsPanelActive } = useMapCreators();
 
-const Map: FC<MapProps> = (props: MapProps) => {
-  const { isLoading, isHamActive, onChangeHamButton } = props;
-
-  const onClickHamButton = () => {
-    onChangeHamButton(!isHamActive);
-  };
+  const onClickButton = () => changeIsPanelActive(!isPanelActive);
 
   return (
     <main
@@ -28,9 +22,9 @@ const Map: FC<MapProps> = (props: MapProps) => {
       style={{ filter: isLoading ? 'blur(5px)' : 'none' }}
     >
       <Panel />
-      <TopMenuContainer />
+      <TopMenu />
       <div className={styles['ham-container']}>
-        <HamButton isActive={isHamActive} onClick={onClickHamButton} />
+        <HamButton isActive={isPanelActive} onClick={onClickButton} />
       </div>
       <LeftMenu />
       <Chessboard />
@@ -39,23 +33,4 @@ const Map: FC<MapProps> = (props: MapProps) => {
       </a>
     </main>
   );
-};
-
-const mapStateToProps = (state: any) => {
-  return {
-    isLoading: state.App.isLoading,
-    isHamActive: state.TopMenu.isHamActive,
-  };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    onChangeHamButton: (isHamActive: boolean) => {
-      dispatch(changeHamButton(isHamActive));
-    },
-  };
-};
-
-const MapContainer = connect(mapStateToProps, mapDispatchToProps)(Map);
-
-export default MapContainer;
+}

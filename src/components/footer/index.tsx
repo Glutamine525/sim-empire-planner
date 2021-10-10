@@ -16,6 +16,7 @@ function Footer(props: FooterProps) {
       style={{
         opacity: show ? 1 : 0,
         visibility: show ? 'visible' : 'hidden',
+        bottom: show ? '1.5rem' : '-6rem',
       }}
     >
       <div>

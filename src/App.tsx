@@ -1,22 +1,20 @@
 import { DarkColor, LightColor, ThemeType } from '@/types/theme';
-import React, { FC, useEffect } from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import Map from '@/pages/map';
-import { connect } from 'react-redux';
 import { message } from 'antd';
 import Loading from './components/loading';
 import { getMiniMapInStorage, getThemeInStorage } from './utils/storage';
-import { changeMiniMap, changeTheme } from './actions';
+import NoMatch from './pages/no-match';
+import { useAppCreators, useMapCreators, useValue } from './utils/hook';
+import { MapAction } from './state';
+import { AppAction } from './state/reducers/app';
 
-interface AppProps {
-  isLoading: boolean;
-  theme: ThemeType;
-  onChangeTheme: any;
-  onChangeMiniMap: any;
-}
-
-const App: FC<AppProps> = (props: AppProps) => {
-  const { isLoading, theme, onChangeTheme, onChangeMiniMap } = props;
+const App = () => {
+  const { isLoading } = useValue<AppAction>(state => state.app);
+  const { theme } = useValue<MapAction>(state => state.map);
+  const { changeIsLoading } = useAppCreators();
+  const { changeTheme, changeMiniMap } = useMapCreators();
 
   useEffect(() => {
     const themeInStorage = getThemeInStorage();
@@ -25,41 +23,35 @@ const App: FC<AppProps> = (props: AppProps) => {
         '(prefers-color-scheme: dark)'
       ).matches;
       if (isDarkMode) {
-        onChangeTheme(ThemeType.Dark);
+        changeTheme(ThemeType.Dark);
       }
     } else {
-      onChangeTheme(themeInStorage);
+      changeTheme(themeInStorage as ThemeType);
     }
     const miniMapInStorage = getMiniMapInStorage();
     if (miniMapInStorage === 'false') {
-      onChangeMiniMap(false);
+      changeMiniMap(false);
     }
     message.config({
       top: 50,
       duration: 2,
       maxCount: 3,
     });
+    document.body.removeChild(document.getElementById('init-loading')!);
+    changeIsLoading(false);
     document.addEventListener('contextmenu', event => event.preventDefault());
   }, []); // eslint-disable-line
 
   useEffect(() => {
     if (theme === ThemeType.Light) {
-      // ConfigProvider.config({
-      //   theme: {
-      //     primaryColor: '#25b864',
-      //   },
-      // });
+      // ConfigProvider.config({ theme: { primaryColor: '#25b864' } });
       Object.keys(LightColor).forEach(v => {
         document.body.style.setProperty(v, LightColor[v]);
       });
       document.body.classList.add('light');
       document.body.classList.remove('dark');
     } else {
-      // ConfigProvider.config({
-      //   theme: {
-      //     primaryColor: '#acb67c',
-      //   },
-      // });
+      // ConfigProvider.config({ theme: { primaryColor: '#acb67c' } });
       Object.keys(DarkColor).forEach(v => {
         document.body.style.setProperty(v, DarkColor[v]);
       });
@@ -71,32 +63,15 @@ const App: FC<AppProps> = (props: AppProps) => {
   return (
     <>
       <Router>
-        <Route exact path="/" component={Map} />
-        <Route path="/map" component={Map} />
+        <Switch>
+          <Route exact path="/" component={Map} />
+          <Route path="/map" component={Map} />
+          <Route path="*" component={NoMatch} />
+        </Switch>
       </Router>
       <Loading isLoading={isLoading} />
     </>
   );
 };
 
-const mapStateToProps = (state: any) => {
-  return {
-    theme: state.TopMenu.theme,
-    isLoading: state.App.isLoading,
-  };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    onChangeTheme: (theme: ThemeType) => {
-      dispatch(changeTheme(theme));
-    },
-    onChangeMiniMap: (showMiniMap: boolean) => {
-      dispatch(changeMiniMap(showMiniMap));
-    },
-  };
-};
-
-const AppContainer = connect(mapStateToProps, mapDispatchToProps)(App);
-
-export default AppContainer;
+export default App;

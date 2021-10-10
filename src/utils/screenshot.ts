@@ -1,5 +1,5 @@
+import store from '@/state';
 import { Building, CivilBuilding, MarkerColor } from '@/types/building';
-import { store } from '..';
 import { DEFAULT_SIZE } from './browser';
 import { parseBuildingKey, showMarker } from './chessboard';
 import { LENGTH } from './config';
@@ -148,7 +148,7 @@ export async function getFullSizeImage(
       return null;
     });
   } else {
-    const { civil } = store.getState().TopMenu;
+    const { civil } = store.getState().map;
     const protectionNum = CivilBuilding[civil]['防护'].length;
     Object.values(data).map((v: any) => {
       if ((!showMarker(v) || v.IsFixed) && !v.IsRoad) return null;

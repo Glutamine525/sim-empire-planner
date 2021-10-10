@@ -1,5 +1,23 @@
-import { ActionType } from '@/actions';
-import { InitPanelState, PanelAction } from '@/types/state';
+import { ActionType } from '@/state/action-creators';
+import { SimpleBuilding } from '@/types/building';
+
+export interface PanelAction {
+  type: ActionType;
+  tab: string;
+  targetSpecial: SimpleBuilding;
+  specials: SimpleBuilding[];
+  dragIndex: number;
+  dropIndex: number;
+}
+
+export const InitPanelState: PanelAction = {
+  type: ActionType.Empty,
+  tab: 'tab-0',
+  targetSpecial: {} as SimpleBuilding,
+  specials: [] as SimpleBuilding[],
+  dragIndex: 0,
+  dropIndex: 0,
+};
 
 const Panel = (state = InitPanelState, action: PanelAction) => {
   const { specials } = state;

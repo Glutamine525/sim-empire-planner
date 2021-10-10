@@ -1,5 +1,5 @@
+import store from '@/state';
 import { message } from 'antd';
-import { store } from '..';
 
 export function stringToBase64(str: string) {
   const encode = encodeURI(str);
@@ -28,7 +28,7 @@ export function getPostfixName() {
 }
 
 export function getScreenshotName() {
-  const { civil, mapType, isNoWood } = store.getState().TopMenu;
+  const { civil, mapType, isNoWood } = store.getState().map;
   return `模拟帝国-${civil}-${mapType}木-${
     isNoWood ? '无木' : '有木'
   }-${getPostfixName()}`;

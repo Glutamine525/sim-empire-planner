@@ -1,6 +1,34 @@
-import { ActionType } from '@/actions';
-import { CatalogType } from '@/types/building';
-import { InitChessboardState, ChessboardAction } from '@/types/state';
+import { ActionType } from '@/state/action-creators';
+import { Building, CatalogType } from '@/types/building';
+import { Counter } from '@/types/couter';
+
+export interface ChessboardAction {
+  type: ActionType;
+  buildings: Building[];
+  diff: number;
+  copiedBuilding: Building;
+  counter: Counter;
+}
+
+export const InitChessboardState: ChessboardAction = {
+  type: ActionType.Empty,
+  buildings: [] as Building[],
+  diff: 1,
+  copiedBuilding: {} as Building,
+  counter: {
+    OridinaryHouse: 0,
+    HighEndHouse: 0,
+    Barn: 0,
+    Warehouse: 0,
+    Agriculture: 0,
+    Industry: 0,
+    General: 0,
+    Fixed: 0,
+    Total: 0,
+    Road: 0,
+    OccupiedCells: 0,
+  },
+};
 
 const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
   switch (action.type) {
@@ -45,7 +73,7 @@ const Chessboard = (state = InitChessboardState, action: ChessboardAction) => {
           counter.OccupiedCells += diff * building.Width * building.Height;
       });
       return { ...state, counter: { ...counter } };
-    case ActionType.SetCopiedBuilding:
+    case ActionType.ChangeCopiedBuilding:
       return {
         ...state,
         copiedBuilding: action.copiedBuilding,

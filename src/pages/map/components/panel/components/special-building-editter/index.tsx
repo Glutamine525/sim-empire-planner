@@ -4,32 +4,16 @@ import React, { useState } from 'react';
 import styles from './index.less';
 import Switcher from '@/components/switcher';
 import { ColorChangeHandler } from 'react-color';
-import { connect } from 'react-redux';
-import { CivilBuilding, SimpleBuilding } from '@/types/building';
-import {
-  deleteSpecialBuilding,
-  insertSpecialBuilding,
-  swapSpecialBuilding,
-} from '@/actions';
-import { CivilType } from '@/types/civil';
+import { CivilBuilding } from '@/types/building';
 import { rgbToHex } from '@/utils/color';
+import { useMapCreators, useValue } from '@/utils/hook';
+import { MapAction } from '@/state';
 
-interface SpecialBuildingEditterProps {
-  civil: CivilType;
-  specials: SimpleBuilding[];
-  onInsertSpecialBuilding: any;
-  onDeleteSpecialBuilding: any;
-  onSwapSpecialBuilding: any;
-}
+export default function SpecialBuildingEditter() {
+  const { civil, specials } = useValue<MapAction>(state => state.map);
 
-function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
-  const {
-    civil,
-    specials,
-    onInsertSpecialBuilding,
-    onDeleteSpecialBuilding,
-    onSwapSpecialBuilding,
-  } = props;
+  const { insertSpecialBuilding, deleteSpecialBuilding, swapSpecialBuilding } =
+    useMapCreators();
 
   const [isFullProtection, setIsFullProtection] = useState(false);
   const [name, setName] = useState('花坛');
@@ -79,7 +63,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
       message.error('建筑的影响范围只能等于0或者≥4！');
       return;
     }
-    onInsertSpecialBuilding({
+    insertSpecialBuilding({
       name,
       text,
       range,
@@ -96,7 +80,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
   };
 
   const onClickDelete = (name: string) => {
-    onDeleteSpecialBuilding(specials.find(v => v.name === name));
+    deleteSpecialBuilding(specials.find(v => v.name === name)!);
   };
 
   const onDragStart = (index: number) => {
@@ -105,7 +89,7 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
 
   const onDrop = (index: number) => {
     setHash(new Date().getTime().toString());
-    onSwapSpecialBuilding(dragIndex, index);
+    swapSpecialBuilding(dragIndex, index);
   };
 
   return (
@@ -370,31 +354,3 @@ function SpecialBuildingEditter(props: SpecialBuildingEditterProps) {
     </div>
   );
 }
-
-const mapStateToProps = (state: any) => {
-  return {
-    civil: state.TopMenu.civil,
-    specials: state.Panel.specials,
-  };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    onInsertSpecialBuilding: (targetSpecial: SimpleBuilding) => {
-      dispatch(insertSpecialBuilding(targetSpecial));
-    },
-    onDeleteSpecialBuilding: (targetSpecial: SimpleBuilding) => {
-      dispatch(deleteSpecialBuilding(targetSpecial));
-    },
-    onSwapSpecialBuilding: (dragIndex: number, dropIndex: number) => {
-      dispatch(swapSpecialBuilding(dragIndex, dropIndex));
-    },
-  };
-};
-
-const SpecialBuildingEditterContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(SpecialBuildingEditter);
-
-export default SpecialBuildingEditterContainer;

@@ -1,82 +1,54 @@
-import {
-  changeCivil,
-  changeHamButton,
-  changeIsImportingData,
-  changeIsLoading,
-  changeMapType,
-  changeNoWood,
-  changeOperation,
-  changePanelTab,
-} from '@/actions';
 import MenuIcon from '@/components/menu-icon';
 import DragUpload from '@/pages/map/components/left-menu/components/drag-upload';
+import { MapAction } from '@/state';
 import {
   BorderStyleType,
-  Building,
   CatalogType,
   CivilBuilding,
   GeneralBuilding,
   SimpleBuilding,
 } from '@/types/building';
 import { BuildingColor } from '@/types/building-color';
-import { CivilType } from '@/types/civil';
-import { Counter } from '@/types/couter';
 import { OperationType } from '@/types/operation';
 import { Cells } from '@/utils/cells';
 import { base64ToString } from '@/utils/file';
+import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
 import { Menu, message, Modal } from 'antd';
 import md5 from 'md5';
-import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
-import { connect } from 'react-redux';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './index.less';
 
 const { SubMenu } = Menu;
 
 const KEYS = 'asdqwerzxcv1234567890';
 
-interface LeftMenuProps {
-  isHamActive: boolean;
-  mapType: number;
-  civil: CivilType;
-  isMapRotated: boolean;
-  operation: OperationType;
-  copiedBuilding: Building;
-  counter: Counter;
-  specials: SimpleBuilding[];
-  onChangeHamButton: any;
-  onChangeOperation: (a0: OperationType, a1: string, a2: Building) => void;
-  onChangeIsLoading: any;
-  onChangeMapType: any;
-  onChangeCivil: any;
-  onChangeNoWood: any;
-  onChangeIsImportingData: any;
-  onChangePanelTab: any;
-}
-
 const cells = Cells.getInstance();
 
-const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
+const LeftMenu = () => {
   const {
-    isHamActive,
+    isPanelActive,
     mapType,
     civil,
     isMapRotated,
     operation,
-    copiedBuilding,
     counter,
+    copiedBuilding,
     specials,
-    onChangeHamButton,
-    onChangeOperation,
-    onChangeIsLoading,
-    onChangeMapType,
-    onChangeCivil,
-    onChangeNoWood,
-    onChangeIsImportingData,
-    onChangePanelTab,
-  } = props;
+  } = useValue<MapAction>(state => state.map);
+
+  const { changeIsLoading } = useAppCreators();
+  const {
+    changeIsPanelActive,
+    changeMapType,
+    changeCivil,
+    changeNoWood,
+    changeOperation,
+    changeIsImportingData,
+    changePanelTab,
+  } = useMapCreators();
 
   const isHamActiveRef = useRef<boolean>();
-  isHamActiveRef.current = isHamActive;
+  isHamActiveRef.current = isPanelActive;
 
   const [showUpload, setShowUpload] = useState(false);
   const [uploadType, setUploadType] = useState('map');
@@ -117,7 +89,7 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       const { key } = event;
       if (key !== ' ') return;
       event.preventDefault();
-      onChangeOperation(OperationType.Empty, '', {} as any);
+      changeOperation(OperationType.Empty, '', {} as any);
     });
   }, []); // eslint-disable-line
 
@@ -159,17 +131,17 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   }, [specials]);
 
   useEffect(() => {
-    onChangeOperation(OperationType.Empty, '', {} as any);
+    changeOperation(OperationType.Empty, '', {} as any);
   }, [mapType, civil]); // eslint-disable-line
 
   useEffect(() => {
     if (operation === OperationType.Watermark || !isMapRotated) return;
-    onChangeOperation(OperationType.Empty, '', {} as any);
+    changeOperation(OperationType.Empty, '', {} as any);
   }, [isMapRotated]); // eslint-disable-line
 
   useEffect(() => {
     if (!Object.keys(copiedBuilding).length) {
-      onChangeOperation(OperationType.Empty, '', {} as any);
+      changeOperation(OperationType.Empty, '', {} as any);
       return;
     }
     const {
@@ -206,24 +178,24 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
 
   useEffect(() => {
     const callback = (event: KeyboardEvent) => {
-      if (isHamActive) return;
+      if (isPanelActive) return;
       if (isMapRotated) return;
       const { key, ctrlKey } = event;
       if (key !== 'c' || !ctrlKey) return;
-      onChangeOperation(OperationType.Copying, '', {} as any);
+      changeOperation(OperationType.Copying, '', {} as any);
     };
     document.addEventListener('keyup', callback);
     return () => document.removeEventListener('keyup', callback);
-  }, [isHamActive, isMapRotated]); // eslint-disable-line
+  }, [isPanelActive, isMapRotated]); // eslint-disable-line
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       const { key, ctrlKey } = event;
       if (key === 'Escape') {
-        onChangeHamButton(!isHamActive);
+        changeIsPanelActive(!isPanelActive);
         return;
       }
-      if (isHamActive) return;
+      if (isPanelActive) return;
       if (isMapRotated && KEYS.includes(key)) {
         message.warning('旋转地图后无法进行编辑！');
         return;
@@ -249,10 +221,10 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           dispatchBuilding(keyPath, building);
           return;
         case 's':
-          onChangeOperation(OperationType.Select, '', {} as any);
+          changeOperation(OperationType.Select, '', {} as any);
           break;
         case 'd':
-          onChangeOperation(OperationType.Delete, '', {} as any);
+          changeOperation(OperationType.Delete, '', {} as any);
           break;
         case 'z':
           if (protection.length < 1) return;
@@ -306,10 +278,10 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
     };
     document.addEventListener('keydown', onKeyDown);
     return () => document.removeEventListener('keydown', onKeyDown);
-  }, [catalog, isHamActive, isMapRotated]); // eslint-disable-line
+  }, [catalog, isPanelActive, isMapRotated]); // eslint-disable-line
 
   const dispatchBuilding = (keyPath: string[], building: SimpleBuilding) => {
-    onChangeOperation(OperationType.Placing, keyPath.join('-'), {
+    changeOperation(OperationType.Placing, keyPath.join('-'), {
       Name: building.name,
       Text: building.text || '',
       Range: building.range || 0,
@@ -374,20 +346,20 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
           };
           break;
         case '特殊建筑':
-          onChangeHamButton(true);
-          onChangePanelTab('tab-1');
+          changeIsPanelActive(true);
+          changePanelTab('tab-1');
           return;
         case '取消操作':
-          onChangeOperation(OperationType.Empty, '', {} as any);
+          changeOperation(OperationType.Empty, '', {} as any);
           return;
         case '选中建筑':
-          onChangeOperation(OperationType.Select, '', {} as any);
+          changeOperation(OperationType.Select, '', {} as any);
           return;
         case '删除建筑':
-          onChangeOperation(OperationType.Delete, '', {} as any);
+          changeOperation(OperationType.Delete, '', {} as any);
           return;
         case '水印模式':
-          onChangeOperation(OperationType.Watermark, '', {} as any);
+          changeOperation(OperationType.Watermark, '', {} as any);
           return;
         case '导入新文明':
           setShowUpload(true);
@@ -424,8 +396,8 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
       keyPath[0] === '特殊建筑' &&
       keyPath[keyPath.length - 1] === '打开编辑面板'
     ) {
-      onChangeHamButton(true);
-      onChangePanelTab('tab-1');
+      changeIsPanelActive(true);
+      changePanelTab('tab-1');
       return;
     } else {
       building = catalog[keyPath[0] as CatalogType].sub.find(
@@ -470,11 +442,11 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
         message.error('该文件不是地图数据，导入失败！');
         return;
       }
-      onChangeIsLoading(true);
-      onChangeIsImportingData(true);
-      onChangeMapType(Number(data.woodNum));
-      onChangeCivil(data.civil);
-      onChangeNoWood(data.isNoWood);
+      changeIsLoading(true);
+      changeIsImportingData(true);
+      changeMapType(Number(data.woodNum));
+      changeCivil(data.civil);
+      changeNoWood(data.isNoWood);
       cells.init(Number(data.woodNum), data.civil, data.isNoWood);
       data.roads.forEach((v: any) => {
         const { line, column } = v;
@@ -578,7 +550,6 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
             const icon = (
               <MenuIcon src={require(`@/images/${v}.png`).default} alt={v} />
             );
-
             return !catalog[v as CatalogType].sub.length ? (
               <Menu.Item key={v} icon={icon}>
                 {v}
@@ -622,55 +593,4 @@ const LeftMenu: FC<LeftMenuProps> = (props: LeftMenuProps) => {
   );
 };
 
-const mapStateToProps = (state: any) => {
-  return {
-    isHamActive: state.TopMenu.isHamActive,
-    mapType: state.TopMenu.mapType,
-    civil: state.TopMenu.civil,
-    isMapRotated: state.TopMenu.isMapRotated,
-    operation: state.LeftMenu.operation,
-    copiedBuilding: state.Chessboard.copiedBuilding,
-    counter: state.Chessboard.counter,
-    specials: state.Panel.specials,
-  };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    onChangeHamButton: (isHamActive: boolean) => {
-      dispatch(changeHamButton(isHamActive));
-    },
-    onChangeOperation: (
-      operation: OperationType,
-      operationSub: string,
-      buildingConfig: Building
-    ) => {
-      dispatch(changeOperation(operation, operationSub, buildingConfig));
-    },
-    onChangeIsLoading: (isLoading: boolean) => {
-      dispatch(changeIsLoading(isLoading));
-    },
-    onChangeMapType: (mapType: number) => {
-      dispatch(changeMapType(mapType));
-    },
-    onChangeCivil: (civil: CivilType) => {
-      dispatch(changeCivil(civil));
-    },
-    onChangeNoWood: (isNoWood: boolean) => {
-      dispatch(changeNoWood(isNoWood));
-    },
-    onChangeIsImportingData: (isImportingData: boolean) => {
-      dispatch(changeIsImportingData(isImportingData));
-    },
-    onChangePanelTab: (tab: string) => {
-      dispatch(changePanelTab(tab));
-    },
-  };
-};
-
-const LeftMenuContainer = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(LeftMenu);
-
-export default LeftMenuContainer;
+export default LeftMenu;

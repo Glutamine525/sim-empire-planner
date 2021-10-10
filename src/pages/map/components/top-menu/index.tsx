@@ -1,43 +1,14 @@
 import Switcher from '@/components/switcher';
-import React, { FC } from 'react';
+import React from 'react';
 import { CivilArray, CivilType } from '@/types/civil';
-import { OperationType } from '@/types/operation';
-import { Counter } from '@/types/couter';
 import styles from './index.less';
-import { connect } from 'react-redux';
-import {
-  changeCivil,
-  changeTheme,
-  changeMapType,
-  changeMiniMap,
-  changeNoWood,
-  changeRotateMap,
-  changeIsLoading,
-} from '@/actions';
 import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu, Modal, Tooltip } from 'antd';
 import { EMAIL, LENGTH, MINOR_PATCH, VERSION } from '@/utils/config';
 import { copyLink } from '@/utils/browser';
 import { BuildingFixed } from '@/types/building-fixed';
-
-interface TopMenuProps {
-  mapType: number;
-  civil: CivilType;
-  isNoWood: boolean;
-  theme: ThemeType;
-  showMiniMap: boolean;
-  isMapRotated: boolean;
-  operation: OperationType;
-  operationSub: string;
-  counter: Counter;
-  onChangeIsLoading: any;
-  onChangeMapType: any;
-  onChangeCivil: any;
-  onChangeNoWood: any;
-  onChangeTheme: any;
-  onChangeMiniMap: any;
-  onChangeRotateMap: any;
-}
+import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
+import { MapAction } from '@/state';
 
 const helper = () => {
   return (
@@ -85,7 +56,7 @@ const helper = () => {
   );
 };
 
-const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
+export default function TopMenu() {
   const {
     mapType,
     civil,
@@ -93,17 +64,20 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
     theme,
     showMiniMap,
     isMapRotated,
+    counter,
     operation,
     operationSub,
-    counter,
-    onChangeIsLoading,
-    onChangeMapType,
-    onChangeCivil,
-    onChangeNoWood,
-    onChangeTheme,
-    onChangeMiniMap,
-    onChangeRotateMap,
-  } = props;
+  } = useValue<MapAction>(state => state.map);
+
+  const { changeIsLoading } = useAppCreators();
+  const {
+    changeMapType,
+    changeCivil,
+    changeNoWood,
+    changeTheme,
+    changeMiniMap,
+    changeRotateMap,
+  } = useMapCreators();
 
   const mapTypeDropdown = (
     <Menu
@@ -116,8 +90,8 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         if (Number(key) === mapType) return;
         const { Total, Fixed, Road } = counter;
         const callback = () => {
-          onChangeIsLoading(true);
-          onChangeMapType(Number(key));
+          changeIsLoading(true);
+          changeMapType(Number(key));
         };
         if (Total - Fixed || Road - 1) {
           Modal.confirm({
@@ -153,8 +127,8 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
         if (key === civil) return;
         const { Total, Fixed, Road } = counter;
         const callback = () => {
-          onChangeIsLoading(true);
-          onChangeCivil(key);
+          changeIsLoading(true);
+          changeCivil(key as CivilType);
         };
         if (Total - Fixed || Road - 1) {
           Modal.confirm({
@@ -180,21 +154,21 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
   );
 
   const onClickNoWood = () => {
-    onChangeIsLoading(true);
-    onChangeNoWood(!isNoWood);
+    changeIsLoading(true);
+    changeNoWood(!isNoWood);
   };
 
   const onClickTheme = () => {
-    onChangeIsLoading(true);
-    onChangeTheme(theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
+    changeIsLoading(true);
+    changeTheme(theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
   };
 
   const onClickMiniMap = () => {
-    onChangeMiniMap(!showMiniMap);
+    changeMiniMap(!showMiniMap);
   };
 
   const onClickRotateMap = () => {
-    onChangeRotateMap(!isMapRotated);
+    changeRotateMap(!isMapRotated);
   };
 
   return (
@@ -362,48 +336,4 @@ const TopMenu: FC<TopMenuProps> = (props: TopMenuProps) => {
       </div>
     </nav>
   );
-};
-
-const mapStateToProps = (state: any) => {
-  return {
-    mapType: state.TopMenu.mapType,
-    civil: state.TopMenu.civil,
-    isNoWood: state.TopMenu.isNoWood,
-    theme: state.TopMenu.theme,
-    showMiniMap: state.TopMenu.showMiniMap,
-    isMapRotated: state.TopMenu.isMapRotated,
-    operation: state.LeftMenu.operation,
-    operationSub: state.LeftMenu.operationSub,
-    counter: state.Chessboard.counter,
-  };
-};
-
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    onChangeIsLoading: (isLoading: boolean) => {
-      dispatch(changeIsLoading(isLoading));
-    },
-    onChangeMapType: (mapType: number) => {
-      dispatch(changeMapType(mapType));
-    },
-    onChangeCivil: (civil: CivilType) => {
-      dispatch(changeCivil(civil));
-    },
-    onChangeNoWood: (isNoWood: boolean) => {
-      dispatch(changeNoWood(isNoWood));
-    },
-    onChangeTheme: (theme: ThemeType) => {
-      dispatch(changeTheme(theme));
-    },
-    onChangeMiniMap: (showMiniMap: boolean) => {
-      dispatch(changeMiniMap(showMiniMap));
-    },
-    onChangeRotateMap: (isMapRotated: boolean) => {
-      dispatch(changeRotateMap(isMapRotated));
-    },
-  };
-};
-
-const TopMenuContainer = connect(mapStateToProps, mapDispatchToProps)(TopMenu);
-
-export default TopMenuContainer;
+}
