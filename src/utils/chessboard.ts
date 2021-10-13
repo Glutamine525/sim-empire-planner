@@ -1,4 +1,11 @@
-import { BorderStyleType, Building } from '@/types/building';
+import store from '@/state';
+import {
+  BorderStyleType,
+  Building,
+  CatalogType,
+  CivilBuilding,
+  SimpleBuilding,
+} from '@/types/building';
 import { LENGTH } from './config';
 import { getBuildingImage } from './screenshot';
 
@@ -142,3 +149,47 @@ export function mapRectToCell(rect: {
   h = (curLi - initLi) * 30;
   return { x, y, w, h };
 }
+
+export function isEmptyBuilding(b: Building) {
+  return Object.keys(b).length === 0;
+}
+
+export function converToBuilding(c: CatalogType, b: SimpleBuilding): Building {
+  const { civil } = store.getState().map;
+  const protect = CivilBuilding[civil]['防护'];
+  return {
+    Name: b.name,
+    Text: b.text || '',
+    Range: b.range || 0,
+    Catalog: c,
+    Marker: 0,
+    IsFixed: b.isFixed || false,
+    IsBarrier: b.isBarrier || false,
+    IsDecoration: b.isDecoration || c === CatalogType.General,
+    IsGeneral: b.isGeneral || false,
+    IsProtection:
+      b.isProtection ||
+      (c === CatalogType.Municipal && protect.includes(b.name)),
+    IsRoad: b.isRoad || false,
+    IsWonder:
+      c === CatalogType.Wonder ||
+      b.isWonder ||
+      b.isMiracle ||
+      b.isPalace ||
+      (b.catagory === '市政' && ['皇宫', '宫殿'].includes(b.name)),
+    Width: b.size || b.width || 1,
+    Height: b.size || b.height || 1,
+    Color: b.color || '#000000',
+    Shadow: b.shadow || '#ffffff',
+    FontSize: b.fontSize || 1.4,
+    Background: b.background || '#ffffff',
+    BorderColor: '#000000',
+    BorderWidth: 0.1,
+    BorderTStyle: 'solid' as BorderStyleType,
+    BorderBStyle: 'solid' as BorderStyleType,
+    BorderRStyle: 'solid' as BorderStyleType,
+    BorderLStyle: 'solid' as BorderStyleType,
+  };
+}
+
+export function placeBuilding(l: number, c: number, b: Building) {}

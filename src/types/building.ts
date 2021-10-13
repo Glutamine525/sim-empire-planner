@@ -58,6 +58,8 @@ export enum BorderStyleType {
 export interface SimpleBuilding {
   name: string;
   text?: string;
+  catalog?: string;
+  catagory?: string;
   size?: number;
   width?: number;
   height?: number;
@@ -68,8 +70,13 @@ export interface SimpleBuilding {
   fontSize?: number;
   isRoad?: boolean;
   isWonder?: boolean;
+  isMiracle?: boolean;
   isDecoration?: boolean;
   isPalace?: boolean;
+  isGeneral?: boolean;
+  isProtection?: boolean;
+  isBarrier?: boolean;
+  isFixed?: boolean;
 }
 
 export interface Building {

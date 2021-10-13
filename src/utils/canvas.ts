@@ -1,8 +1,11 @@
+import {
+  buildingCanvasRef,
+  markerCanvasRef,
+  miniMapCanvasRef,
+} from '@/pages/map/components/chessboard';
 import { MINI_MAP_RATIO } from '@/pages/map/components/chessboard/components/mini-map';
 import { Building } from '@/types/building';
-import { CivilType } from '@/types/civil';
 import { RefObject } from 'react';
-import { showMarker } from './chessboard';
 import { RATIO } from './screenshot';
 
 export function getContext(canvasRef: RefObject<HTMLCanvasElement>) {
@@ -29,15 +32,10 @@ export function fillRect(
   ctx.fillRect(x, y, w, h);
 }
 
-export function drawMiniMap(
-  canvasRef: RefObject<HTMLCanvasElement>,
-  line: number,
-  column: number,
-  building: Building
-) {
+export function drawMiniMap(line: number, column: number, building: Building) {
   const { Background, Width, Height } = building;
   fillRect(
-    canvasRef,
+    miniMapCanvasRef,
     MINI_MAP_RATIO * (column - 1),
     MINI_MAP_RATIO * (line - 1),
     MINI_MAP_RATIO * Width,
@@ -46,13 +44,24 @@ export function drawMiniMap(
   );
 }
 
-export function draw(
-  canvasRef: RefObject<HTMLCanvasElement>,
+export function drawBuilding(
   line: number,
   column: number,
   image: HTMLImageElement
 ) {
-  getContext(canvasRef).drawImage(
+  getContext(buildingCanvasRef).drawImage(
+    image,
+    (column - 1) * 30 * RATIO,
+    (line - 1) * 30 * RATIO
+  );
+}
+
+export function drawMarker(
+  line: number,
+  column: number,
+  image: HTMLImageElement
+) {
+  getContext(markerCanvasRef).drawImage(
     image,
     (column - 1) * 30 * RATIO,
     (line - 1) * 30 * RATIO

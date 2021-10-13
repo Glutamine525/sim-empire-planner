@@ -1,5 +1,5 @@
 import PerfectScrollbar from 'perfect-scrollbar';
-import { getScreenSize } from '@/utils/browser';
+import { getCoord, getScreenSize } from '@/utils/browser';
 import { LENGTH } from '@/utils/config';
 import { useAppCreators, useValue } from '@/utils/hook';
 import { getBuildingImage } from '@/utils/screenshot';
@@ -15,6 +15,8 @@ import styles from './index.less';
 import { ThemeColor } from '@/types/theme';
 import {
   getRoadImageBuffer,
+  isAllInRange,
+  isEmptyBuilding,
   isInRange,
   mapRectToCell,
   showMarker as showBuildingMarker,
@@ -32,11 +34,15 @@ import {
 } from '@/types/building';
 import { OperationType } from '@/types/operation';
 import MiniMap, { MINI_MAP_SIZE } from './components/mini-map';
+import BuildingContainer from '@/pages/map/components/building-container';
 import Canvases from './components/canvases';
 import Box from './components/box';
 import BoxEffect from './components/box-effect';
 import Range from './components/range';
 import { Cells } from '@/utils/cells';
+
+const LEFT_OFFSET = 86;
+const TOP_OFFSET = 80;
 
 const initBuildingPos = { l: -1, oL: -1, c: -1, oC: -1 };
 const initRect = { x: -1, y: -1, w: -1, h: -1 };
@@ -70,10 +76,11 @@ function Chessboard() {
   const [origin, setOrigin] = useState({ x: -1, y: -1 }); // 按下鼠标时的坐标
   const [current, setCurrent] = useState({ x: -1, y: -1 }); // 当前鼠标坐标
   const [showBuilding, setShowBuilding] = useState(false);
-  const [buildingPos, setBuildingPos] = useState({ ...initBuildingPos }); // 建筑位置
+  const [buildingPos, setBuildingPos] = useState({ ...initBuildingPos }); // 鼠标指向的建筑位置
   const [cellOccupied, setCellOccupied] = useState(false);
   const [buildingMarker, setBuildingMarker] = useState(0);
   const [hoveredBuilding, setHoveredBuilding] = useState<Building>({} as any);
+  const [roadBuffer, setRoadBuffer] = useState(new Set<string>());
   const [showBox, setShowBox] = useState(false);
   const [boxRect, setBoxRect] = useState({ ...initRect });
   const [showBoxButton, setShowBoxButton] = useState(false);
@@ -88,7 +95,7 @@ function Chessboard() {
     () => Array.from(Array(LENGTH + 1), () => null) as any[],
     []
   );
-  const markerBuffer = useMemo(() => {
+  const markerImageBuffer = useMemo(() => {
     const num = protectNum + 1;
     return {
       [MarkerColor.Normal]: roadMarkerBuffer,
@@ -230,6 +237,10 @@ function Chessboard() {
     resetState();
   }, [operation]);
 
+  useEffect(() => {
+    if (isEmptyBuilding(building)) return;
+  }, [building]);
+
   const resetState = () => {
     setShowBuilding(false);
     setCellOccupied(false);
@@ -259,8 +270,8 @@ function Chessboard() {
       setShowBox(true);
       setShowBoxButton(false);
       setBoxRect({
-        x: getScrollLeft() + offsetX! - 86,
-        y: getScrollTop() + offsetY! - 80,
+        x: getScrollLeft() + offsetX! - LEFT_OFFSET,
+        y: getScrollTop() + offsetY! - TOP_OFFSET,
         w: 0,
         h: 0,
       });
@@ -268,8 +279,8 @@ function Chessboard() {
       const { x, y } = boxRect;
       setBoxRect(state => ({
         ...state,
-        w: getScrollLeft() + offsetX! - 86 - x,
-        h: getScrollTop() + offsetY! - 80 - y,
+        w: getScrollLeft() + offsetX! - LEFT_OFFSET - x,
+        h: getScrollTop() + offsetY! - TOP_OFFSET - y,
       }));
     } else if (type === 'up') {
       if (building.IsRoad) {
@@ -292,6 +303,13 @@ function Chessboard() {
           setBoxBuffer(state => state.add(occupied));
         }
       }
+    }
+  };
+
+  const updateBuilding = (type: string, offsetX?: number, offsetY?: number) => {
+    if (type === 'down') {
+    } else if (type === 'move') {
+    } else if (type === 'up') {
     }
   };
 
@@ -320,19 +338,63 @@ function Chessboard() {
   };
 
   const onWrapperMouseMove: MouseEventHandler<HTMLDivElement> = event => {
-    if (!isDragging) return;
-    const { ctrlKey, clientX, clientY, target } = event;
-    if (ctrlKey) {
+    const { ctrlKey, target, clientX, clientY, pageX, pageY } = event;
+    const [offsetX, offsetY] = [
+      pageX + getScrollLeft() - LEFT_OFFSET,
+      pageY + getScrollTop() - TOP_OFFSET,
+    ];
+    const { line: l, column: c } = getCoord(offsetX, offsetY);
+    if (
+      isDragging &&
+      (ctrlKey || (isMapRotated && operation !== OperationType.Watermark))
+    ) {
       dragMap('move', clientX, clientY);
       return;
     }
     switch (operation) {
       case OperationType.Empty:
-        dragMap('move', clientX, clientY);
+        if (isDragging) dragMap('move', clientX, clientY);
         break;
       case OperationType.Placing:
-        if (isDragging && building.IsRoad) {
+        const { Height, Width } = buildingConfig;
+        const [oL, oC] = [
+          -Math.floor((Height - 1) / 2),
+          -Math.floor((Width - 1) / 2),
+        ];
+        if (!isAllInRange(l + oL, c + oC, Width - 1, Height - 1)) {
+          setShowBuilding(false);
+          setCellOccupied(false);
+          return;
+        }
+        const [canP, marker] = cells.canPlace(l + oL, c + oC, Width, Height);
+        const [canR, gM, gL, gC] = cells.canReplace(l, c, Width, Height);
+        if (!buildingConfig.IsGeneral && canR) {
+          setShowBuilding(true);
+          setBuildingMarker(gM);
+          setCellOccupied(false);
+          setBuildingPos({ l: gL, oL: 0, c: gC, oC: 0 });
+        } else {
+          setShowBuilding(true);
+          setBuildingMarker(marker);
+          setCellOccupied(!canP);
+          setBuildingPos({ l, oL, c, oC });
+        }
+        if (!isDragging || (!canP && !canR)) return;
+        if (building.IsRoad) {
           updateBoxRect('move', clientX, clientY);
+          setRoadBuffer(state => state.add(`${l}-${c}`));
+          return;
+        }
+        if (canR) {
+          // deleteBuilding(generalLine, generalColumn, {});
+          // placeBuilding(buildingConfig, generalLine, generalColumn, {});
+        } else if (canP) {
+          // placeBuilding(
+          //   buildingConfig,
+          //   line + offsetLine,
+          //   column + offsetColumn,
+          //   { updateRoad: false }
+          // );
         }
         break;
       case OperationType.Select:
@@ -454,6 +516,17 @@ function Chessboard() {
           markerCanvasRef={markerCanvasRef}
         />
         <div className={styles.function}>
+          <BuildingContainer
+            scene="map"
+            show={showBuilding}
+            operation={operation}
+            building={building}
+            cellOccupied={cellOccupied}
+            line={buildingPos.l + buildingPos.oL}
+            column={buildingPos.c + buildingPos.oC}
+            marker={buildingMarker}
+            protectNum={protectNum}
+          />
           <Range
             show={showBuilding}
             size={building.Range || 0}
