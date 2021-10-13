@@ -4,7 +4,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 
-const privateKey = fs.readFileSync('simempire.fun.pem');
+const privateKey = fs.readFileSync('simempire.fun.key');
 const certificate = fs.readFileSync('simempire.fun.pem');
 
 const app = express();
