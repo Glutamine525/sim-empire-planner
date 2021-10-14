@@ -9,14 +9,18 @@ const fs = require('fs');
 const privateKey = fs.readFileSync('simempire.fun.key');
 const certificate = fs.readFileSync('simempire.fun.pem');
 
-const app = express();
+const httpApp = express();
+httpApp.all('*', (req, res) => {
+  const { path } = req;
+  res.redirect(301, `https://www.simempire.fun${path}`);
+});
+http.createServer(httpApp).listen(PORT);
 
-app.use(express.static(path.join(__dirname, '../build')));
-app.get('*', (req, res) => {
+const httpsApp = express();
+httpsApp.use(express.static(path.join(__dirname, '../build')));
+httpsApp.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/../build/index.html'));
 });
-
-app.listen(PORT);
 
 https
   .createServer(
@@ -24,7 +28,7 @@ https
       key: privateKey,
       cert: certificate,
     },
-    app
+    httpsApp
   )
   .listen(SECURE_PORT);
 

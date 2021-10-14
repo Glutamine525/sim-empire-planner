@@ -8,7 +8,6 @@ import { getMiniMapInStorage, getThemeInStorage } from './utils/storage';
 import NoMatch from './pages/no-match';
 import { useAppCreators, useMapCreators, useValue } from './utils/hook';
 import { AppAction } from './state/reducers/app';
-import { ORIGIN } from './utils/config';
 
 const App = () => {
   const { isLoading, theme } = useValue<AppAction>(state => state.app);
@@ -39,13 +38,6 @@ const App = () => {
     document.body.removeChild(document.getElementById('init-loading')!);
     changeIsLoading(false);
     document.addEventListener('contextmenu', event => event.preventDefault());
-    if (process.env.NODE_ENV !== 'production') return;
-    if (
-      window.location.protocol === 'http:' ||
-      window.location.host === 'simempire.fun'
-    ) {
-      window.location.replace(`https://${ORIGIN}${window.location.pathname}`);
-    }
   }, []); // eslint-disable-line
 
   useEffect(() => {
