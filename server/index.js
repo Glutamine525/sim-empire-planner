@@ -14,7 +14,7 @@ httpApp.all('*', (req, res) => {
   const { path } = req;
   res.redirect(301, `https://www.simempire.fun${path}`);
 });
-http.createServer(httpApp).listen(PORT);
+httpApp.listen(PORT);
 
 const httpsApp = express();
 httpsApp.use(express.static(path.join(__dirname, '../build')));
