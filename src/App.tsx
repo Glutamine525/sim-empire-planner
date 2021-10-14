@@ -7,14 +7,13 @@ import Loading from './components/loading';
 import { getMiniMapInStorage, getThemeInStorage } from './utils/storage';
 import NoMatch from './pages/no-match';
 import { useAppCreators, useMapCreators, useValue } from './utils/hook';
-import { MapAction } from './state';
 import { AppAction } from './state/reducers/app';
+import { ORIGIN } from './utils/config';
 
 const App = () => {
-  const { isLoading } = useValue<AppAction>(state => state.app);
-  const { theme } = useValue<MapAction>(state => state.map);
-  const { changeIsLoading } = useAppCreators();
-  const { changeTheme, changeMiniMap } = useMapCreators();
+  const { isLoading, theme } = useValue<AppAction>(state => state.app);
+  const { changeIsLoading, changeTheme } = useAppCreators();
+  const { changeMiniMap } = useMapCreators();
 
   useEffect(() => {
     const themeInStorage = getThemeInStorage();
@@ -40,6 +39,13 @@ const App = () => {
     document.body.removeChild(document.getElementById('init-loading')!);
     changeIsLoading(false);
     document.addEventListener('contextmenu', event => event.preventDefault());
+    if (process.env.NODE_ENV !== 'production') return;
+    if (
+      window.location.protocol === 'http:' ||
+      window.location.host === 'simempire.fun'
+    ) {
+      window.location.replace(`https://${ORIGIN}${window.location.pathname}`);
+    }
   }, []); // eslint-disable-line
 
   useEffect(() => {

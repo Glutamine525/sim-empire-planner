@@ -1,5 +1,8 @@
+import Switcher from '@/components/switcher';
 import { MapAction } from '@/state';
-import { useMapCreators, useValue } from '@/utils/hook';
+import { AppAction } from '@/state/reducers/app';
+import { ThemeType } from '@/types/theme';
+import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
 import { Tabs } from 'antd';
 import React from 'react';
 import Archive from './components/archive';
@@ -9,11 +12,17 @@ import styles from './index.less';
 const { TabPane } = Tabs;
 
 function Panel() {
+  const { theme } = useValue<AppAction>(state => state.app);
   const { isPanelActive, tab } = useValue<MapAction>(state => state.map);
 
+  const { changeTheme } = useAppCreators();
   const { changePanelTab } = useMapCreators();
 
   const onTabClick = (key: string) => changePanelTab(key);
+
+  const onClickTheme = () => {
+    changeTheme(theme === ThemeType.Light ? ThemeType.Dark : ThemeType.Light);
+  };
 
   return (
     <div
@@ -34,6 +43,14 @@ function Panel() {
           Content of Tab Pane 2: 生成文明
         </TabPane>
       </Tabs>
+      <div className={styles['theme-container']}>
+        <Switcher
+          id="theme-in-panel"
+          type="daynight"
+          value={theme === ThemeType.Light}
+          onClick={onClickTheme}
+        />
+      </div>
     </div>
   );
 }

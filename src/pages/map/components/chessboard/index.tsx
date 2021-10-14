@@ -40,6 +40,7 @@ import Box from './components/box';
 import BoxEffect from './components/box-effect';
 import Range from './components/range';
 import { Cells } from '@/utils/cells';
+import { AppAction } from '@/state/reducers/app';
 
 const LEFT_OFFSET = 86;
 const TOP_OFFSET = 80;
@@ -55,11 +56,11 @@ export const miniMapCanvasRef = createRef<HTMLCanvasElement>();
 const cells = Cells.getInstance();
 
 function Chessboard() {
+  const { theme } = useValue<AppAction>(state => state.app);
   const {
     mapType,
     civil,
     isNoWood,
-    theme,
     showMiniMap,
     isMapRotated,
     operation,

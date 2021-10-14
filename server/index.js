@@ -1,4 +1,5 @@
-const PORT = 443;
+const PORT = 80;
+const SECURE_PORT = 443;
 
 const https = require('https');
 const express = require('express');
@@ -15,6 +16,8 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '/../build/index.html'));
 });
 
+app.listen(PORT);
+
 https
   .createServer(
     {
@@ -23,6 +26,6 @@ https
     },
     app
   )
-  .listen(PORT);
+  .listen(SECURE_PORT);
 
-console.log(`running the server on port ${PORT}`);
+console.log(`running the server on port ${PORT}, ${SECURE_PORT}`);

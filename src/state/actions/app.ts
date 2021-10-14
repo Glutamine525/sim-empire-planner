@@ -1,3 +1,4 @@
+import { ThemeType } from '@/types/theme';
 import { ActionType } from '.';
 
 export const changeIsLoading = (isLoading: boolean) => {
@@ -6,5 +7,11 @@ export const changeIsLoading = (isLoading: boolean) => {
       type: ActionType.ChangeIsLoading,
       isLoading,
     });
+  };
+};
+
+export const changeTheme = (theme: ThemeType) => {
+  return (dispatch: any) => {
+    dispatch({ type: ActionType.ChangeTheme, theme });
   };
 };

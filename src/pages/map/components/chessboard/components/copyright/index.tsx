@@ -1,6 +1,6 @@
 import { CivilType } from '@/types/civil';
 import { copyLink } from '@/utils/browser';
-import { VERSION, WEBSITE } from '@/utils/config';
+import { ORIGIN, VERSION } from '@/utils/config';
 import React from 'react';
 import styles from './index.less';
 
@@ -33,8 +33,8 @@ function Copyright(props: CopyrightProps) {
       </div>
       <div>
         <span>网页链接: </span>
-        <strong className={styles.link} onClick={() => copyLink(WEBSITE)}>
-          {WEBSITE}
+        <strong className={styles.link} onClick={() => copyLink(ORIGIN)}>
+          {ORIGIN}
         </strong>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { copyLink } from '@/utils/browser';
 import { BuildingFixed } from '@/types/building-fixed';
 import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
 import { MapAction } from '@/state';
+import { AppAction } from '@/state/reducers/app';
 
 const helper = () => {
   return (
@@ -57,11 +58,11 @@ const helper = () => {
 };
 
 export default function TopMenu() {
+  const { theme } = useValue<AppAction>(state => state.app);
   const {
     mapType,
     civil,
     isNoWood,
-    theme,
     showMiniMap,
     isMapRotated,
     counter,
@@ -69,12 +70,11 @@ export default function TopMenu() {
     operationSub,
   } = useValue<MapAction>(state => state.map);
 
-  const { changeIsLoading } = useAppCreators();
+  const { changeIsLoading, changeTheme } = useAppCreators();
   const {
     changeMapType,
     changeCivil,
     changeNoWood,
-    changeTheme,
     changeMiniMap,
     changeRotateMap,
   } = useMapCreators();

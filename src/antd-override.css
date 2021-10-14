@@ -97,6 +97,7 @@ img + .ant-menu-title-content {
   padding-top: 0.2rem;
   width: 100%;
   background: var(--background-lighter);
+  transition: background 0.3s ease-in-out;
 }
 
 .ant-tabs-nav-wrap {
@@ -105,6 +106,7 @@ img + .ant-menu-title-content {
 
 .ant-tabs-top > .ant-tabs-nav::before {
   border-color: var(--border-base);
+  transition: border-color 0.3s ease-in-out;
 }
 
 .ant-tabs-tab {
@@ -153,17 +155,20 @@ img + .ant-menu-title-content {
 .ant-input-affix-wrapper {
   border-color: var(--border-base);
   background: var(--background-lighter);
+  transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out;
 }
 
 .ant-input {
   color: var(--text-primary);
   background: var(--background-lighter);
+  transition: background 0.3s ease-in-out;
 }
 
 .ant-input-number {
   border-color: var(--border-base);
   color: var(--text-primary);
   background: var(--background-lighter);
+  transition: border-color 0.3s ease-in-out, background 0.3s ease-in-out;
 }
 
 .ant-input-number-handler-wrap {

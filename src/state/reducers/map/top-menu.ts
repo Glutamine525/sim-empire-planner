@@ -1,7 +1,6 @@
 import { ActionType } from '@/state/actions';
 import { CivilType } from '@/types/civil';
-import { ThemeType } from '@/types/theme';
-import { setMiniMapInStorage, setThemeInStorage } from '@/utils/storage';
+import { setMiniMapInStorage } from '@/utils/storage';
 
 export interface TopMenuAction {
   type: ActionType;
@@ -9,7 +8,6 @@ export interface TopMenuAction {
   mapType: number;
   civil: CivilType;
   isNoWood: boolean;
-  theme: ThemeType;
   showMiniMap: boolean;
   isMapRotated: boolean;
 }
@@ -20,7 +18,6 @@ export const InitTopMenuState: TopMenuAction = {
   mapType: 5,
   civil: CivilType.China,
   isNoWood: false,
-  theme: ThemeType.Light,
   showMiniMap: true,
   isMapRotated: false,
 };
@@ -45,9 +42,6 @@ const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
       return { ...state, civil: action.civil };
     case ActionType.ChangeNoWood:
       return { ...state, isNoWood: action.isNoWood };
-    case ActionType.ChangeTheme:
-      setThemeInStorage(action.theme);
-      return { ...state, theme: action.theme };
     case ActionType.ChangeMiniMap:
       setMiniMapInStorage(action.showMiniMap);
       return { ...state, showMiniMap: action.showMiniMap };
