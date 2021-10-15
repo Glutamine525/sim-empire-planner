@@ -8,13 +8,29 @@
   flex-direction: column;
   transition: opacity 0.2s linear, visibility 0.2s linear;
 
-  & > div > span + span {
-    margin-left: 1.6rem;
+  // & > div > span + span {
+  //   margin-left: 1.6rem;
+  // }
+
+  & > div {
+    display: flex;
+    align-items: center;
+    gap: 1.6rem;
+  }
+
+  & > div > span {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  img {
+    display: inline;
   }
 }
 
 .link {
   cursor: pointer;
+  white-space: pre;
 
   &:hover {
     text-shadow: var(--text-primary) 0 0 0.1rem;

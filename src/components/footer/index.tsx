@@ -1,5 +1,5 @@
 import { copyLink } from '@/utils/browser';
-import { EMAIL, ICP, ORIGIN } from '@/utils/config';
+import { BEIAN, EMAIL, ICP, ORIGIN } from '@/utils/config';
 import React from 'react';
 import styles from './index.less';
 
@@ -20,6 +20,14 @@ function Footer(props: FooterProps) {
     >
       <div>
         <span>
+          联系邮箱：
+          <strong className={styles.link} onClick={() => copyLink(EMAIL)}>
+            {EMAIL}
+          </strong>
+        </span>
+      </div>
+      <div>
+        <span>
           <strong>
             © 2021
             {new Date().getFullYear() === 2021
@@ -28,19 +36,27 @@ function Footer(props: FooterProps) {
             {ORIGIN} 版权所有
           </strong>
         </span>
-        <span>
-          联系邮箱:
-          <strong className={styles.link} onClick={() => copyLink(EMAIL)}>
-            {EMAIL}
-          </strong>
-        </span>
       </div>
       <div>
-        <strong className={styles.link}>
-          <a href="http://beian.miit.gov.cn" target="_blank" rel="noreferrer">
-            {ICP}
-          </a>
-        </strong>
+        <span>
+          <img src={require(`@/images/备案.png`).default} alt="备案" />
+          <strong className={styles.link}>
+            <a
+              href="//www.beian.gov.cn/portal/registerSystemInfo?recordcode=42010302002383"
+              target="_blank"
+              rel="noreferrer"
+            >
+              {` ${BEIAN}`}
+            </a>
+          </strong>
+        </span>
+        <span>
+          <strong className={styles.link}>
+            <a href="//beian.miit.gov.cn" target="_blank" rel="noreferrer">
+              {ICP}
+            </a>
+          </strong>
+        </span>
       </div>
     </div>
   );
