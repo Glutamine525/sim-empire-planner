@@ -33,7 +33,10 @@ function Footer(props: FooterProps) {
             {new Date().getFullYear() === 2021
               ? ' '
               : `-${new Date().getFullYear()} `}
-            {ORIGIN} 版权所有
+            <strong className={styles.link} onClick={() => copyLink(EMAIL)}>
+              {ORIGIN}
+            </strong>
+            {' 版权所有'}
           </strong>
         </span>
       </div>

@@ -90,7 +90,7 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "style": "stylelint 'src/**/*.(vue|css|less)' --fix",
-    "deploy": "npm install && react-app-rewired build && node ./server/index.js"
+    "deploy": "npm install && react-app-rewired build && cd server && nohup node index.js &"
   },
   "eslintConfig": {
     "extends": [
