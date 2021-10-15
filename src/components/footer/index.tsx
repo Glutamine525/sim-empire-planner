@@ -42,7 +42,7 @@ function Footer(props: FooterProps) {
           <img src={require(`@/images/备案.png`).default} alt="备案" />
           <strong className={styles.link}>
             <a
-              href="//www.beian.gov.cn/portal/registerSystemInfo?recordcode=42010302002383"
+              href="http://www.beian.gov.cn/portal/registerSystemInfo?recordcode=42010302002383"
               target="_blank"
               rel="noreferrer"
             >
@@ -52,7 +52,7 @@ function Footer(props: FooterProps) {
         </span>
         <span>
           <strong className={styles.link}>
-            <a href="//beian.miit.gov.cn" target="_blank" rel="noreferrer">
+            <a href="http://beian.miit.gov.cn" target="_blank" rel="noreferrer">
               {ICP}
             </a>
           </strong>

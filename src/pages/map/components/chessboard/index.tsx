@@ -176,7 +176,7 @@ function Chessboard() {
       const [, height] = getWrapperSize();
       const [, scrollHeight] = getScreenSize();
       const top = getScrollTop();
-      setShowFooter((top + scrollHeight) / height > 0.99);
+      setShowFooter((top + scrollHeight) / height > 0.98);
     });
     window.addEventListener('resize', onResize);
     document.addEventListener('mouseleave', () => {
