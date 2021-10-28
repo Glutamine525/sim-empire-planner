@@ -48,7 +48,7 @@ const helper = () => {
         模拟帝国地图编辑器 <strong>{`V${VERSION}.${MINOR_PATCH}`}</strong>
       </div>
       <div style={{ textAlign: 'center' }}>
-        作者邮箱:{' '}
+        联系邮箱：
         <strong className={styles.link} onClick={() => copyLink(EMAIL)}>
           {EMAIL}
         </strong>

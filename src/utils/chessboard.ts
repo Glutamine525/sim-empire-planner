@@ -29,7 +29,7 @@ export function getRoadImageBuffer(): {
     Height: 1,
     IsRoad: true,
   } as any;
-  let styles = {} as { [key: string]: Promise<HTMLImageElement> };
+  let result = {} as { [key: string]: Promise<HTMLImageElement> };
   for (let l of h) {
     for (let r of h) {
       for (let t of v) {
@@ -38,12 +38,12 @@ export function getRoadImageBuffer(): {
           building.BorderRStyle = r;
           building.BorderBStyle = b;
           building.BorderLStyle = l;
-          styles[`${t} ${r} ${b} ${l}`] = getBuildingImage(building);
+          result[`${t} ${r} ${b} ${l}`] = getBuildingImage(building);
         }
       }
     }
   }
-  return styles;
+  return result;
 }
 
 export function isInRange(line: number, column: number) {

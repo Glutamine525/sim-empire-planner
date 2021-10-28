@@ -41,6 +41,7 @@ import BoxEffect from './components/box-effect';
 import Range from './components/range';
 import { Cells } from '@/utils/cells';
 import { AppAction } from '@/state/reducers/app';
+import ImageBuffer from '@/utils/image-buffer';
 
 const LEFT_OFFSET = 86;
 const TOP_OFFSET = 80;
@@ -54,6 +55,7 @@ export const markerCanvasRef = createRef<HTMLCanvasElement>();
 export const miniMapCanvasRef = createRef<HTMLCanvasElement>();
 
 const cells = Cells.getInstance();
+const imageBuffer = ImageBuffer.getInstance();
 
 function Chessboard() {
   const { theme } = useValue<AppAction>(state => state.app);
@@ -173,8 +175,8 @@ function Chessboard() {
     wrapperOuter.addEventListener('ps-scroll-x', () => updateMiniRect());
     wrapperOuter.addEventListener('ps-scroll-y', () => {
       updateMiniRect();
-      const [, height] = getWrapperSize();
-      const [, scrollHeight] = getScreenSize();
+      const height = getWrapperSize()[1];
+      const scrollHeight = getScreenSize()[1];
       const top = getScrollTop();
       setShowFooter((top + scrollHeight) / height > 0.98);
     });
@@ -240,6 +242,8 @@ function Chessboard() {
 
   useEffect(() => {
     if (isEmptyBuilding(building)) return;
+    if (building.IsRoad) imageBuffer.get('road', 'solid solid solid solid');
+    else imageBuffer.get('building', building.Catalog, building.Name);
   }, [building]);
 
   const resetState = () => {

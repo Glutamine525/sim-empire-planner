@@ -25,8 +25,6 @@ export const InitTopMenuState: TopMenuAction = {
 const TopMenu = (state = InitTopMenuState, action: TopMenuAction) => {
   switch (action.type) {
     case ActionType.ChangeIsPanelActive:
-      console.log(state, action.isPanelActive);
-
       let chessboard = document.getElementById('chessboard-wrapper');
       if (!action.isPanelActive) {
         chessboard!.style.display = 'block';
