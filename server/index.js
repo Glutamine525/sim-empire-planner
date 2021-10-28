@@ -19,6 +19,7 @@ httpApp.listen(PORT);
 const httpsApp = express();
 httpsApp.use(express.static(path.join(__dirname, '../build')));
 httpsApp.get('*', (req, res) => {
+  console.log(req);
   res.sendFile(path.join(__dirname, '/../build/index.html'));
 });
 
