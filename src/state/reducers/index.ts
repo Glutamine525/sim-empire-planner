@@ -1,5 +1,7 @@
-import concatReducers from '@/utils/concat-reducers';
 import { combineReducers } from 'redux';
+
+import concatReducers from '@/utils/concat-reducers';
+
 import { MapAction } from '..';
 import App from './app';
 import Chessboard from './map/chessboard';

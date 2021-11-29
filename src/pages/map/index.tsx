@@ -1,8 +1,10 @@
+import React from 'react';
+
 import HamButton from '@/components/ham-button';
 import { MapAction } from '@/state';
 import { AppAction } from '@/state/reducers/app';
 import { useMapCreators, useValue } from '@/utils/hook';
-import React from 'react';
+
 import Chessboard from './components/chessboard';
 import LeftMenu from './components/left-menu';
 import Panel from './components/panel';

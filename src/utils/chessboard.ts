@@ -6,6 +6,7 @@ import {
   CivilBuilding,
   SimpleBuilding,
 } from '@/types/building';
+
 import { LENGTH } from './config';
 import { getBuildingImage } from './screenshot';
 

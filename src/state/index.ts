@@ -1,5 +1,6 @@
 import { applyMiddleware, createStore } from 'redux';
 import thunk from 'redux-thunk';
+
 import reducers from './reducers';
 import { AppAction } from './reducers/app';
 import { ChessboardAction } from './reducers/map/chessboard';

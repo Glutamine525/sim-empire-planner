@@ -1,4 +1,5 @@
 import { SimpleBuilding } from '@/types/building';
+
 import { ActionType } from '..';
 
 export const insertSpecialBuilding = (targetSpecial: SimpleBuilding) => {

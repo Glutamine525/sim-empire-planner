@@ -1,4 +1,5 @@
 import React from 'react';
+
 import styles from './index.less';
 
 function Coord(props: { line: number; column: number }) {

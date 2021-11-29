@@ -1,7 +1,7 @@
-import * as MapTopMenuActionCreators from './map/top-menu';
-import * as MapLeftMenuActionCreators from './map/left-menu';
 import * as MapChessboardActionCreators from './map/chessboard';
+import * as MapLeftMenuActionCreators from './map/left-menu';
 import * as MapPanelActionCreators from './map/panel';
+import * as MapTopMenuActionCreators from './map/top-menu';
 
 export enum ActionType {
   Empty,

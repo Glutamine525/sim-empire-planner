@@ -1,13 +1,15 @@
-import { DarkColor, LightColor, ThemeType } from '@/types/theme';
+import { message } from 'antd';
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+
 import Map from '@/pages/map';
-import { message } from 'antd';
+import { DarkColor, LightColor, ThemeType } from '@/types/theme';
+
 import Loading from './components/loading';
-import { getMiniMapInStorage, getThemeInStorage } from './utils/storage';
 import NoMatch from './pages/no-match';
-import { useAppCreators, useMapCreators, useValue } from './utils/hook';
 import { AppAction } from './state/reducers/app';
+import { useAppCreators, useMapCreators, useValue } from './utils/hook';
+import { getMiniMapInStorage, getThemeInStorage } from './utils/storage';
 
 const App = () => {
   const { isLoading, theme } = useValue<AppAction>(state => state.app);

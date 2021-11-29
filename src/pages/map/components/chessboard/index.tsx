@@ -1,29 +1,17 @@
 import PerfectScrollbar from 'perfect-scrollbar';
-import { getCoord, getScreenSize } from '@/utils/browser';
-import { LENGTH } from '@/utils/config';
-import { useAppCreators, useValue } from '@/utils/hook';
-import { getBuildingImage } from '@/utils/screenshot';
 import React, {
   createRef,
+  MouseEventHandler,
   useEffect,
   useMemo,
-  useState,
-  MouseEventHandler,
   useRef,
+  useState,
 } from 'react';
-import styles from './index.less';
-import { ThemeColor } from '@/types/theme';
-import {
-  getRoadImageBuffer,
-  isAllInRange,
-  isEmptyBuilding,
-  isInRange,
-  mapRectToCell,
-  showMarker as showBuildingMarker,
-} from '@/utils/chessboard';
-import Copyright from './components/copyright';
+
 import Footer from '@/components/footer';
+import BuildingContainer from '@/pages/map/components/building-container';
 import { MapAction } from '@/state';
+import { AppAction } from '@/state/reducers/app';
 import {
   Building,
   BuildingType,
@@ -33,15 +21,29 @@ import {
   MarkerColor,
 } from '@/types/building';
 import { OperationType } from '@/types/operation';
-import MiniMap, { MINI_MAP_SIZE } from './components/mini-map';
-import BuildingContainer from '@/pages/map/components/building-container';
-import Canvases from './components/canvases';
+import { ThemeColor } from '@/types/theme';
+import { getCoord, getScreenSize } from '@/utils/browser';
+import { Cells } from '@/utils/cells';
+import {
+  getRoadImageBuffer,
+  isAllInRange,
+  isEmptyBuilding,
+  isInRange,
+  mapRectToCell,
+  showMarker as showBuildingMarker,
+} from '@/utils/chessboard';
+import { LENGTH } from '@/utils/config';
+import { useAppCreators, useValue } from '@/utils/hook';
+import ImageBuffer from '@/utils/image-buffer';
+import { getBuildingImage } from '@/utils/screenshot';
+
 import Box from './components/box';
 import BoxEffect from './components/box-effect';
+import Canvases from './components/canvases';
+import Copyright from './components/copyright';
+import MiniMap, { MINI_MAP_SIZE } from './components/mini-map';
 import Range from './components/range';
-import { Cells } from '@/utils/cells';
-import { AppAction } from '@/state/reducers/app';
-import ImageBuffer from '@/utils/image-buffer';
+import styles from './index.less';
 
 const LEFT_OFFSET = 86;
 const TOP_OFFSET = 80;

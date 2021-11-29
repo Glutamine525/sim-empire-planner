@@ -1,13 +1,15 @@
 import { Button, Input, InputNumber, message, Tag, Tooltip } from 'antd';
-import { ColorPicker } from '@/components/color-picker';
 import React, { useState } from 'react';
-import styles from './index.less';
-import Switcher from '@/components/switcher';
 import { ColorChangeHandler } from 'react-color';
+
+import { ColorPicker } from '@/components/color-picker';
+import Switcher from '@/components/switcher';
+import { MapAction } from '@/state';
 import { CivilBuilding } from '@/types/building';
 import { rgbToHex } from '@/utils/color';
 import { useMapCreators, useValue } from '@/utils/hook';
-import { MapAction } from '@/state';
+
+import styles from './index.less';
 
 export default function SpecialBuildingEditter() {
   const { civil, specials } = useValue<MapAction>(state => state.map);

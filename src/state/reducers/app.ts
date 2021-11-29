@@ -1,5 +1,6 @@
 import { ThemeType } from '@/types/theme';
 import { setThemeInStorage } from '@/utils/storage';
+
 import { ActionType } from '../actions';
 
 export interface AppAction {

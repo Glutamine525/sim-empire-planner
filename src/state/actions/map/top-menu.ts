@@ -1,4 +1,5 @@
 import { CivilType } from '@/types/civil';
+
 import { ActionType } from '..';
 
 export const changeIsPanelActive = (isPanelActive: boolean) => {

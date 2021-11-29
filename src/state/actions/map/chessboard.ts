@@ -1,4 +1,5 @@
 import { Building } from '@/types/building';
+
 import { ActionType } from '..';
 
 export const resetCounter = () => {

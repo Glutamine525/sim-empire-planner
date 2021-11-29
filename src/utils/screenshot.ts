@@ -1,5 +1,6 @@
 import store from '@/state';
 import { Building, CivilBuilding, MarkerColor } from '@/types/building';
+
 import { DEFAULT_SIZE } from './browser';
 import { parseBuildingKey, showMarker } from './chessboard';
 import { LENGTH } from './config';

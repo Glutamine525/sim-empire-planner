@@ -1,5 +1,6 @@
-import store from '@/state';
 import { message } from 'antd';
+
+import store from '@/state';
 
 export function stringToBase64(str: string) {
   const encode = encodeURI(str);

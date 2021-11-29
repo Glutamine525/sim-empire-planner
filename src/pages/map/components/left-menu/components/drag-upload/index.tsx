@@ -1,9 +1,10 @@
-import { message, Upload } from 'antd';
 import { InboxOutlined } from '@ant-design/icons';
-import React, { useEffect } from 'react';
-import styles from './index.less';
-import { createPortal } from 'react-dom';
+import { message, Upload } from 'antd';
 import { RcFile } from 'antd/lib/upload';
+import React, { useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
+import styles from './index.less';
 
 const { Dragger } = Upload;
 

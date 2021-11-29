@@ -1,7 +1,9 @@
+import React, { useEffect, useState } from 'react';
+
 import { Building } from '@/types/building';
 import { OperationType } from '@/types/operation';
 import { showMarker } from '@/utils/chessboard';
-import React, { useEffect, useState } from 'react';
+
 import styles from './index.less';
 
 interface BuildingContainerProps {

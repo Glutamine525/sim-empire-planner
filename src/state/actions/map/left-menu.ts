@@ -1,5 +1,6 @@
 import { Building } from '@/types/building';
 import { OperationType } from '@/types/operation';
+
 import { ActionType } from '..';
 
 export const changeOperation = (

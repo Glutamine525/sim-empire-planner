@@ -1,7 +1,9 @@
+import React, { MouseEventHandler, useEffect, useRef } from 'react';
+
 import { ThemeColor, ThemeType } from '@/types/theme';
 import { isInRange } from '@/utils/chessboard';
 import { LENGTH } from '@/utils/config';
-import React, { MouseEventHandler, useEffect, useRef } from 'react';
+
 import styles from './index.less';
 
 export const MINI_MAP_SIZE = LENGTH * 2;

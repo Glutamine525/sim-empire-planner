@@ -1,3 +1,7 @@
+import { Menu, message, Modal } from 'antd';
+import md5 from 'md5';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+
 import MenuIcon from '@/components/menu-icon';
 import DragUpload from '@/pages/map/components/left-menu/components/drag-upload';
 import { MapAction } from '@/state';
@@ -13,9 +17,7 @@ import { OperationType } from '@/types/operation';
 import { Cells } from '@/utils/cells';
 import { base64ToString } from '@/utils/file';
 import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
-import { Menu, message, Modal } from 'antd';
-import md5 from 'md5';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+
 import styles from './index.less';
 
 const { SubMenu } = Menu;

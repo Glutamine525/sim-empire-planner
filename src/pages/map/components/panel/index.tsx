@@ -1,10 +1,12 @@
+import { Tabs } from 'antd';
+import React from 'react';
+
 import Switcher from '@/components/switcher';
 import { MapAction } from '@/state';
 import { AppAction } from '@/state/reducers/app';
 import { ThemeType } from '@/types/theme';
 import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
-import { Tabs } from 'antd';
-import React from 'react';
+
 import Archive from './components/archive';
 import SpecialBuildingEditter from './components/special-building-editter';
 import styles from './index.less';

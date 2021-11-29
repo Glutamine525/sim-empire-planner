@@ -1,6 +1,8 @@
+import React from 'react';
+
 import { LENGTH } from '@/utils/config';
 import { RATIO } from '@/utils/screenshot';
-import React from 'react';
+
 import styles from './index.less';
 
 interface CanvasesProps {

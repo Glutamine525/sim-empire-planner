@@ -90,13 +90,22 @@
     "build": "react-app-rewired build",
     "test": "react-app-rewired test",
     "style": "stylelint 'src/**/*.(vue|css|less)' --fix",
-    "deploy": "npm install && react-app-rewired build && cd server && nohup node index.js &"
+    "deploy": "npm install && react-app-rewired build && cd server && nohup node index.js &",
+    "import": "eslint --fix --ext .ts --ext .tsx src/"
   },
   "eslintConfig": {
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "plugins": [
+      "simple-import-sort"
+    ],
+    "rules": {
+      "import/order": 0,
+      "simple-import-sort/exports": 1,
+      "simple-import-sort/imports": 1
+    }
   },
   "browserslist": {
     "production": [
@@ -174,6 +183,7 @@
     "@types/redux-thunk": "^2.1.0",
     "babel-plugin-import": "^1.13.3",
     "customize-cra": "^1.0.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
     "less": "^3.13.1",
     "less-loader": "^5.0.0",
     "react-app-rewired": "^2.1.8",

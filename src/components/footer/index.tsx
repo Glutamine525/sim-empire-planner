@@ -1,6 +1,8 @@
+import React from 'react';
+
 import { copyLink } from '@/utils/browser';
 import { BEIAN, EMAIL, ICP, ORIGIN } from '@/utils/config';
-import React from 'react';
+
 import styles from './index.less';
 
 interface FooterProps {

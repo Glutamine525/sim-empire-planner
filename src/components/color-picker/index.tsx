@@ -1,6 +1,7 @@
 import React from 'react';
 import { SketchPicker } from 'react-color';
 import { createPortal } from 'react-dom';
+
 import styles from './index.less';
 
 interface ColorPickerProps {

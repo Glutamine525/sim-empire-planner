@@ -1,6 +1,8 @@
+import React, { useEffect, useState } from 'react';
+
 import { OperationType } from '@/types/operation';
 import { parseBuildingKey } from '@/utils/chessboard';
-import React, { useEffect, useState } from 'react';
+
 import styles from './index.less';
 
 interface BoxEffectProps {

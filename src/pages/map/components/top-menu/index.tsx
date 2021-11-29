@@ -1,15 +1,17 @@
-import Switcher from '@/components/switcher';
-import React from 'react';
-import { CivilArray, CivilType } from '@/types/civil';
-import styles from './index.less';
-import { ThemeType } from '@/types/theme';
 import { Dropdown, Menu, Modal, Tooltip } from 'antd';
-import { EMAIL, LENGTH, MINOR_PATCH, VERSION } from '@/utils/config';
-import { copyLink } from '@/utils/browser';
-import { BuildingFixed } from '@/types/building-fixed';
-import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
+import React from 'react';
+
+import Switcher from '@/components/switcher';
 import { MapAction } from '@/state';
 import { AppAction } from '@/state/reducers/app';
+import { BuildingFixed } from '@/types/building-fixed';
+import { CivilArray, CivilType } from '@/types/civil';
+import { ThemeType } from '@/types/theme';
+import { copyLink } from '@/utils/browser';
+import { EMAIL, LENGTH, MINOR_PATCH, VERSION } from '@/utils/config';
+import { useAppCreators, useMapCreators, useValue } from '@/utils/hook';
+
+import styles from './index.less';
 
 const helper = () => {
   return (

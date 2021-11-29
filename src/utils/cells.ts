@@ -1,5 +1,6 @@
 import { BorderStyleType, Building, CivilBuilding } from '@/types/building';
 import { CivilType } from '@/types/civil';
+
 import {
   getBuildingKey,
   isInBuildingRange,

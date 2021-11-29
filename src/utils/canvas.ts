@@ -1,3 +1,5 @@
+import { RefObject } from 'react';
+
 import {
   buildingCanvasRef,
   markerCanvasRef,
@@ -5,7 +7,7 @@ import {
 } from '@/pages/map/components/chessboard';
 import { MINI_MAP_RATIO } from '@/pages/map/components/chessboard/components/mini-map';
 import { Building } from '@/types/building';
-import { RefObject } from 'react';
+
 import { RATIO } from './screenshot';
 
 export function getContext(canvasRef: RefObject<HTMLCanvasElement>) {

@@ -1,4 +1,5 @@
 import { ThemeType } from '@/types/theme';
+
 import { ActionType } from '.';
 
 export const changeIsLoading = (isLoading: boolean) => {

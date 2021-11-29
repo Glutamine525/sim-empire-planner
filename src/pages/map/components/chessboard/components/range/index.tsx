@@ -1,6 +1,8 @@
+import React, { useEffect, useMemo, useState } from 'react';
+
 import { OperationType } from '@/types/operation';
 import { isInBuildingRange } from '@/utils/chessboard';
-import React, { useEffect, useMemo, useState } from 'react';
+
 import styles from './index.less';
 
 interface RangeProps {

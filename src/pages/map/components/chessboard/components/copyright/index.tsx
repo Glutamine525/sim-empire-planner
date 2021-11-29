@@ -1,7 +1,9 @@
+import React from 'react';
+
 import { CivilType } from '@/types/civil';
 import { copyLink } from '@/utils/browser';
 import { ORIGIN, VERSION } from '@/utils/config';
-import React from 'react';
+
 import styles from './index.less';
 
 interface CopyrightProps {
