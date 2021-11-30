@@ -6,6 +6,7 @@ import Map from '@/pages/map';
 import { DarkColor, LightColor, ThemeType } from '@/types/theme';
 
 import Loading from './components/loading';
+import Home from './pages/home';
 import NoMatch from './pages/no-match';
 import { AppAction } from './state/reducers/app';
 import { useAppCreators, useMapCreators, useValue } from './utils/hook';
@@ -64,7 +65,7 @@ const App = () => {
     <>
       <Router>
         <Switch>
-          <Route exact path="/" component={Map} />
+          <Route exact path="/" component={Home} />
           <Route path="/map" component={Map} />
           <Route path="*" component={NoMatch} />
         </Switch>

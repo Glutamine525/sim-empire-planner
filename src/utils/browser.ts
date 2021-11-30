@@ -35,8 +35,9 @@ export function getCoord(offsetX: number, offsetY: number) {
 export function copyText(text: string) {
   let textarea = document.createElement('textarea');
   const currentFocus = document.activeElement;
-  const toolBoxwrap = document.getElementById('map');
-  toolBoxwrap!.appendChild(textarea);
+  // const toolboxWrapper = document.getElementById('map');
+  const toolboxWrapper = document.documentElement;
+  toolboxWrapper!.appendChild(textarea);
   textarea.value = text;
   textarea.focus();
   if ('setSelectionRange' in textarea) {
@@ -50,7 +51,7 @@ export function copyText(text: string) {
   } catch (_) {
     flag = false;
   }
-  toolBoxwrap!.removeChild(textarea);
+  toolboxWrapper!.removeChild(textarea);
   (currentFocus as any).focus();
   return flag;
 }

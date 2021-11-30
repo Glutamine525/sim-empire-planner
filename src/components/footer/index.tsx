@@ -7,10 +7,11 @@ import styles from './index.less';
 
 interface FooterProps {
   show: boolean;
+  position: 'fixed' | 'initial';
 }
 
 function Footer(props: FooterProps) {
-  const { show } = props;
+  const { show, position } = props;
 
   return (
     <div
@@ -18,6 +19,7 @@ function Footer(props: FooterProps) {
       style={{
         opacity: show ? 1 : 0,
         visibility: show ? 'visible' : 'hidden',
+        position,
       }}
     >
       <div>

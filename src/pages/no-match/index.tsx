@@ -6,7 +6,7 @@ export default function NoMatch() {
   return (
     <div>
       404 Not Found
-      <Footer show={true} />
+      <Footer show={true} position="fixed" />
     </div>
   );
 }

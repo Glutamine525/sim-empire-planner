@@ -566,7 +566,7 @@ function Chessboard() {
         onMouseMove={onMiniMapMouseMove}
         onMouseUp={onMiniMapMouseUp}
       />
-      <Footer show={showFooter} />
+      <Footer show={showFooter} position="fixed" />
     </div>
   );
 }
