@@ -2,8 +2,8 @@ import React, { FC } from 'react';
 
 import Footer from '@/components/footer';
 
-import Nav from './components/nav';
 import Block from './components/block';
+import Nav from './components/nav';
 import styles from './index.less';
 
 const Home: FC = () => {

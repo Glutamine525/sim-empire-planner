@@ -1,8 +1,7 @@
-import { CivilArray } from '@/types/civil';
-import { Radio, Select } from 'antd';
+import { Select } from 'antd';
 import React, { FC, useState } from 'react';
-import Displayer from '../displayer';
 
+import Displayer from '../displayer';
 import styles from './index.less';
 
 const { Option } = Select;

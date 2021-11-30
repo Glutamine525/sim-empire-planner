@@ -1,5 +1,6 @@
-import { CivilType } from '@/types/civil';
 import React, { FC } from 'react';
+
+import { CivilType } from '@/types/civil';
 
 import styles from './index.less';
 
