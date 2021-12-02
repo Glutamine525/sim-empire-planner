@@ -1,4 +1,7 @@
+import 'moment/locale/zh-cn';
+
 import { message } from 'antd';
+import moment from 'moment';
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 
@@ -18,6 +21,7 @@ const App = () => {
   const { changeMiniMap } = useMapCreators();
 
   useEffect(() => {
+    moment.locale('zh-cn');
     const themeInStorage = getThemeInStorage();
     if (!themeInStorage) {
       const isDarkMode = window.matchMedia(

@@ -1,4 +1,4 @@
-import React, { FC } from 'react';
+import React, { FC, useEffect } from 'react';
 
 import Footer from '@/components/footer';
 
@@ -7,14 +7,18 @@ import Nav from './components/nav';
 import styles from './index.less';
 
 const Home: FC = () => {
+  useEffect(() => {}, []);
+
   return (
     <div className={styles.wrapper}>
       <Nav />
-      <div className={styles.container}>
-        <Block type="popular" title="热门" />
-        <Block type="common" title="中国" />
+      <div id="home-content" className={styles.container}>
+        <div className={styles.content}>
+          <Block type="popular" title="热门" />
+          <Block type="common" title="中国" />
+        </div>
+        <Footer show={true} position="initial" />
       </div>
-      <Footer show={true} position="initial" />
     </div>
   );
 };

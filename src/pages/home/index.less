@@ -1,10 +1,25 @@
 .wrapper {
   display: flex;
   align-items: center;
+  overflow: hidden;
+  height: 100vh;
   flex-direction: column;
+
+  & > * {
+    flex-grow: 0;
+  }
 }
 
 .container {
+  display: flex;
+  align-items: center;
+  overflow: auto;
+  padding: 2rem 0;
+  width: 100vw;
+  flex-direction: column;
+}
+
+.content {
   width: 120rem;
 
   & > div {

@@ -1,13 +1,126 @@
-import { Select } from 'antd';
+import { Select, Switch } from 'antd';
 import React, { FC, useState } from 'react';
+
+import { CivilType } from '@/types/civil';
 
 import Displayer from '../displayer';
 import styles from './index.less';
 
 const { Option } = Select;
 
+const data = [
+  {
+    id: '1',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '2',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '3',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '4',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '5',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '6',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '7',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime(),
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '8',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: false,
+    uploadTime: new Date().getTime() - 200000,
+    editable: false,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+  {
+    id: '9',
+    woodNum: 5,
+    civil: CivilType.China,
+    isNoWood: false,
+    like: 10,
+    liked: true,
+    uploadTime: new Date().getTime() - 200000,
+    editable: true,
+    url: '',
+    tags: ['前期', '有税'],
+  },
+];
+
 interface BlockProps {
-  type: 'popular' | 'common';
+  type: 'popular' | 'like' | 'common';
   title: string;
 }
 
@@ -20,11 +133,14 @@ const Block: FC<BlockProps> = props => {
   return (
     <div className={styles.container}>
       <div className={styles['title-container']}>
-        <div className={styles.title}>{title}</div>
+        <div className={styles.title}>
+          {title}
+          <span className={styles.count}>10</span>
+        </div>
         {type === 'common' && (
-          <div className={styles.select}>
+          <div className={styles.filter}>
             <div>
-              <div className={styles['select-title']}>地图类型</div>
+              <div className={styles['filter-title']}>地图类型</div>
               <Select
                 value={woodNum}
                 size="small"
@@ -39,7 +155,7 @@ const Block: FC<BlockProps> = props => {
               </Select>
             </div>
             <div>
-              <div className={styles['select-title']}>游戏阶段</div>
+              <div className={styles['filter-title']}>游戏阶段</div>
               <Select
                 value={period}
                 size="small"
@@ -52,19 +168,21 @@ const Block: FC<BlockProps> = props => {
                 <Option value="later">后期</Option>
               </Select>
             </div>
+            <div>
+              <div className={styles['filter-title']}>无木之地</div>
+              <Switch size="small" />
+            </div>
+            <div>
+              <div className={styles['filter-title']}>可编辑</div>
+              <Switch size="small" />
+            </div>
           </div>
         )}
       </div>
       <div className={styles.content}>
-        <Displayer />
-        <Displayer />
-        <Displayer />
-        <Displayer />
-        <Displayer />
-        <Displayer />
-        <Displayer />
-        <Displayer />
-        <Displayer />
+        {data.map(v => (
+          <Displayer {...v} key={v.id} type={type} />
+        ))}
       </div>
     </div>
   );
