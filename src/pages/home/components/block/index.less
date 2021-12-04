@@ -1,3 +1,7 @@
+.container {
+  width: 100%;
+}
+
 .title-container {
   display: flex;
   justify-content: space-between;
@@ -10,6 +14,14 @@
   font-size: 4rem;
   line-height: initial;
   color: var(--text-primary);
+}
+
+.map-type-label {
+  width: 2.4rem;
+  font-weight: bold;
+  text-align: center;
+  color: var(--ant-primary-color);
+  cursor: pointer;
 }
 
 .count {
@@ -32,7 +44,30 @@
 }
 
 .content {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5rem;
+  display: grid;
+  justify-content: center;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  grid-gap: 4rem;
+}
+
+@media screen and(max-width: 490px) {
+
+  .title {
+    font-size: 3rem;
+  }
+
+  .count {
+    font-size: 1.5rem;
+  }
+
+  .filter {
+    gap: 0.6rem;
+    transform: scale(0.85);
+    transform-origin: bottom right;
+  }
+
+  .content {
+    grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr));
+    grid-gap: 2rem;
+  }
 }

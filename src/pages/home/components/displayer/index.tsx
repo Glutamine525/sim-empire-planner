@@ -1,4 +1,10 @@
-import { EyeOutlined, LikeFilled, LikeOutlined } from '@ant-design/icons';
+import {
+  DownloadOutlined,
+  EditOutlined,
+  EyeOutlined,
+  LikeFilled,
+  LikeOutlined,
+} from '@ant-design/icons';
 import { Tooltip } from 'antd';
 import moment from 'moment';
 import React, { FC, useEffect, useState } from 'react';
@@ -19,6 +25,7 @@ interface DisplayerProps {
   editable: boolean;
   url: string;
   tags: string[];
+  author: string;
 }
 
 const Displayer: FC<DisplayerProps> = props => {
@@ -32,10 +39,10 @@ const Displayer: FC<DisplayerProps> = props => {
     uploadTime,
     editable,
     tags,
+    author,
   } = props;
 
   const [mouseOnImg, setMouseOnImg] = useState(false);
-  const [isPreviewing, setIsPreviewing] = useState(false);
   const [time, setTime] = useState(moment(uploadTime).fromNow());
 
   useEffect(() => {
@@ -45,6 +52,7 @@ const Displayer: FC<DisplayerProps> = props => {
       setTime(moment(uploadTime).fromNow());
       setTimeout(setter, 1000);
     };
+    if (new Date().getTime() - uploadTime >= 60 * 60 * 1000) return;
     setter();
     return () => {
       destroyed = true;
@@ -54,6 +62,7 @@ const Displayer: FC<DisplayerProps> = props => {
   return (
     <div className={styles.container}>
       <div
+        className={styles['map-container']}
         onMouseOver={() => setMouseOnImg(true)}
         onMouseOut={() => setMouseOnImg(false)}
       >
@@ -66,28 +75,30 @@ const Displayer: FC<DisplayerProps> = props => {
           className={styles.mask}
           style={{ display: mouseOnImg ? 'block' : 'none' }}
         >
-          <div
-            className={styles['preview-button']}
-            onClick={() => {
-              setIsPreviewing(true);
-              setMouseOnImg(false);
-            }}
+          <a
+            href={require('@/images/demo-map.jpg').default}
+            target="_blank"
+            rel="noreferrer"
           >
-            <EyeOutlined /> 预览
+            <div
+              className={styles.preview}
+              onClick={() => {
+                setMouseOnImg(false);
+              }}
+            >
+              <EyeOutlined /> 查看原图
+            </div>
+          </a>
+          <div className={styles.button}>
+            {editable && (
+              <div className={styles.edit}>
+                <EditOutlined /> 编辑
+              </div>
+            )}
+            <div className={styles.download}>
+              <DownloadOutlined /> 下载
+            </div>
           </div>
-          {editable && <div className={styles.edit}>编辑</div>}
-        </div>
-      </div>
-      <div
-        className={styles['preview-container']}
-        style={{
-          display: isPreviewing ? 'block' : 'none',
-        }}
-        onClick={() => setIsPreviewing(false)}
-      >
-        <div className={styles['preview-operation']}></div>
-        <div className={styles['preview-image']}>
-          <img src={require('@/images/demo-map.jpg').default} alt="map" />
         </div>
       </div>
       <div className={styles['info-container']}>
@@ -100,8 +111,13 @@ const Displayer: FC<DisplayerProps> = props => {
             {isNoWood ? '无' : '有'}木
           </span>
           {tags.map(v => (
-            <div className={styles.tag}>{v}</div>
+            <div className={styles.tag} key={v}>
+              {v}
+            </div>
           ))}
+        </div>
+        <div>
+          作者 - <strong>{author}</strong>
         </div>
         <div className={styles['info-second']}>
           <span>

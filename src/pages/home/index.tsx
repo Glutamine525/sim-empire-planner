@@ -12,10 +12,11 @@ const Home: FC = () => {
   return (
     <div className={styles.wrapper}>
       <Nav />
-      <div id="home-content" className={styles.container}>
+      <div className={styles.container}>
         <div className={styles.content}>
           <Block type="popular" title="热门" />
           <Block type="common" title="中国" />
+          <Block type="common" title="阿兹特克" />
         </div>
         <Footer show={true} position="initial" />
       </div>

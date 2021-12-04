@@ -193,17 +193,13 @@ export default function TopMenu() {
           <div>
             <span> 地图类型：</span>
             <Dropdown overlay={mapTypeDropdown} placement="bottomCenter" arrow>
-              <span className={`ant-dropdown-link ${styles['map-type-label']}`}>
-                {mapType}
-              </span>
+              <span className={styles['map-type-label']}>{mapType}</span>
             </Dropdown>
           </div>
           <div>
             <span> 文明：</span>
             <Dropdown overlay={civilDropdown} placement="bottomCenter" arrow>
-              <span className={`ant-dropdown-link ${styles['civil-label']}`}>
-                {civil}
-              </span>
+              <span className={styles['civil-label']}>{civil}</span>
             </Dropdown>
           </div>
           <div>
