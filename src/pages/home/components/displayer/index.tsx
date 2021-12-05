@@ -10,6 +10,7 @@ import moment from 'moment';
 import React, { FC, useEffect, useState } from 'react';
 
 import { CivilType } from '@/types/civil';
+import { IS_MOBILE } from '@/utils/config';
 
 import styles from './index.less';
 
@@ -90,7 +91,7 @@ const Displayer: FC<DisplayerProps> = props => {
             </div>
           </a>
           <div className={styles.button}>
-            {editable && (
+            {!IS_MOBILE && editable && (
               <div className={styles.edit}>
                 <EditOutlined /> 编辑
               </div>

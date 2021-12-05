@@ -2,6 +2,7 @@ import { Dropdown, Empty, Menu, Switch } from 'antd';
 import React, { FC, useMemo, useState } from 'react';
 
 import { CivilType } from '@/types/civil';
+import { IS_MOBILE } from '@/utils/config';
 
 import Displayer from '../displayer';
 import styles from './index.less';
@@ -199,26 +200,36 @@ const Block: FC<BlockProps> = props => {
           <div className={styles.filter}>
             <div>
               <div className={styles['filter-title']}>地图类型</div>
-              <Dropdown overlay={mapTypeDropdown} placement="bottomCenter">
+              <Dropdown
+                overlay={mapTypeDropdown}
+                placement="bottomCenter"
+                arrow
+              >
                 <span className={styles.label}>{mapType}</span>
               </Dropdown>
             </div>
             <div>
               <div className={styles['filter-title']}>无木之地</div>
-              <Dropdown overlay={isNoWoodDropdown} placement="bottomCenter">
+              <Dropdown
+                overlay={isNoWoodDropdown}
+                placement="bottomCenter"
+                arrow
+              >
                 <span className={styles.label}>{isNoWood}</span>
               </Dropdown>
             </div>
-            <div>
-              <div className={styles['filter-title']}>可编辑</div>
-              <Switch
-                size="small"
-                checked={editable}
-                onClick={checked => {
-                  setEditable(checked);
-                }}
-              />
-            </div>
+            {!IS_MOBILE && (
+              <div>
+                <div className={styles['filter-title']}>可编辑</div>
+                <Switch
+                  size="small"
+                  checked={editable}
+                  onClick={checked => {
+                    setEditable(checked);
+                  }}
+                />
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -227,7 +238,13 @@ const Block: FC<BlockProps> = props => {
           <Displayer {...v} key={v.id} type={type} />
         ))}
       </div>
-      {!selectedData.length && <Empty description={<span>暂无数据</span>} />}
+      {!selectedData.length && (
+        <div className={styles['empty-container']}>
+          {!IS_MOBILE && <div className={styles.splitter}></div>}
+          <Empty description={<span>暂无数据</span>} />
+          {!IS_MOBILE && <div className={styles.splitter}></div>}
+        </div>
+      )}
     </div>
   );
 };

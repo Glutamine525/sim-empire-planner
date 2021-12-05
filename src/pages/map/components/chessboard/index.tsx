@@ -56,8 +56,8 @@ export const buildingCanvasRef = createRef<HTMLCanvasElement>();
 export const markerCanvasRef = createRef<HTMLCanvasElement>();
 export const miniMapCanvasRef = createRef<HTMLCanvasElement>();
 
-const cells = Cells.getInstance();
-const imageBuffer = ImageBuffer.getInstance();
+let cells: Cells;
+let imageBuffer: ImageBuffer;
 
 function Chessboard() {
   const { theme } = useValue<AppAction>(state => state.app);
@@ -163,6 +163,8 @@ function Chessboard() {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    cells = Cells.getInstance();
+    imageBuffer = ImageBuffer.getInstance();
     const wrapperOuter = document.getElementById('chessboard-wrapper')!;
     const scroll = new PerfectScrollbar(wrapperOuter, { wheelSpeed: 1 });
     const onResize = () => {

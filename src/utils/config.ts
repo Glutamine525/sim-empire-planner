@@ -1,3 +1,7 @@
+import { isMobile } from './browser';
+
+export const IS_MOBILE = isMobile();
+
 export const VERSION = '2.6';
 
 export const MINOR_PATCH = '0';
