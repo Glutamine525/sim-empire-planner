@@ -9,7 +9,9 @@
   padding-bottom: 100%;
   width: 100%;
   height: 0;
-  transition: transform 100ms ease-in-out;
+  border-radius: 1rem;
+  background: var(--background-lighter);
+  transition: transform 100ms ease-out;
 
   &:hover {
     transform: scale(1.05);
@@ -22,12 +24,12 @@
   width: 100%;
   height: 100%;
   border-radius: 1rem;
+  visibility: hidden;
 }
 
 .mask {
   position: absolute;
   top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   border-radius: 1rem;

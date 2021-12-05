@@ -13,6 +13,7 @@ import { CivilType } from '@/types/civil';
 import { IS_MOBILE } from '@/utils/config';
 
 import styles from './index.less';
+import { io } from '@/utils/lazy-image';
 
 interface DisplayerProps {
   type: 'popular' | 'like' | 'common';
@@ -28,6 +29,17 @@ interface DisplayerProps {
   tags: string[];
   author: string;
 }
+
+const woodNumColor: any = {
+  5: 'var(--ant-primary-color)',
+  4: 'var(--ant-warning-color)',
+  3: 'var(--ant-error-color)',
+};
+
+const isNoWoodColor = {
+  1: 'var(--text-regular)',
+  0: 'var(--ant-success-color)',
+};
 
 const Displayer: FC<DisplayerProps> = props => {
   const {
@@ -46,7 +58,10 @@ const Displayer: FC<DisplayerProps> = props => {
   const [mouseOnImg, setMouseOnImg] = useState(false);
   const [time, setTime] = useState(moment(uploadTime).fromNow());
 
+  const ref = React.createRef<HTMLImageElement>();
+
   useEffect(() => {
+    io.observe(ref.current!);
     let destroyed = false;
     const setter = () => {
       if (destroyed) return;
@@ -68,7 +83,11 @@ const Displayer: FC<DisplayerProps> = props => {
         onMouseOut={() => setMouseOnImg(false)}
       >
         <img
-          src={require('@/images/demo-map.jpg').default}
+          ref={ref}
+          data-src={
+            require('@/images/demo-map@thumbnail.jpg').default +
+            `?t=${Math.random()}`
+          }
           className={styles.map}
           alt="thumbnail"
         />
@@ -105,10 +124,10 @@ const Displayer: FC<DisplayerProps> = props => {
       <div className={styles['info-container']}>
         <div className={styles['info-first']}>
           {type !== 'common' && (
-            <span style={{ color: 'var(--ant-primary-color)' }}>{civil}</span>
+            <span style={{ color: 'var(--text-primary)' }}>{civil}</span>
           )}
-          <span style={{ color: 'var(--ant-error-color)' }}>{woodNum}木</span>
-          <span style={{ color: 'var(--ant-success-color)' }}>
+          <span style={{ color: woodNumColor[woodNum] }}>{woodNum}木</span>
+          <span style={{ color: isNoWoodColor[isNoWood ? 1 : 0] }}>
             {isNoWood ? '无' : '有'}木
           </span>
           {tags.map(v => (
